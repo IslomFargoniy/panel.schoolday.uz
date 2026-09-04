@@ -32,14 +32,14 @@ This ensures that the site is searchable and looks great when shared on social m
 Since this is a static landing page, you can simply:
 1. Clone the repository:
    ```bash
-   git clone git@github.com:IslamAbdurahman/landing.schoolday.git
+   git clone git@github.com:IslomFargoniy/landing.schoolday.git
    ```
 2. Open `index.html` in your favorite browser.
 
 ## 📞 Contact
 
 For any questions or inquiries, please contact us:
-- **Telegram**: [@Livelongevity](https://t.me/Livelongevity)
+- **Telegram**: [@IslomFargniy](https://t.me/IslomFargniy)
 - **Phone**: +998 91 115 77 09 / +998 99 303 34 84
 
 ---
