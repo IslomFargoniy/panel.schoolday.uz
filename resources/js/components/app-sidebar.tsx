@@ -9,7 +9,6 @@ import {
     Users,
     Building2,
     Building,
-    ScanFace,
     Activity,
     BarChart3,
     UserCog,
@@ -67,11 +66,6 @@ const getMainNavItems = (t: any, user: any): NavItem[] => {
             title: t('sidebar.branches', 'Branches'),
             href: '/branches',
             icon: Building,
-        },
-        {
-            title: t('sidebar.devices', 'Qurilmalar'),
-            href: '/devices',
-            icon: ScanFace,
         },
         {
             title: t('sidebar.shifts', 'Shifts'),
