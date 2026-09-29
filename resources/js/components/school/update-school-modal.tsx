@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
 import { Building2 } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 import type { School } from '@/types';
 
 interface UpdateSchoolModalProps {
@@ -45,7 +46,7 @@ export default function UpdateSchoolModal({ school, open, onOpenChange }: Update
                 comment: school.comment || '',
                 branch_limit: String(school.branch_limit || 1),
                 branch_price: String(school.branch_price || 0),
-                valid_date: school.valid_date || '',
+                valid_date: school.valid_date ? formatDate(school.valid_date) : '',
                 status: school.status ?? 1,
             });
         }

@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { formatDateTime } from '@/lib/utils';
 import type { Branch, BranchDevice } from '@/types';
 import CreateBranchDeviceModal from './create-branch-device-modal';
 import DeviceConnectionGuideModal from './device-connection-guide-modal';
@@ -94,15 +95,7 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
 
     const formatLastSeen = (dateStr?: string | null) => {
         if (!dateStr) return null;
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return null;
-
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-
-        return `${day}.${month} ${hours}:${minutes}`;
+        return formatDateTime(dateStr);
     };
 
     return (

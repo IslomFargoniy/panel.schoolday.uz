@@ -396,5 +396,15 @@
         "feature_turnstile_desc": "Prevent unauthorized access to schools and kindergartens with advanced Hikvision Face ID recognition technology. 100% guarantee of student safety.",
         "feature_notif_title": "Telegram Notifications for Parents",
         "feature_notif_desc": "Instant automated alerts when your child enters or leaves school. Reliable Telegram bot notifications for parent peace of mind and constant monitoring."
+    },
+    "school_table": {
+        "name": "School Name",
+        "users": "Responsible Users",
+        "address": "Address",
+        "branches": "Branches",
+        "valid_date": "Expiration Date",
+        "status": "Status",
+        "actions": "Actions",
+        "no_schools": "No schools available"
     }
 }

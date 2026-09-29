@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Building2, Pencil, Settings, Trash2, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatDate } from '@/lib/utils';
 import CreateSchoolModal from './create-school-modal';
 import UpdateSchoolModal from './update-school-modal';
 import SchoolSettingModal from './school-setting-modal';
@@ -63,12 +64,12 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
                         <thead className="border-b border-border bg-muted/60 font-semibold text-muted-foreground uppercase tracking-wider">
                             <tr>
                                 <th className="px-4 py-3 text-center w-12 font-mono">{t('n', '№')}</th>
-                                <th className="px-4 py-3">{t('school_name', 'Maktab nomi')}</th>
-                                <th className="px-4 py-3">{t('users', 'Mas‘ul foydalanuvchilar')}</th>
-                                <th className="px-4 py-3">{t('address', 'Manzil')}</th>
-                                <th className="px-4 py-3 text-center">{t('branches', 'Filiallar')}</th>
-                                <th className="px-4 py-3">{t('valid_date', 'Amal qilish muddati')}</th>
-                                <th className="px-4 py-3 text-center">{t('status', 'Holat')}</th>
+                                <th className="px-4 py-3">{t('school_table.name', 'Maktab nomi')}</th>
+                                <th className="px-4 py-3">{t('school_table.users', 'Mas‘ul foydalanuvchilar')}</th>
+                                <th className="px-4 py-3">{t('school_table.address', 'Manzil')}</th>
+                                <th className="px-4 py-3 text-center">{t('school_table.branches', 'Filiallar')}</th>
+                                <th className="px-4 py-3 whitespace-nowrap">{t('school_table.valid_date', 'Amal qilish muddati')}</th>
+                                <th className="px-4 py-3 text-center">{t('school_table.status', 'Holat')}</th>
                                 <th className="px-4 py-3 text-right w-36">
                                     {isAdmin && <CreateSchoolModal />}
                                 </th>
@@ -80,7 +81,7 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
                                 <tr>
                                     <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
                                         <Building2 className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                                        <p className="text-sm font-medium">{t('no_schools', 'Hozircha maktablar mavjud emas')}</p>
+                                        <p className="text-sm font-medium">{t('school_table.no_schools', 'Hozircha maktablar mavjud emas')}</p>
                                     </td>
                                 </tr>
                             ) : (
@@ -122,7 +123,9 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
                                                     {item.branches_count ?? 0} / {item.branch_limit}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-muted-foreground font-mono">{item.valid_date || '—'}</td>
+                                            <td className="px-4 py-3 text-muted-foreground font-mono whitespace-nowrap">
+                                                {formatDate(item.valid_date)}
+                                            </td>
                                             <td className="px-4 py-3 text-center">
                                                 {isActive ? (
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">

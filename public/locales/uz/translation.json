@@ -396,5 +396,15 @@
         "feature_turnstile_desc": "Eng ilg'or Hikvision Face ID yuzni tanish texnologiyasi va turniketlari yordamida maktab va bog'chaga 100% ruxsatsiz shaxslar kirishining oldini oling. O'quvchilar xavfsizligi kafolati.",
         "feature_notif_title": "Ota-onalarga Telegram Xabarnoma",
         "feature_notif_desc": "Farzandingiz maktabga kirdi yoki ketdi degan tezkor va avtomatik bildirishnomalar. Ota-onalar xotirjamligi va doimiy nazorat uchun Telegram bot orqali ishlaydigan xabarnoma xizmati."
+    },
+    "school_table": {
+        "name": "Maktab nomi",
+        "users": "Mas‘ul foydalanuvchilar",
+        "address": "Manzil",
+        "branches": "Filiallar",
+        "valid_date": "Amal qilish muddati",
+        "status": "Holat",
+        "actions": "Harakatlar",
+        "no_schools": "Hozircha maktablar mavjud emas"
     }
 }

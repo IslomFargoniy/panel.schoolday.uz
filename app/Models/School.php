@@ -28,9 +28,22 @@ class School extends Model
     protected $casts = [
         'branch_limit' => 'integer',
         'branch_price' => 'decimal:2',
-        'valid_date' => 'date',
+        'valid_date' => 'date:Y-m-d',
         'status' => 'integer',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
+
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    public function getValidDateAttribute($value): ?string
+    {
+        if (!$value) return null;
+        return substr($value, 0, 10);
+    }
 
     public function branches(): HasMany
     {
