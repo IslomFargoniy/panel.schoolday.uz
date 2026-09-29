@@ -13,7 +13,7 @@ use App\Observers\SchoolObserver;
 #[ObservedBy([SchoolObserver::class])]
 class School extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\FormatsDates;
 
     protected $fillable = [
         'name',
@@ -33,11 +33,6 @@ class School extends Model
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
-
-    protected function serializeDate(\DateTimeInterface $date): string
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
 
     public function getValidDateAttribute($value): ?string
     {

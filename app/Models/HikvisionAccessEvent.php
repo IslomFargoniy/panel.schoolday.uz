@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy([HikvisionAccessEventObserver::class])]
 class HikvisionAccessEvent extends Model
 {
+    use \App\Traits\FormatsDates;
+
     protected $fillable = [
         'hikvision_access_id', 'deviceName', 'majorEventType', 'subEventType',
         'name', 'cardReaderNo', 'employeeNoString', 'serialNo', 'userType',
@@ -22,8 +24,10 @@ class HikvisionAccessEvent extends Model
     protected $casts = [
         'purePwdVerifyEnable' => 'boolean',
         'onlyVerify' => 'boolean',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_time' => 'datetime:Y-m-d H:i:s',
+        'end_time' => 'datetime:Y-m-d H:i:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function access(): BelongsTo

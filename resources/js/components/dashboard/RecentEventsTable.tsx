@@ -2,6 +2,7 @@ import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImageModal } from '@/components/students/ImageModal';
+import { formatDateTime } from '@/lib/utils';
 
 interface EventData {
     id: number;
@@ -25,15 +26,6 @@ interface EventData {
 interface RecentEventsTableProps {
     events: EventData[];
 }
-
-const formatTime = (timeStr: string | null) => {
-    if (!timeStr) return '-';
-    return new Date(timeStr).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-    });
-};
 
 const getImageUrl = (evt: EventData) => {
     if (evt.picture) {
@@ -145,8 +137,8 @@ export function RecentEventsTable({ events }: RecentEventsTableProps) {
                                         </td>
                                         <td className="px-6 py-4 font-medium">
                                             <div className="flex flex-col">
-                                                <span>
-                                                    {formatTime(
+                                                <span className="font-mono text-xs">
+                                                    {formatDateTime(
                                                         evt.access?.dateTime ||
                                                             evt.start_time ||
                                                             evt.created_at,
@@ -158,8 +150,8 @@ export function RecentEventsTable({ events }: RecentEventsTableProps) {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {formatTime(evt.created_at)}
+                                        <td className="px-6 py-4 text-muted-foreground font-mono text-xs">
+                                            {formatDateTime(evt.created_at)}
                                         </td>
                                     </tr>
                                 );

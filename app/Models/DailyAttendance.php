@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[ObservedBy([DailyAttendanceObserver::class])]
 class DailyAttendance extends Model
 {
+    use \App\Traits\FormatsDates;
+
     protected $fillable = [
         'student_id', 'date', 'first_check_in', 'last_check_out',
         'is_late', 'is_left_early', 'start_time', 'end_time',
@@ -25,9 +27,10 @@ class DailyAttendance extends Model
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
-    protected function serializeDate(\DateTimeInterface $date): string
+    public function getDateAttribute($value): ?string
     {
-        return $date->format('Y-m-d H:i:s');
+        if (!$value) return null;
+        return substr($value, 0, 10);
     }
 
     public function student(): BelongsTo

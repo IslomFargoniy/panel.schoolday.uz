@@ -4,20 +4,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { ImageModal } from '@/components/students/ImageModal';
+import { formatDate, formatDateTime } from '@/lib/utils';
 
 interface AttendanceTableProps {
     attendances: any;
     filters?: any;
 }
 
-const formatTime = (timeStr: string | null) => {
-    if (!timeStr) return '-';
-    return new Date(timeStr).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-    });
-};
 export function AttendanceTable({
     attendances,
     filters,
@@ -102,8 +95,8 @@ export function AttendanceTable({
                                         key={item.id}
                                         className="transition-colors hover:bg-muted/30"
                                     >
-                                        <td className="px-6 py-4 font-medium text-muted-foreground">
-                                            {item.date?.split('T')[0]}
+                                        <td className="px-6 py-4 font-medium text-muted-foreground font-mono whitespace-nowrap">
+                                            {formatDate(item.date)}
                                         </td>
 
                                         <td className="px-6 py-4">
@@ -156,10 +149,10 @@ export function AttendanceTable({
                                         </td>
                                         <td className="px-6 py-4 font-medium">
                                             <div className="flex flex-col">
-                                                <span>
-                                                    {formatTime(
-                                                        item.first_check_in,
-                                                    )}
+                                                <span className="font-mono text-xs">
+                                                    {item.first_check_in
+                                                        ? formatDateTime(item.first_check_in)
+                                                        : '-'}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
                                                     (
@@ -175,10 +168,10 @@ export function AttendanceTable({
                                         </td>
                                         <td className="px-6 py-4 font-medium">
                                             <div className="flex flex-col">
-                                                <span>
-                                                    {formatTime(
-                                                        item.last_check_out,
-                                                    )}
+                                                <span className="font-mono text-xs">
+                                                    {item.last_check_out
+                                                        ? formatDateTime(item.last_check_out)
+                                                        : '-'}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
                                                     (

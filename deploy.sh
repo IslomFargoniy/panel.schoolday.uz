@@ -86,12 +86,7 @@ deploy() {
     log_info "Deploy boshlanmoqda... [rejim: $MODE]"
     echo ""
 
-    # 1. Maintenance mode
-    log_info "Maintenance rejimiga o'tkazilmoqda..."
-    run_remote "$PHP artisan down --refresh=15 --retry=60" || true
-    log_success "Maintenance rejimi yoqildi"
-
-    # 2. Git pull
+    # 1. Kod yangilash
     log_info "Kod yangilanmoqda (git pull)..."
     run_remote "git pull origin $BRANCH"
     log_success "Kod yangilandi"

@@ -11,6 +11,8 @@ use App\Observers\StudentObserver;
 #[ObservedBy([StudentObserver::class])]
 class Student extends Model
 {
+    use \App\Traits\FormatsDates;
+
     protected $fillable = [
         'name', 'phone', 'address', 'comment',
         'employeeNoString', 'status', 'telegram_id', 'class_id', 'face_image',
@@ -22,8 +24,10 @@ class Student extends Model
     protected $casts = [
         'local_ui_right' => 'boolean',
         'valid_enabled' => 'boolean',
-        'valid_begin' => 'datetime',
-        'valid_end' => 'datetime',
+        'valid_begin' => 'datetime:Y-m-d H:i:s',
+        'valid_end' => 'datetime:Y-m-d H:i:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function schoolClass(): BelongsTo

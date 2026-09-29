@@ -11,6 +11,8 @@ use App\Observers\BranchObserver;
 #[ObservedBy([BranchObserver::class])]
 class Branch extends Model
 {
+    use \App\Traits\FormatsDates;
+
     protected $fillable = ['school_id', 'name', 'description'];
 
     public function school(): BelongsTo

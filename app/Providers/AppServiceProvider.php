@@ -33,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
 
+        $dateSerializer = function ($carbon) {
+            return $carbon->format($carbon->format('H:i:s') === '00:00:00' ? 'Y-m-d' : 'Y-m-d H:i:s');
+        };
+        \Carbon\Carbon::serializeUsing($dateSerializer);
+        CarbonImmutable::serializeUsing($dateSerializer);
+
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );

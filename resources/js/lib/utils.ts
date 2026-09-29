@@ -17,11 +17,9 @@ export function formatDate(dateInput?: string | Date | null): string {
     if (!dateInput) return '—';
     if (typeof dateInput === 'string') {
         const trimmed = dateInput.trim();
-        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-            return trimmed;
-        }
-        if (trimmed.length >= 10 && /^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
-            return trimmed.slice(0, 10);
+        const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (match) {
+            return match[1];
         }
     }
     const d = new Date(dateInput);
@@ -41,6 +39,13 @@ export function formatDateTime(dateInput?: string | Date | null): string {
     if (typeof dateInput === 'string') {
         const trimmed = dateInput.trim();
         if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(trimmed)) {
+            return trimmed;
+        }
+        const isoMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}:\d{2})/);
+        if (isoMatch) {
+            return `${isoMatch[1]} ${isoMatch[2]}`;
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
             return trimmed;
         }
     }

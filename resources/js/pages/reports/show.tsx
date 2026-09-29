@@ -29,14 +29,7 @@ interface ReportDetailsAttendance extends DailyAttendance {
     events?: AttendanceEventItem[];
 }
 
-const formatTime = (timeStr?: string | null) => {
-    if (!timeStr) return '-';
-    return new Date(timeStr).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-    });
-};
+import { formatDate, formatDateTime } from '@/lib/utils';
 
 const getImageUrl = (evt: AttendanceEventItem) => {
     if (evt.picture) {
@@ -120,8 +113,8 @@ export default function ReportDetailsPage({
                             <div className="mt-1 flex gap-4 text-sm text-muted-foreground">
                                 <span>
                                     {t('reports.date', 'Date')}:{' '}
-                                    <strong>
-                                        {attendance.date?.split('T')[0]}
+                                    <strong className="font-mono">
+                                        {formatDate(attendance.date)}
                                     </strong>
                                 </span>
                                 <span>
@@ -156,8 +149,10 @@ export default function ReportDetailsPage({
                                 <span className="text-muted-foreground">
                                     {t('reports.first_in', 'First Check-in')}
                                 </span>
-                                <span className="text-base font-medium">
-                                    {formatTime(attendance.first_check_in)}
+                                <span className="text-base font-medium font-mono text-xs">
+                                    {attendance.first_check_in
+                                        ? formatDateTime(attendance.first_check_in)
+                                        : '-'}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                     (
@@ -171,8 +166,10 @@ export default function ReportDetailsPage({
                                 <span className="text-muted-foreground">
                                     {t('reports.last_out', 'Last Check-out')}
                                 </span>
-                                <span className="text-base font-medium">
-                                    {formatTime(attendance.last_check_out)}
+                                <span className="text-base font-medium font-mono text-xs">
+                                    {attendance.last_check_out
+                                        ? formatDateTime(attendance.last_check_out)
+                                        : '-'}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                     (
@@ -297,20 +294,20 @@ export default function ReportDetailsPage({
                                             >
                                                 <td className="px-6 py-4 font-medium">
                                                     <div className="flex flex-col">
-                                                        <span>
-                                                            {formatTime(
+                                                        <span className="font-mono text-xs">
+                                                            {formatDateTime(
                                                                 evt.access
                                                                     ?.dateTime ||
                                                                     evt.start_time ||
                                                                     evt.created_at,
                                                             )}
                                                         </span>
-                                                        <span className="text-xs font-normal whitespace-nowrap text-muted-foreground">
+                                                        <span className="text-xs font-normal whitespace-nowrap text-muted-foreground font-mono">
                                                             {t(
                                                                 'reports.recorded',
                                                                 'Rec:',
                                                             )}{' '}
-                                                            {formatTime(
+                                                            {formatDateTime(
                                                                 evt.created_at,
                                                             )}
                                                         </span>

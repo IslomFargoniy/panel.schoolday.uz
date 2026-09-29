@@ -11,7 +11,7 @@ use App\Observers\BranchDeviceObserver;
 #[ObservedBy([BranchDeviceObserver::class])]
 class BranchDevice extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\FormatsDates;
 
     protected $fillable = [
         'branch_id',
@@ -28,7 +28,9 @@ class BranchDevice extends Model
     protected $casts = [
         'status' => 'boolean',
         'is_online' => 'boolean',
-        'last_seen_at' => 'datetime',
+        'last_seen_at' => 'datetime:Y-m-d H:i:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function branch(): BelongsTo
