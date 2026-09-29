@@ -59,31 +59,46 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
         });
     };
 
-    const handleSync = (device: BranchDevice) => {
+    const handleSync = async (device: BranchDevice) => {
         setSyncingId(device.id);
-        router.post(
-            `/branch_device/${device.id}/sync`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: (page: any) => {
-                    setSyncingId(null);
-                    toast.success(
-                        t(
-                            'sync_success',
-                            'ISUP hodisalar muvaffaqiyatli sinxronlandi',
-                        ),
-                    );
+        try {
+            const xsrfToken = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1];
+
+            const response = await fetch(`/branch_device/${device.id}/sync`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
                 },
-                onError: (err: any) => {
-                    setSyncingId(null);
-                    toast.error(
-                        err?.message ||
-                            t('sync_failed', 'Sinxronizatsiyada xatolik'),
-                    );
-                },
-            },
-        );
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success !== false) {
+                const count = data.synced_count ?? 0;
+                toast.success(
+                    t(
+                        'sync_success',
+                        `ISUP hodisalar muvaffaqiyatli sinxronlandi (${count} ta yangi hodisa)`,
+                    ),
+                );
+                router.reload({ only: ['branch'] });
+            } else {
+                toast.error(
+                    data.message || t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
+                );
+            }
+        } catch (err: any) {
+            toast.error(
+                err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
+            );
+        } finally {
+            setSyncingId(null);
+        }
     };
 
     const copyToClipboard = (text: string, deviceId: number) => {
@@ -149,7 +164,7 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                 </div>
             ) : (
                 /* Devices Grid */
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {devices.map((item, index) => {
                         const isIsup = item.connection_type === 'isup';
                         const isOnline = item.is_online;
@@ -264,40 +279,40 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                     </div>
 
                                     {/* Terminal Bottom Status Bar */}
-                                    <div className="flex items-center justify-between pt-1 text-[11px]">
-                                        <div className="flex items-center gap-1.5">
-                                            {isOnline ? (
-                                                <>
-                                                    <span className="relative flex h-2 w-2">
-                                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                                                    </span>
-                                                    <span className="font-sans font-semibold text-emerald-600 dark:text-emerald-400">
-                                                        {t(
-                                                            'online_active',
-                                                            'Online • Faol',
-                                                        )}
-                                                    </span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span className="relative flex h-2 w-2">
-                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
-                                                    </span>
-                                                    <span className="font-sans font-medium text-rose-500">
-                                                        {t(
-                                                            'offline_inactive',
-                                                            'Offline • Aloqada emas',
-                                                        )}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
+                                    <div className="flex flex-col gap-2 pt-1 border-t border-border/60">
+                                        <div className="flex items-center justify-between text-[11px]">
+                                            <div className="flex items-center gap-1.5">
+                                                {isOnline ? (
+                                                    <>
+                                                        <span className="relative flex h-2 w-2">
+                                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                                                        </span>
+                                                        <span className="font-sans font-semibold text-emerald-600 dark:text-emerald-400">
+                                                            {t(
+                                                                'online_active',
+                                                                'Online • Faol',
+                                                            )}
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className="relative flex h-2 w-2">
+                                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                                                        </span>
+                                                        <span className="font-sans font-medium text-rose-500">
+                                                            {t(
+                                                                'offline_inactive',
+                                                                'Offline • Aloqada emas',
+                                                            )}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
 
-                                        <div className="flex items-center gap-2">
                                             {isIsup && (
                                                 <Button
-                                                    variant="ghost"
+                                                    variant="secondary"
                                                     size="sm"
                                                     disabled={
                                                         syncingId === item.id
@@ -305,7 +320,7 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                                     onClick={() =>
                                                         handleSync(item)
                                                     }
-                                                    className="h-6 gap-1 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                                                    className="h-6 gap-1 px-2.5 text-[11px] font-medium"
                                                     title={t(
                                                         'sync_now',
                                                         'ISUP orqali hodisalarni tortib olish',
@@ -322,27 +337,13 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                                     </span>
                                                 </Button>
                                             )}
-
-                                            {item.last_seen_at ? (
-                                                <span className="font-mono text-[10px] text-muted-foreground">
-                                                    {t(
-                                                        'last_seen',
-                                                        'Oxirgi aloqa',
-                                                    )}
-                                                    :{' '}
-                                                    {formatLastSeen(
-                                                        item.last_seen_at,
-                                                    )}
-                                                </span>
-                                            ) : (
-                                                <span className="font-mono text-[10px] text-muted-foreground">
-                                                    {t(
-                                                        'biometric_sync',
-                                                        'Biometric Sync',
-                                                    )}
-                                                </span>
-                                            )}
                                         </div>
+
+                                        {item.last_seen_at && (
+                                            <div className="text-[10px] text-muted-foreground font-mono">
+                                                {t('last_seen', 'Oxirgi aloqa')}: {formatLastSeen(item.last_seen_at)}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

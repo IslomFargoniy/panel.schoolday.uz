@@ -127,4 +127,19 @@ class StudentController extends Controller
 
         return redirect()->back()->with('success', "O'quvchilarni yuklash orqa fonda boshlandi. Sahifani birozdan so'ng yangilang!");
     }
+
+    public function hikvisionEvents(Student $student)
+    {
+        $events = \App\Models\HikvisionAccessEvent::with('access')
+            ->where('employeeNoString', $student->employeeNoString)
+            ->latest()
+            ->limit(30)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'student' => $student,
+            'events' => $events,
+        ]);
+    }
 }

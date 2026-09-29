@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('classes', SchoolClassController::class)->except(['create', 'show', 'edit'])->parameters(['classes' => 'schoolClass']);
     Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
     Route::get('students/template', [StudentController::class, 'template'])->name('students.template');
+    Route::get('students/{student}/hikvision-events', [StudentController::class, 'hikvisionEvents'])->name('students.hikvision-events');
     Route::match(['put', 'patch', 'post'], 'students/{student}', [StudentController::class, 'update'])->name('students.update');
     Route::resource('students', StudentController::class)->except(['create', 'show', 'edit', 'update']);
 });

@@ -106,25 +106,50 @@ class BranchController extends Controller
             },
         ]);
 
-        $studentsQuery = \App\Models\Student::with(['schoolClass'])
+        $shiftId = $request->input('shift_id');
+        $classId = $request->input('class_id');
+
+        $studentsQuery = \App\Models\Student::with(['schoolClass.shift'])
             ->whereHas('schoolClass.shift', function ($q) use ($branch) {
                 $q->where('branch_id', $branch->id);
             });
+
+        if ($shiftId) {
+            $studentsQuery->whereHas('schoolClass', function ($q) use ($shiftId) {
+                $q->where('shift_id', $shiftId);
+            });
+        }
+
+        if ($classId) {
+            $studentsQuery->where('class_id', $classId);
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
             $studentsQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('employeeNoString', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
-        $students = $studentsQuery->paginate($request->input('per_page', 15))->withQueryString();
+        $students = $studentsQuery->latest()->paginate($request->input('per_page', 20))->withQueryString();
+
+        $branchClasses = \App\Models\SchoolClass::with('shift')
+            ->whereHas('shift', fn ($q) => $q->where('branch_id', $branch->id))
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('branches/show', [
             'branch' => $branch,
             'students' => $students,
-            'filters' => $request->only(['search', 'per_page']),
+            'branchClasses' => $branchClasses,
+            'filters' => [
+                'search' => $request->search,
+                'shift_id' => $shiftId,
+                'class_id' => $classId,
+                'per_page' => $request->input('per_page', 20),
+            ],
         ]);
     }
 

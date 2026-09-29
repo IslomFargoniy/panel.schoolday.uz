@@ -252,9 +252,14 @@ class HikvisionController extends Controller
     /**
      * Manually trigger ISUP event sync for a device
      */
-    public function syncDeviceEvents(BranchDevice $device, HikvisionSyncService $syncService)
+    public function syncDeviceEvents(Request $request, BranchDevice $device, HikvisionSyncService $syncService)
     {
         $res = $syncService->syncEventsFromDevice($device);
+
+        if ($request->header('X-Inertia')) {
+            $count = $res['synced_count'] ?? 0;
+            return back()->with('success', "ISUP hodisalar muvaffaqiyatli sinxronlandi ({$count} ta)");
+        }
 
         return response()->json($res);
     }
