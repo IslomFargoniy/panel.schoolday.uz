@@ -4,7 +4,7 @@ Ushbu qo'llanma **SchoolDay** (Laravel + React/Inertia + Vite + Hikvision Integr
 
 ## 1. Talab Qilinadigan Dasturlar (Prerequisites)
 Loyihani ishga tushirishdan oldin server yoki kompyuteringizda quyidagilar o'rnatilganligiga ishonch hosil qiling:
-- **PHP** (v8.2 yoki undan yuqori)
+- **PHP** (v8.3 yoki undan yuqori)
 - **Composer** (v2.x)
 - **Node.js** (v18 yoki undan yuqori) va **npm**
 - **MySQL** yoki **MariaDB**

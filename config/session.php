@@ -214,4 +214,15 @@ return [
 
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Session Data Serialization
+    |--------------------------------------------------------------------------
+    |
+    | This option specifies how session data is serialized. Supported drivers: "php", "json".
+    |
+    */
+
+    'serialization' => env('SESSION_SERIALIZATION', 'php'),
+
 ];

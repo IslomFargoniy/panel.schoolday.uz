@@ -4,10 +4,10 @@
   <p><strong>Zamonaviy Maktab Boshqaruvi va Xavfsizlik Platformasi</strong></p>
   
   <p>
-    <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel 12" /></a>
+    <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel 13" /></a>
     <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
     <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" /></a>
-    <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php" alt="PHP 8.2" /></a>
+    <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php" alt="PHP 8.3" /></a>
     <a href="https://inertiajs.com/"><img src="https://img.shields.io/badge/Inertia.js-Black?style=for-the-badge" alt="Inertia.js" /></a>
   </p>
 </div>
@@ -34,7 +34,7 @@ O'zining **Hikvision kameralari** bilan integratsiyasi orqali tizim o'quvchilar 
 
 | Texnologiya Kategoriya | Ishlatilgan Dasturlar va Kutubxonalar |
 | --------------------- | ------------------------------------- |
-| **Backend (Mantiq)** | Laravel 12.0, PHP 8.2+ |
+| **Backend (Mantiq)** | Laravel 13.x, PHP 8.3+ |
 | **Frontend (Ko'rinish)** | React 19.2, TypeScript 5.7.2, Inertia.js |
 | **Dizayn va Komponentlar** | Tailwind CSS 4.0, Radix UI Primitives, Lucide Icons, Shadcn-like komponentlar |
 | **Ma'lumotlar Bazasi** | MySQL / MariaDB |
@@ -48,7 +48,7 @@ O'zining **Hikvision kameralari** bilan integratsiyasi orqali tizim o'quvchilar 
 Loyihani o'z kompyuteringiz yoki mahalliy serveringizda sinab ko'rish va ishga tushirish uchun quyidagi ko'rsatmalarni diqqat bilan bajaring.
 
 ### Oldindan Talab Qilinadi:
-- **PHP** (v8.2 yoki undan yuqori) va modullari
+- **PHP** (v8.3 yoki undan yuqori) va modullari
 - **Composer** (PHP kutubxonalar menejeri)
 - **Node.js** (v18+) va **npm**
 - **MySQL** / **MariaDB** bazasi

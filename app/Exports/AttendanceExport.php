@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Illuminate\Support\Collection;
-use Carbon\Carbon;
 
 class AttendanceExport implements FromCollection, WithHeadings, WithMapping
 {

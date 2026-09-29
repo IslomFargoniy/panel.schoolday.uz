@@ -114,4 +114,16 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'schoolday')) . '-cache-'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | Configure the classes that may be unserialized when retrieved from the cache.
+    | Set to false to disallow unserializing objects for security.
+    |
+    */
+
+    'serializable_classes' => false,
+
 ];
