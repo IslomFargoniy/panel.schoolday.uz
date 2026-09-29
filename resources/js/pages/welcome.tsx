@@ -1,14 +1,10 @@
-import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { Moon, Sun, Phone, Send, MessageCircle, Activity } from 'lucide-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppearance } from '@/hooks/use-appearance';
-import { Moon, Sun, Phone, Send, MessageCircle, Activity } from 'lucide-react';
 
-export default function Welcome({
-    canRegister = true,
-}: {
-    canRegister?: boolean;
-}) {
+export default function Welcome() {
     const { auth } = usePage().props;
     const year = new Date().getFullYear();
     const { t, i18n } = useTranslation();

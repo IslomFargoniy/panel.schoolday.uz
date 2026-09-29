@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
-import { useTranslation } from 'react-i18next';
 
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -15,13 +15,12 @@ import { request } from '@/routes/password';
 type Props = {
     status?: string;
     canResetPassword: boolean;
-    canRegister: boolean;
+    canRegister?: boolean;
 };
 
 export default function Login({
     status,
     canResetPassword,
-    canRegister,
 }: Props) {
     const { t } = useTranslation();
 

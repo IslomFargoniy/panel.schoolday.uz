@@ -1,18 +1,40 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
 import { Users, ArrowLeft, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ImageModal } from '@/components/students/ImageModal';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, DailyAttendance } from '@/types';
 
-const formatTime = (timeStr: string | null) => {
+interface AttendanceAccessItem {
+    dateTime?: string | null;
+    macAddress?: string | null;
+}
+
+interface AttendanceEventItem {
+    id: number;
+    picture?: string | null;
+    created_at?: string;
+    start_time?: string | null;
+    majorEventType?: number | null;
+    subEventType?: number | null;
+    cardReaderNo?: number | null;
+    deviceName?: string | null;
+    currentVerifyMode?: string | null;
+    access?: AttendanceAccessItem | null;
+}
+
+interface ReportDetailsAttendance extends DailyAttendance {
+    events?: AttendanceEventItem[];
+}
+
+const formatTime = (timeStr?: string | null) => {
     if (!timeStr) return '-';
     return new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 };
 
-const getImageUrl = (evt: any) => {
+const getImageUrl = (evt: AttendanceEventItem) => {
     if (evt.picture) {
         if (evt.picture.startsWith('http') || evt.picture.startsWith('/')) return evt.picture;
         return '/storage/' + evt.picture;
@@ -20,7 +42,7 @@ const getImageUrl = (evt: any) => {
     return null;
 };
 
-export default function ReportDetailsPage({ attendance }: { attendance: any }) {
+export default function ReportDetailsPage({ attendance }: { attendance: ReportDetailsAttendance }) {
     const { t } = useTranslation();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -43,7 +65,7 @@ export default function ReportDetailsPage({ attendance }: { attendance: any }) {
         }
     };
 
-    const student = attendance.student || {};
+    const student = attendance.student;
     const events = attendance.events || [];
 
     return (
@@ -58,11 +80,11 @@ export default function ReportDetailsPage({ attendance }: { attendance: any }) {
                         </Link>
                         <div>
                             <h2 className="text-2xl font-semibold tracking-tight">
-                                {student.name || t('reports.unknown_student', 'Unknown Student')}
+                                {student?.name || t('reports.unknown_student', 'Unknown Student')}
                             </h2>
                             <div className="text-muted-foreground text-sm flex gap-4 mt-1">
                                 <span>{t('reports.date', 'Date')}: <strong>{attendance.date?.split('T')[0]}</strong></span>
-                                <span>{t('reports.class', 'Class')}: <strong>{student.school_class?.name || '-'}</strong></span>
+                                <span>{t('reports.class', 'Class')}: <strong>{student?.school_class?.name || student?.schoolClass?.name || '-'}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +152,7 @@ export default function ReportDetailsPage({ attendance }: { attendance: any }) {
                                 onClick={() => student?.face_image && setSelectedImage(student.face_image)}
                             >
                                 {student?.face_image ? (
-                                    <img src={student.face_image} alt={student.name} className="w-full h-full object-cover" />
+                                    <img src={student.face_image} alt={student?.name || ''} className="w-full h-full object-cover" />
                                 ) : (
                                     <Users className="h-10 w-10 text-muted-foreground/50" />
                                 )}
@@ -162,7 +184,7 @@ export default function ReportDetailsPage({ attendance }: { attendance: any }) {
                                         </td>
                                     </tr>
                                 ) : (
-                                    events.map((evt: any) => {
+                                    events.map((evt: AttendanceEventItem) => {
                                         const imgUrl = getImageUrl(evt);
                                         return (
                                             <tr key={evt.id} className="hover:bg-muted/30 transition-colors">

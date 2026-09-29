@@ -1,7 +1,8 @@
+import { ScanFace } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination } from '@/components/pagination';
-import { useTranslation } from 'react-i18next';
 
 interface BranchesTableProps {
     branches: any;
@@ -9,9 +10,10 @@ interface BranchesTableProps {
     onPerPageChange: (val: string) => void;
     onEdit: (branch: any) => void;
     onDelete: (id: number) => void;
+    onManageDevices: (branch: any) => void;
 }
 
-export function BranchesTable({ branches, perPage, onPerPageChange, onEdit, onDelete }: BranchesTableProps) {
+export function BranchesTable({ branches, perPage, onPerPageChange, onEdit, onDelete, onManageDevices }: BranchesTableProps) {
     const { t } = useTranslation();
 
     return (
@@ -36,7 +38,7 @@ export function BranchesTable({ branches, perPage, onPerPageChange, onEdit, onDe
                         <thead className="bg-muted/50 border-b text-xs text-muted-foreground uppercase">
                             <tr>
                                 <th className="px-6 py-4 font-medium">{t('branches.details', 'Branch Details')}</th>
-                                <th className="px-6 py-4 font-medium">{t('branches.mac_addresses', 'MAC Addresses')}</th>
+                                <th className="px-6 py-4 font-medium">{t('branches.devices', 'Qurilmalar')}</th>
                                 <th className="px-6 py-4 font-medium">{t('branches.capacity', 'Capacity')}</th>
                                 <th className="px-6 py-4 font-medium">{t('branches.today_attendance', "Today's Attendance")}</th>
                                 <th className="px-6 py-4 font-medium text-right">{t('branches.actions', 'Actions')}</th>
@@ -52,7 +54,30 @@ export function BranchesTable({ branches, perPage, onPerPageChange, onEdit, onDe
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {(branch.mac_address_list && branch.mac_address_list.length > 0) ? (
+                                        {branch.devices && branch.devices.length > 0 ? (
+                                            <div className="flex flex-col gap-1.5">
+                                                {branch.devices.map((dev: any) => (
+                                                    <div key={dev.id} className="flex items-center gap-1.5 flex-wrap">
+                                                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                                                            dev.connection_type === 'isup'
+                                                                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                                                                : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                                        }`}>
+                                                            {dev.connection_type === 'isup' ? 'ISUP 5.0' : 'HTTP'}
+                                                        </span>
+                                                        <span
+                                                            className={`inline-block w-2 h-2 rounded-full ${
+                                                                dev.is_online ? 'bg-emerald-500 ring-2 ring-emerald-500/30 animate-pulse' : 'bg-rose-400'
+                                                            }`}
+                                                            title={dev.is_online ? 'Online' : 'Offline'}
+                                                        />
+                                                        <span className="font-mono text-xs text-foreground">
+                                                            {dev.name || dev.mac_address}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : branch.mac_address_list && branch.mac_address_list.length > 0 ? (
                                             <div className="flex flex-col gap-1">
                                                 {branch.mac_address_list.map((mac: string) => (
                                                     <span key={mac} className="font-mono text-xs bg-muted px-2 py-0.5 rounded">{mac}</span>
@@ -82,7 +107,16 @@ export function BranchesTable({ branches, perPage, onPerPageChange, onEdit, onDe
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right flex gap-2 justify-end">
+                                    <td className="px-6 py-4 text-right flex gap-2 justify-end items-center flex-wrap">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => onManageDevices(branch)}
+                                            className="gap-1.5 text-xs border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                                        >
+                                            <ScanFace className="w-3.5 h-3.5" />
+                                            <span>{t('branches.devices', 'Qurilmalar')} ({branch.devices?.length || branch.mac_address_list?.length || 0})</span>
+                                        </Button>
                                         <Button size="sm" variant="secondary" onClick={() => onEdit(branch)}>{t('branches.edit', 'Edit')}</Button>
                                         <Button size="sm" variant="destructive" onClick={() => onDelete(branch.id)}>{t('branches.delete', 'Delete')}</Button>
                                     </td>

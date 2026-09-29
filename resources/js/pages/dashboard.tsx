@@ -1,12 +1,12 @@
 import { Head, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import { dashboard } from '@/routes';
 import { useTranslation } from 'react-i18next';
-
-import { StatsGrid } from '@/components/dashboard/StatsGrid';
-import { RecentEventsTable } from '@/components/dashboard/RecentEventsTable';
 import { DashboardCharts } from '@/components/dashboard/DashboardCharts';
+import { RecentEventsTable } from '@/components/dashboard/RecentEventsTable';
+import { StatsGrid } from '@/components/dashboard/StatsGrid';
+import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
+import type { BreadcrumbItem } from '@/types';
+
 
 interface StatData {
     total_students: number;
@@ -14,6 +14,14 @@ interface StatData {
     late_arrivals: number;
     on_time_today: number;
     absent_today: number;
+}
+
+interface MonthlyStat {
+    date: string;
+    present: number;
+    absent: number;
+    late: number;
+    on_time: number;
 }
 
 interface EventData {
@@ -35,7 +43,7 @@ export default function Dashboard() {
 
     const stats = (props.stats as StatData) || { total_students: 0, present_today: 0, late_arrivals: 0, on_time_today: 0, absent_today: 0 };
     const recentEvents = (props.recent_events as EventData[]) || [];
-    const monthlyStats = (props.monthly_stats as any[]) || [];
+    const monthlyStats = (props.monthly_stats as MonthlyStat[]) || [];
 
     const breadcrumbs: BreadcrumbItem[] = [{ title: t('dashboard.title', 'Dashboard'), href: dashboard().url }];
 

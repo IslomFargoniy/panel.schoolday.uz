@@ -1,7 +1,7 @@
+import { useTranslation } from 'react-i18next';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination } from '@/components/pagination';
-import { useTranslation } from 'react-i18next';
 
 interface ShiftsTableProps {
     shifts: any;

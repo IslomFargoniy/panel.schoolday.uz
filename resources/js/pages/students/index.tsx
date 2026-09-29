@@ -1,26 +1,38 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { FormEvent, useState, useRef } from 'react';
-import type { BreadcrumbItem } from '@/types';
+import type { FormEvent} from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ImageModal } from '@/components/students/ImageModal';
-import { StudentForm } from '@/components/students/StudentForm';
 import { StudentFilters } from '@/components/students/StudentFilters';
-import { StudentsTable } from '@/components/students/StudentsTable';
+import { StudentForm } from '@/components/students/StudentForm';
 import { StudentImportModal } from '@/components/students/StudentImportModal';
+import { StudentsTable } from '@/components/students/StudentsTable';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, Student, SchoolClass, PaginatedResponse } from '@/types';
 
+interface StudentsPageFilters {
+    class_id?: string;
+    status?: string;
+    search?: string;
+    per_page?: string;
+}
+
+interface StudentsPageProps {
+    students: PaginatedResponse<Student>;
+    classes: SchoolClass[];
+    filters: StudentsPageFilters;
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+}
 
 export default function StudentsPage({
     students,
     classes,
     filters,
-}: {
-    students: any;
-    classes: any[];
-    filters: any;
-    flash?: any;
-}) {
+}: StudentsPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [{ title: t('students.title', 'Students'), href: '/students' }];
@@ -34,7 +46,7 @@ export default function StudentsPage({
     });
 
     const handleFilter = () => {
-        router.get('/students', filterData as any, { preserveState: true, replace: true });
+        router.get('/students', filterData, { preserveState: true, replace: true });
     };
 
     const clearFilters = () => {
@@ -43,7 +55,7 @@ export default function StudentsPage({
     };
 
     // ─── Form ────────────────────────────────────────────────────────────────────
-    const [editing, setEditing] = useState<any>(null);
+    const [editing, setEditing] = useState<Student | null>(null);
     const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
     const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -89,7 +101,7 @@ export default function StudentsPage({
             ? editing.employeeNoString || String(editing.id)
             : Date.now().toString().slice(-8);
 
-        transform((data: any) => ({ ...data, employeeNoString: targetEmployeeNo }));
+        transform((data) => ({ ...data, employeeNoString: targetEmployeeNo }));
 
         if (editing) {
             post(`/students/${editing.id}`, {
@@ -125,7 +137,7 @@ export default function StudentsPage({
         }
     };
 
-    const handleEdit = (student: any) => {
+    const handleEdit = (student: Student) => {
         setEditing(student);
         clearErrors();
         setFormImagePreview(student.face_image || null);
@@ -147,14 +159,14 @@ export default function StudentsPage({
         });
     };
 
-    const handleDelete = async (student: any) => {
+    const handleDelete = async (student: Student) => {
         if (confirm(t('students.delete_confirm', 'Are you sure you want to delete this student?'))) {
             destroy(`/students/${student.id}`);
         }
     };
 
     const handleImageChange = (file: File | null) => {
-        setData('face_image', file as any);
+        setData('face_image', file);
         if (file) {
             setFormImagePreview(URL.createObjectURL(file));
         } else {

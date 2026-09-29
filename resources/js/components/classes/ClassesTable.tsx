@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/pagination';
 import { useTranslation } from 'react-i18next';
+import { Pagination } from '@/components/pagination';
+import { Button } from '@/components/ui/button';
 
 interface ClassesTableProps {
     classes: any;

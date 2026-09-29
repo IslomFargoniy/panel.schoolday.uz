@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Users } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImageModal } from '@/components/students/ImageModal';
 

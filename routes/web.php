@@ -35,13 +35,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->except(['create', 'show', 'edit'])
         ->middleware(App\Http\Middleware\SuperadminMiddleware::class);
     Route::resource('branches', BranchController::class)->except(['create', 'show', 'edit']);
+    Route::resource('branch_device', App\Http\Controllers\BranchDeviceController::class);
+    Route::post('branch_device/{device}/sync', [App\Http\Controllers\Api\HikvisionController::class, 'syncDeviceEvents'])->name('branch_device.sync');
     Route::resource('shifts', ShiftController::class)->except(['create', 'show', 'edit']);
     Route::resource('classes', SchoolClassController::class)->except(['create', 'show', 'edit'])->parameters(['classes' => 'schoolClass']);
     Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
     Route::get('students/template', [StudentController::class, 'template'])->name('students.template');
-    Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
-    Route::post('students/{student}', [StudentController::class, 'update'])->name('students.update_post');
-    Route::resource('students', StudentController::class)->except(['create', 'show', 'edit']);
+    Route::match(['put', 'patch', 'post'], 'students/{student}', [StudentController::class, 'update'])->name('students.update');
+    Route::resource('students', StudentController::class)->except(['create', 'show', 'edit', 'update']);
 });
 
 require __DIR__ . '/settings.php';

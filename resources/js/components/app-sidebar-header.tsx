@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { NavUser } from '@/components/nav-user';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
-import { NavUser } from '@/components/nav-user';
 
 export function AppSidebarHeader({
     breadcrumbs = [],

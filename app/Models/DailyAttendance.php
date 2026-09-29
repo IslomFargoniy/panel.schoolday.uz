@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\DailyAttendanceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy([DailyAttendanceObserver::class])]
 class DailyAttendance extends Model
 {
     protected $fillable = [

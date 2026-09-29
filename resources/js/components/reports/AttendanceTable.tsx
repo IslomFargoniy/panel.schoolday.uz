@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Pagination } from '@/components/pagination';
-import { useTranslation } from 'react-i18next';
-import { Users, Eye, FileDown } from 'lucide-react';
-import { ImageModal } from '@/components/students/ImageModal';
 import { Link } from '@inertiajs/react';
+import { Users, Eye, FileDown } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pagination } from '@/components/pagination';
+import { ImageModal } from '@/components/students/ImageModal';
 
 interface AttendanceTableProps {
     attendances: any;

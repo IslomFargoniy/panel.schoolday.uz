@@ -1,11 +1,31 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import { FormEvent } from 'react';
+import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ReportFilters } from '@/components/reports/ReportFilters';
 import { AttendanceTable } from '@/components/reports/AttendanceTable';
+import { ReportFilters } from '@/components/reports/ReportFilters';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, DailyAttendance, Branch, Shift, SchoolClass, Student, PaginatedResponse } from '@/types';
+
+interface ReportPageFilters {
+    start_date?: string;
+    end_date?: string;
+    branch_id?: string;
+    shift_id?: string;
+    class_id?: string;
+    student_id?: string;
+    status?: string;
+    per_page?: string;
+}
+
+interface ReportsPageProps {
+    attendances: PaginatedResponse<DailyAttendance>;
+    branches: Branch[];
+    shifts: Shift[];
+    classes: SchoolClass[];
+    students: Student[];
+    filters: ReportPageFilters;
+}
 
 export default function ReportsPage({
     attendances,
@@ -14,14 +34,7 @@ export default function ReportsPage({
     classes,
     students,
     filters,
-}: {
-    attendances: any;
-    branches: any[];
-    shifts: any[];
-    classes: any[];
-    students: any[];
-    filters: any;
-}) {
+}: ReportsPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -29,19 +42,19 @@ export default function ReportsPage({
     ];
 
     const { data: filterData, setData } = useForm({
-        start_date: filters.start_date || '',
-        end_date: filters.end_date || '',
-        branch_id: filters.branch_id || '',
-        shift_id: filters.shift_id || '',
-        class_id: filters.class_id || '',
-        student_id: filters.student_id || '',
-        status: filters.status || 'all',
-        per_page: filters.per_page || '20',
+        start_date: filters?.start_date || '',
+        end_date: filters?.end_date || '',
+        branch_id: filters?.branch_id || '',
+        shift_id: filters?.shift_id || '',
+        class_id: filters?.class_id || '',
+        student_id: filters?.student_id || '',
+        status: filters?.status || 'all',
+        per_page: filters?.per_page || '20',
     });
 
     const handleFilter = (e: FormEvent) => {
         e.preventDefault();
-        router.get('/reports', filterData as any, { preserveState: true, replace: true });
+        router.get('/reports', filterData, { preserveState: true, replace: true });
     };
 
     return (

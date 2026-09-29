@@ -1,22 +1,31 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { FormEvent, useState } from 'react';
-import type { BreadcrumbItem } from '@/types';
+import type { FormEvent} from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ClassForm } from '@/components/classes/ClassForm';
-import { ClassFilters } from '@/components/classes/ClassFilters';
 import { ClassesTable } from '@/components/classes/ClassesTable';
+import { ClassFilters } from '@/components/classes/ClassFilters';
+import { ClassForm } from '@/components/classes/ClassForm';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, SchoolClass, Shift, PaginatedResponse } from '@/types';
+
+interface ClassesPageFilters {
+    shift_id?: string;
+    search?: string;
+    per_page?: string;
+}
+
+interface ClassesPageProps {
+    classes: PaginatedResponse<SchoolClass>;
+    shifts: Shift[];
+    filters: ClassesPageFilters;
+}
 
 export default function ClassesPage({
     classes,
     shifts,
     filters,
-}: {
-    classes: any;
-    shifts: any[];
-    filters: any;
-}) {
+}: ClassesPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [{ title: t('classes.title', 'Classes'), href: '/classes' }];
@@ -28,7 +37,7 @@ export default function ClassesPage({
     });
 
     const handleFilter = () => {
-        router.get('/classes', filterData as any, { preserveState: true, replace: true });
+        router.get('/classes', filterData, { preserveState: true, replace: true });
     };
 
     const clearFilters = () => {
@@ -36,7 +45,7 @@ export default function ClassesPage({
         router.get('/classes', {}, { preserveState: true, replace: true });
     };
 
-    const [editing, setEditing] = useState<any>(null);
+    const [editing, setEditing] = useState<SchoolClass | null>(null);
     const { data: formData, setData, post, put, delete: destroy, reset, errors, clearErrors } = useForm({
         name: '',
         shift_id: '',
@@ -56,7 +65,7 @@ export default function ClassesPage({
         }
     };
 
-    const handleEdit = (schoolClass: any) => {
+    const handleEdit = (schoolClass: SchoolClass) => {
         setEditing(schoolClass);
         clearErrors();
         setData({

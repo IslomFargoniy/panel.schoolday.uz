@@ -9,8 +9,8 @@ import {
     ArcElement,
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 ChartJS.register(
     CategoryScale,

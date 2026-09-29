@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BranchDevice;
 use App\Models\BranchMacAddress;
 use App\Models\HikvisionAccess;
 use App\Models\HikvisionAccessEvent;
 use App\Models\Student;
+use App\Services\Hikvision\HikvisionSyncService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -50,16 +52,43 @@ class HikvisionController extends Controller
                 return response()->json(['success' => false, 'reason' => 'invalid_payload'], 400);
             }
 
-            // --- 2. MAC whitelist check --------------------------------------
+            // --- 2. Device whitelist check & status update -------------------
             $incomingMac = strtoupper(trim($eventData->macAddress ?? ''));
-            $totalMacs = BranchMacAddress::count();
+            $shortSerial = $eventData->shortSerialNumber ?? null;
+            $deviceId = $eventData->device_id ?? null;
 
-            if ($totalMacs > 0 && $incomingMac) {
-                $allowed = BranchMacAddress::whereRaw('UPPER(mac_address) = ?', [$incomingMac])->exists();
+            $branchDevice = null;
+            if ($incomingMac || $shortSerial || $deviceId) {
+                $branchDevice = BranchDevice::where('status', true)
+                    ->where(function ($q) use ($incomingMac, $shortSerial, $deviceId) {
+                        if ($incomingMac) {
+                            $q->orWhereRaw('UPPER(mac_address) = ?', [$incomingMac]);
+                        }
+                        if ($shortSerial && $shortSerial !== 'default') {
+                            $q->orWhere('device_id', '=', $shortSerial);
+                        }
+                        if ($deviceId) {
+                            $q->orWhere('device_id', '=', $deviceId);
+                        }
+                    })
+                    ->first();
+
+                if ($branchDevice) {
+                    $branchDevice->update([
+                        'is_online' => true,
+                        'last_seen_at' => now(),
+                    ]);
+                }
+            }
+
+            $totalConfigured = BranchDevice::count() + BranchMacAddress::count();
+            if ($totalConfigured > 0 && $incomingMac && ! $branchDevice) {
+                $allowed = BranchMacAddress::whereRaw('UPPER(mac_address) = ?', [$incomingMac])->exists()
+                    || BranchDevice::whereRaw('UPPER(mac_address) = ?', [$incomingMac])->exists();
                 if (! $allowed) {
-                    Log::info("Hikvision: rejected event from unregistered MAC [{$incomingMac}]");
+                    Log::info("Hikvision: rejected event from unregistered device [{$incomingMac}]");
 
-                    return response()->json(['success' => false, 'reason' => 'mac_not_allowed'], 200);
+                    return response()->json(['success' => false, 'reason' => 'device_not_allowed'], 200);
                 }
             }
 
@@ -170,5 +199,62 @@ class HikvisionController extends Controller
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Provide device encryption key to ISUP daemon
+     */
+    public function getDeviceKey(Request $request)
+    {
+        $deviceId = $request->query('device_id') ?? $request->query('deviceId') ?? $request->input('device_id') ?? $request->input('deviceId');
+        if (! $deviceId) {
+            return response()->json(['error' => 'Device ID required'], 400);
+        }
+
+        $device = BranchDevice::where('device_id', $deviceId)->first();
+        $key = ($device && ! empty($device->encryption_key)) ? $device->encryption_key : 'SchoolDay142026';
+
+        return response()->json([
+            'success' => true,
+            'device_id' => $deviceId,
+            'deviceId' => $deviceId,
+            'key' => $key,
+            'encryption_key' => $key,
+        ]);
+    }
+
+    /**
+     * Receive device status heartbeat from ISUP daemon
+     */
+    public function updateDeviceStatus(Request $request)
+    {
+        $deviceId = $request->input('device_id') ?? $request->input('deviceId') ?? $request->query('device_id') ?? $request->query('deviceId');
+        $status = $request->input('status') ?? $request->query('status'); // 'online' or 'offline'
+        $ip = $request->input('ip') ?? $request->query('ip');
+        $serial = $request->input('serial') ?? $request->query('serial');
+
+        if ($deviceId) {
+            $device = BranchDevice::where('device_id', $deviceId)->first();
+            if ($device) {
+                $isOnline = in_array($status, ['online', true, 1, '1'], true);
+                $device->update([
+                    'is_online' => $isOnline,
+                    'status' => 'active',
+                    'last_seen_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Manually trigger ISUP event sync for a device
+     */
+    public function syncDeviceEvents(BranchDevice $device, HikvisionSyncService $syncService)
+    {
+        $res = $syncService->syncEventsFromDevice($device);
+
+        return response()->json($res);
     }
 }

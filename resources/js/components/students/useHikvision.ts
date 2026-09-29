@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface HikvisionConfig {
@@ -455,7 +455,7 @@ export function useHikvision() {
             for (const ip of ips) {
                 setSyncProgress({ current: 0, total: 100, message: `${ip}: Foydalanuvchilar tekshirilmoqda...` });
                 let position = 0;
-                let deviceEmployeeNos = new Set<string>();
+                const deviceEmployeeNos = new Set<string>();
                 let hasMore = true;
 
                 while (hasMore) {

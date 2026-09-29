@@ -1,13 +1,8 @@
-import { useState } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Head, useForm } from '@inertiajs/react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
-import { PhoneInput } from '@/components/ui/phone-input';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -16,13 +11,31 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 
-export default function UsersIndex({ users, roles }: { users: any[], roles: any[] }) {
+interface RoleItem {
+    id: number;
+    name: string;
+}
+
+interface UserItem {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string | null;
+    roles?: RoleItem[];
+    created_at?: string;
+}
+
+export default function UsersIndex({ users, roles }: { users: UserItem[]; roles: RoleItem[] }) {
     const { t } = useTranslation();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [editUser, setEditUser] = useState<any | null>(null);
+    const [editUser, setEditUser] = useState<UserItem | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.users', 'Users'), href: '/users' },
@@ -42,7 +55,7 @@ export default function UsersIndex({ users, roles }: { users: any[], roles: any[
         setIsCreateModalOpen(true);
     };
 
-    const openEditModal = (user: any) => {
+    const openEditModal = (user: UserItem) => {
         clearErrors();
         setData({
             name: user.name,

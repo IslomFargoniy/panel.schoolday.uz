@@ -1,21 +1,26 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { FormEvent, useState } from 'react';
-import type { BreadcrumbItem } from '@/types';
+import type { FormEvent} from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ShiftForm } from '@/components/shifts/ShiftForm';
 import { ShiftsTable } from '@/components/shifts/ShiftsTable';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, Shift, Branch, PaginatedResponse } from '@/types';
+
+interface ShiftsPageProps {
+    shifts: PaginatedResponse<Shift>;
+    branches: Branch[];
+    filters?: {
+        per_page?: string;
+    };
+}
 
 export default function ShiftsPage({
     shifts,
     branches,
     filters,
-}: {
-    shifts: any;
-    branches: any[];
-    filters?: any;
-}) {
+}: ShiftsPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [{ title: t('shifts.title', 'Shifts'), href: '/shifts' }];
@@ -29,7 +34,7 @@ export default function ShiftsPage({
         router.get('/shifts', { per_page: val }, { preserveState: true, replace: true });
     };
 
-    const [editing, setEditing] = useState<any>(null);
+    const [editing, setEditing] = useState<Shift | null>(null);
     const { data: formData, setData, post, put, delete: destroy, reset, errors, clearErrors } = useForm({
         name: '',
         start_time: '',
@@ -66,7 +71,7 @@ export default function ShiftsPage({
         }
     };
 
-    const handleEdit = (shift: any) => {
+    const handleEdit = (shift: Shift) => {
         setEditing(shift);
         clearErrors();
         setData({

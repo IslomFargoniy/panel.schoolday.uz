@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 import AppearanceTabs from '@/components/appearance-tabs';
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import type { BreadcrumbItem } from '@/types';
 import { edit as editAppearance } from '@/routes/appearance';
-import { useTranslation } from 'react-i18next';
+import type { BreadcrumbItem } from '@/types';
 
 export default function Appearance() {
     const { t } = useTranslation();

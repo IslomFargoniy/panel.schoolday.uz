@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutDashboard, Clock, GraduationCap, PieChart, Users, Building2, Activity, BarChart3, UserCog, Github, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -12,10 +13,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
-import { dashboard } from '@/routes';
-import { useTranslation } from 'react-i18next';
 
 
 const getMainNavItems = (t: any, user: any): NavItem[] => {

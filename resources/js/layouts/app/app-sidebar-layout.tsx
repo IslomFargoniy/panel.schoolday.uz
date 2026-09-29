@@ -1,14 +1,14 @@
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { Toaster } from '@/components/ui/sonner';
-import { toast } from 'sonner';
-import { usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
 import type { AppLayoutProps } from '@/types';
 
-import { useTranslation } from 'react-i18next';
 
 export default function AppSidebarLayout({
     children,

@@ -17,7 +17,7 @@ class BranchController extends Controller
 
         $branches = Branch::withCount('shifts')
             ->with([
-                'macAddresses',
+                'devices',
                 'shifts' => function ($q) use ($today) {
                     $q->withCount('classes')
                         ->withCount('students as total_students')
@@ -52,7 +52,7 @@ class BranchController extends Controller
                 $branch->present_students = $branch->shifts->sum('present_students');
                 $branch->on_time_students = $branch->shifts->sum('on_time_students');
                 $branch->late_students = $branch->shifts->sum('late_students');
-                $branch->mac_address_list = $branch->macAddresses->pluck('mac_address')->toArray();
+                $branch->mac_address_list = $branch->devices->pluck('mac_address')->filter()->toArray();
                 unset($branch->shifts);
 
                 return $branch;
@@ -120,11 +120,19 @@ class BranchController extends Controller
             ->toArray();
 
         // Delete old ones not in new list
-        $branch->macAddresses()->whereNotIn('mac_address', $clean)->delete();
+        $branch->devices()->whereNotIn('mac_address', $clean)->delete();
 
         // Create new ones
         foreach ($clean as $mac) {
-            $branch->macAddresses()->firstOrCreate(['mac_address' => $mac]);
+            $branch->devices()->firstOrCreate(
+                ['mac_address' => $mac],
+                [
+                    'name' => 'Hikvision Terminal',
+                    'device_id' => 'branch' . $branch->id,
+                    'connection_type' => 'http_listening',
+                    'status' => true,
+                ]
+            );
         }
     }
 }

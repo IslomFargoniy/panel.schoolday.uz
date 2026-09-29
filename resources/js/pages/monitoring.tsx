@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { useAppearance } from '@/hooks/use-appearance';
-import { useEcho } from '@laravel/echo-react';
+import { useEcho, useConnectionStatus } from '@laravel/echo-react';
 import {
     Moon, Sun, ArrowLeft, RefreshCw, Users,
     UserCheck, UserX,
-    Building2, GraduationCap, Activity,
+    Building2, GraduationCap, Activity, Radio, Wifi, WifiOff,
 } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAppearance } from '@/hooks/use-appearance';
 
 interface StudentData {
     id: number;
@@ -41,7 +41,7 @@ export default function Monitoring() {
     const [data, setData] = useState<MonitoringData | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const echo = useEcho();
+    const connectionStatus = useConnectionStatus();
 
     const toggleTheme = () => {
         const isDark = appearance === 'dark' || (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -65,26 +65,36 @@ export default function Monitoring() {
         fetchData();
     }, [fetchData]);
 
+    // Reverb WebSocket event subscription
+    useEcho(
+        'monitoring',
+        ['.updated', 'updated', 'MonitoringUpdate'],
+        (payload) => {
+            console.log('Realtime event received via Reverb WebSocket:', payload);
+            fetchData();
+        },
+        [fetchData],
+        'public'
+    );
+
+    // Fallback polling: polls every 10s if disconnected, or 60s passive heartbeat if connected
     useEffect(() => {
-        if (!echo) return;
+        const intervalMs = connectionStatus === 'connected' ? 60000 : 10000;
+        const interval = setInterval(() => {
+            fetchData();
+        }, intervalMs);
 
-        const channel = echo.channel('monitoring')
-            .listen('.updated', () => {
-                console.log('Monitoring data updated via Echo');
-                fetchData();
-            });
-
-        return () => {
-            channel.stopListening('.updated');
-        };
-    }, [echo, fetchData]);
-
+        return () => clearInterval(interval);
+    }, [connectionStatus, fetchData]);
 
     // Overall stats
     const totalStudents = data?.branches.reduce((s, b) => s + b.total_students, 0) ?? 0;
     const presentStudents = data?.branches.reduce((s, b) => s + b.present_students, 0) ?? 0;
     const absentStudents = totalStudents - presentStudents;
     const attendanceRate = totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0;
+
+    const isWsConnected = connectionStatus === 'connected';
+    const isWsConnecting = connectionStatus === 'connecting';
 
     return (
         <>
@@ -119,22 +129,54 @@ export default function Monitoring() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {/* Live indicator */}
-                            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20">
+                            {/* Reverb WebSocket Live indicator */}
+                            <div
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+                                    isWsConnected
+                                        ? 'bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                        : isWsConnecting
+                                            ? 'bg-amber-500/10 dark:bg-amber-500/20 border-amber-500/30 text-amber-600 dark:text-amber-400'
+                                            : 'bg-slate-500/10 dark:bg-slate-500/20 border-slate-500/20 text-slate-500 dark:text-slate-400'
+                                }`}
+                                title={`Reverb WebSocket holati: ${connectionStatus}`}
+                            >
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    {isWsConnected && (
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    )}
+                                    <span
+                                        className={`relative inline-flex rounded-full h-2 w-2 ${
+                                            isWsConnected
+                                                ? 'bg-emerald-500'
+                                                : isWsConnecting
+                                                    ? 'bg-amber-500 animate-pulse'
+                                                    : 'bg-slate-400'
+                                        }`}
+                                    ></span>
                                 </span>
-                                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                    LIVE
+                                <span>
+                                    {isWsConnected
+                                        ? 'Reverb: Jonli'
+                                        : isWsConnecting
+                                            ? 'Reverb: Ulanmoqda...'
+                                            : 'Oflayn (polling)'}
                                 </span>
                             </div>
 
                             {data && (
-                                <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">
+                                <span className="hidden sm:inline-block text-xs text-slate-400 dark:text-slate-500 tabular-nums">
                                     {data.updated_at}
                                 </span>
                             )}
+
+                            <button
+                                onClick={() => fetchData()}
+                                disabled={loading}
+                                title="Yangilash"
+                                className="p-2 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-colors disabled:opacity-50"
+                            >
+                                <RefreshCw className={`w-4 h-4 text-slate-600 dark:text-slate-300 ${loading ? 'animate-spin' : ''}`} />
+                            </button>
 
                             <button
                                 onClick={toggleTheme}

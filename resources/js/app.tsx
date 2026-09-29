@@ -1,36 +1,42 @@
 import { createInertiaApp } from '@inertiajs/react';
+import axios from 'axios';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import axios from 'axios';
 import '../css/app.css';
 import './i18n';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
 
+const reverbKey = import.meta.env.VITE_REVERB_APP_KEY || 'schoolday_reverb_key_918237';
+const reverbHost = import.meta.env.VITE_REVERB_HOST;
+const reverbPort = import.meta.env.VITE_REVERB_PORT;
+const reverbScheme = import.meta.env.VITE_REVERB_SCHEME;
+
+const isHttps =
+    reverbScheme === 'https' ||
+    (typeof window !== 'undefined' && window.location.protocol === 'https:');
+
+const isLocalHost =
+    !reverbHost ||
+    reverbHost === 'localhost' ||
+    reverbHost === '127.0.0.1';
+
+const wsHost =
+    typeof window !== 'undefined' && isLocalHost
+        ? window.location.hostname
+        : (reverbHost || 'localhost');
+
+const defaultPort = isHttps ? 443 : 8080;
+const resolvedPort = Number(reverbPort || defaultPort);
+
 configureEcho({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost:
-        import.meta.env.VITE_REVERB_HOST === 'localhost' ||
-        import.meta.env.VITE_REVERB_HOST === '127.0.0.1'
-            ? window.location.hostname
-            : import.meta.env.VITE_REVERB_HOST,
-    wsPort:
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1'
-            ? import.meta.env.VITE_REVERB_PORT ?? 80
-            : 80,
-    wssPort:
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1'
-            ? import.meta.env.VITE_REVERB_PORT ?? 443
-            : 443,
-    forceTLS:
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1'
-            ? (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https'
-            : true,
+    key: reverbKey,
+    wsHost: wsHost,
+    wsPort: resolvedPort,
+    wssPort: resolvedPort,
+    forceTLS: isHttps,
     enabledTransports: ['ws', 'wss'],
 });
 

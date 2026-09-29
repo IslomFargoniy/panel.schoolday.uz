@@ -1,9 +1,9 @@
+import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Combobox } from '@/components/ui/combobox';
-import { FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface ClassFormProps {
     editing: any;

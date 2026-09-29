@@ -1,19 +1,18 @@
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
-import { type BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { usePage } from '@inertiajs/react';
+import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { useTranslation } from 'react-i18next';
-
-import { usePage } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
+import type { BreadcrumbItem, Auth } from '@/types';
 
 export default function SystemSettings({ settings }: { settings: Record<string, string> }) {
     const { t } = useTranslation();
-    const { auth } = usePage().props as unknown as { auth: { user: any } };
+    const { auth } = usePage().props as unknown as { auth: Auth };
     const isSuperadmin = auth?.user?.roles?.includes('Superadmin');
 
     const breadcrumbs: BreadcrumbItem[] = [
