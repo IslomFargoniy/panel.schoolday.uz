@@ -25,6 +25,11 @@ class TelegramService
         $this->telegram = new Api($this->token);
     }
 
+    public function hasToken(): bool
+    {
+        return ! empty($this->token);
+    }
+
     public function setWebhook(string $url): void
     {
         if (empty($this->token)) {

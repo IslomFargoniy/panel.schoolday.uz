@@ -26,7 +26,7 @@ class MonitoringController extends Controller
 
         $branches = Branch::with([
             'shifts.classes.students' => function ($q) {
-                $q->orderBy('name');
+                $q->where('status', 'active')->orderBy('name');
             },
         ])->get();
 

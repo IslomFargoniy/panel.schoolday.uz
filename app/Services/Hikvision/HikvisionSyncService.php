@@ -130,7 +130,7 @@ class HikvisionSyncService
 
                     $eventModel = new HikvisionAccessEvent([
                         'deviceName' => $device->name ?: 'Hikvision Terminal',
-                        'name' => $event['name'] ?? $student->full_name,
+                        'name' => $event['name'] ?? $student->name,
                         'employeeNoString' => $employeeNo,
                         'serialNo' => $serialNo,
                         'attendanceStatus' => $attendanceStatus,

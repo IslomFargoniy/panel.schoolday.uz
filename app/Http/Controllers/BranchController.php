@@ -20,28 +20,24 @@ class BranchController extends Controller
                 'devices',
                 'shifts' => function ($q) use ($today) {
                     $q->withCount('classes')
-                        ->withCount('students as total_students')
+                        ->withCount(['students as total_students' => function ($q) {
+                            $q->where('status', 'active');
+                        }])
                         ->withCount(['students as present_students' => function ($q) use ($today) {
-                            $q->whereHas('attendances', function ($a) use ($today) {
+                            $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                                 $a->whereDate('date', $today);
-                            }
-                            );
-                        },
-                        ])
+                            });
+                        }])
                         ->withCount(['students as on_time_students' => function ($q) use ($today) {
-                            $q->whereHas('attendances', function ($a) use ($today) {
+                            $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                                 $a->whereDate('date', $today)->where('is_late', false);
-                            }
-                            );
-                        },
-                        ])
+                            });
+                        }])
                         ->withCount(['students as late_students' => function ($q) use ($today) {
-                            $q->whereHas('attendances', function ($a) use ($today) {
+                            $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                                 $a->whereDate('date', $today)->where('is_late', true);
-                            }
-                            );
-                        },
-                        ]);
+                            });
+                        }]);
                 },
             ])
             ->latest()
@@ -119,8 +115,8 @@ class BranchController extends Controller
             ->values()
             ->toArray();
 
-        // Delete old ones not in new list
-        $branch->devices()->whereNotIn('mac_address', $clean)->delete();
+        // Delete old HTTP listening devices not in new list (preserve ISUP devices)
+        $branch->devices()->where('connection_type', 'http_listening')->whereNotIn('mac_address', $clean)->delete();
 
         // Create new ones
         foreach ($clean as $mac) {

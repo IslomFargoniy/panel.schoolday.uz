@@ -17,7 +17,7 @@ class StoreBranchDeviceRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'mac_address' => $this->mac_address ? trim($this->mac_address) : '',
+            'mac_address' => $this->mac_address && trim($this->mac_address) !== '' ? strtoupper(trim($this->mac_address)) : null,
             'name' => $this->name && trim($this->name) !== '' ? trim($this->name) : null,
             'device_id' => $this->device_id && trim($this->device_id) !== '' ? trim($this->device_id) : null,
             'encryption_key' => $this->encryption_key && trim($this->encryption_key) !== '' ? trim($this->encryption_key) : null,
@@ -34,9 +34,9 @@ class StoreBranchDeviceRequest extends FormRequest
     {
         return [
             'branch_id' => 'required|exists:branches,id',
-            'mac_address' => 'required|string|max:255',
+            'mac_address' => 'required_if:connection_type,http_listening|nullable|string|max:255',
             'name' => 'nullable|string|max:255',
-            'device_id' => 'nullable|string|max:255',
+            'device_id' => 'required_if:connection_type,isup|nullable|string|max:255',
             'connection_type' => 'nullable|in:isup,http_listening',
             'encryption_key' => 'nullable|string|max:255',
         ];

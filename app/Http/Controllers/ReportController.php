@@ -23,7 +23,7 @@ class ReportController extends Controller
             'branches' => Branch::all(),
             'shifts' => Shift::with('branch')->get(),
             'classes' => SchoolClass::with(['shift.branch'])->get(),
-            'students' => Student::all(),
+            'students' => Student::where('status', 'active')->orderBy('name')->get(),
             'filters' => $filters,
         ]);
     }
@@ -66,7 +66,8 @@ class ReportController extends Controller
         $status = $filters['status'];
 
         if ($status === 'absent') {
-            $query = Student::with(['schoolClass.shift.branch'])
+            $query = Student::where('status', 'active')
+                ->with(['schoolClass.shift.branch'])
                 ->whereDoesntHave('attendances', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date', [$startDate, $endDate]);
                 });
@@ -111,6 +112,14 @@ class ReportController extends Controller
                 ->whereBetween('date', [$startDate, $endDate])
                 ->orderBy('date', 'desc')
                 ->orderBy('first_check_in', 'desc');
+
+            if ($status === 'late') {
+                $query->where('is_late', true);
+            } elseif ($status === 'on_time') {
+                $query->where('is_late', false);
+            } elseif ($status === 'left_early') {
+                $query->where('is_left_early', true)->whereNotNull('last_check_out');
+            }
 
             if ($studentId) {
                 $query->where('student_id', $studentId);

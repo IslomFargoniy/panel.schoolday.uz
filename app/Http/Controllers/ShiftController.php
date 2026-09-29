@@ -18,24 +18,23 @@ class ShiftController extends Controller
 
         $shifts = Shift::with('branch')
             ->withCount('classes')
-            ->withCount('students as total_students')
+            ->withCount(['students as total_students' => function ($q) {
+                $q->where('status', 'active');
+            }])
             ->withCount(['students as present_students' => function ($q) use ($today) {
-                $q->whereHas('attendances', function ($a) use ($today) {
+                $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                     $a->whereDate('date', $today);
-                }
-                );
+                });
             }])
             ->withCount(['students as on_time_students' => function ($q) use ($today) {
-                $q->whereHas('attendances', function ($a) use ($today) {
+                $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                     $a->whereDate('date', $today)->where('is_late', false);
-                }
-                );
+                });
             }])
             ->withCount(['students as late_students' => function ($q) use ($today) {
-                $q->whereHas('attendances', function ($a) use ($today) {
+                $q->where('status', 'active')->whereHas('attendances', function ($a) use ($today) {
                     $a->whereDate('date', $today)->where('is_late', true);
-                }
-                );
+                });
             }])
             ->paginate($limit);
 

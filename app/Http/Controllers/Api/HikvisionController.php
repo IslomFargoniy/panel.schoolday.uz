@@ -18,9 +18,14 @@ class HikvisionController extends Controller
 {
     private function telegramlog($message)
     {
+        $token = config('services.telegram_logging.token');
+        $chat_id = config('services.telegram_logging.chat_id');
+
+        if (! $token || ! $chat_id) {
+            return;
+        }
+
         try {
-            $token = '7763950049:AAFyTjSgv47GC-76zSez6Q9pPzNNYPH6kqA';
-            $chat_id = '531110501';
             $telegram = new Api($token);
             $telegram->sendMessage([
                 'chat_id' => $chat_id,
@@ -100,11 +105,7 @@ class HikvisionController extends Controller
                 return response()->json(['success' => true, 'reason' => 'ignored']);
             }
 
-            if (! $request->hasFile('Picture')) {
-                return response()->json(['success' => true, 'reason' => 'no_picture']);
-            }
-
-            // --- 4. Save uploaded face photo ---------------------------------
+            // --- 4. Save uploaded face photo (if present) -------------------
             $filename = '';
             if ($request->hasFile('Picture')) {
                 $picture = $request->file('Picture');
@@ -239,7 +240,7 @@ class HikvisionController extends Controller
                 $isOnline = in_array($status, ['online', true, 1, '1'], true);
                 $device->update([
                     'is_online' => $isOnline,
-                    'status' => 'active',
+                    'status' => true,
                     'last_seen_at' => now(),
                 ]);
             }

@@ -39,4 +39,9 @@ return [
         'token' => env('SYNC_API_TOKEN'),
     ],
 
+    'telegram_logging' => [
+        'token' => env('TELEGRAM_LOG_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_LOG_CHAT_ID'),
+    ],
+
 ];

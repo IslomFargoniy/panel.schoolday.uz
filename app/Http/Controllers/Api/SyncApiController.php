@@ -41,7 +41,7 @@ class SyncApiController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $students = Student::all()->map(function ($student) use ($request) {
+        $students = Student::where('status', 'active')->get()->map(function ($student) use ($request) {
             $faceUrl = null;
             if ($student->face_image) {
                 // Build absolute URL for the face image

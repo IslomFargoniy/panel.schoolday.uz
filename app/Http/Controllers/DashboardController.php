@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $today = Carbon::today()->toDateString();
 
         // Stats
-        $totalStudents = Student::count();
+        $totalStudents = Student::where('status', 'active')->count();
         $presentToday = DailyAttendance::where('date', $today)->count();
         $lateArrivals = DailyAttendance::where('date', $today)->where('is_late', true)->count();
         $absent = max(0, $totalStudents - $presentToday);
