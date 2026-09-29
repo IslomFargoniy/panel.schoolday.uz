@@ -66,5 +66,30 @@ class UserSeeder extends Seeder
             ['key' => 'branch_limit'],
             ['value' => '1']
         );
+
+        $school = \App\Models\School::firstOrCreate(
+            ['name' => '1-sonli ixtisoslashtirilgan maktab'],
+            [
+                'address' => 'Toshkent shahri',
+                'branch_limit' => 5,
+                'branch_price' => 0,
+                'valid_date' => now()->addYear()->toDateString(),
+                'status' => 1,
+            ]
+        );
+
+        if ($superadmin) {
+            \App\Models\UserSchool::firstOrCreate([
+                'user_id' => $superadmin->id,
+                'school_id' => $school->id,
+            ]);
+        }
+
+        if ($admin) {
+            \App\Models\UserSchool::firstOrCreate([
+                'user_id' => $admin->id,
+                'school_id' => $school->id,
+            ]);
+        }
     }
 }
