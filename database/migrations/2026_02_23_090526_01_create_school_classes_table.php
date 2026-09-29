@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('shift_id')->constrained('shifts')->restrictOnDelete();
+            $table->string('telegram_group_id')->nullable();
             $table->timestamps();
         });
     }

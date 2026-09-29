@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('currentVerifyMode')->nullable();
             $table->string('frontSerialNo')->nullable();
             $table->string('attendanceStatus')->nullable();
+            $table->boolean('onlyVerify')->nullable();
             $table->string('label')->nullable();
             $table->string('mask')->nullable();
             $table->integer('picturesNumber')->nullable();

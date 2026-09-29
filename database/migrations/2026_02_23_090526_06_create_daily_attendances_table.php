@@ -15,11 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->date('date');
+            $table->string('start_time')->nullable();
+            $table->string('end_time')->nullable();
             $table->timestamp('first_check_in')->nullable()->comment('Birinchi kelgan vaqti');
             $table->timestamp('last_check_out')->nullable()->comment('Oxirgi ketgan vaqti');
             $table->boolean('is_late')->default(false);
             $table->boolean('is_left_early')->default(false);
             $table->timestamps();
+
+            $table->unique(['student_id', 'date']);
         });
     }
 
