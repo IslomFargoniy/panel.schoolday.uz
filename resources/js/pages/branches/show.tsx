@@ -243,10 +243,10 @@ export default function BranchShowPage({
                             <div>
                                 <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-indigo-500" />
-                                    <span>Filial tuzilishi: Smena ➔ Sinf ➔ O‘quvchilar ➔ Hikvision</span>
+                                    <span>{t('branch_structure_title', 'Filial tuzilishi: Smena ➔ Sinf ➔ O‘quvchilar ➔ Hikvision')}</span>
                                 </h3>
                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                    Filialdagi smenani tanlang, unga tegishli sinflar va o‘quvchilarni ko‘ring hamda Hikvision tizimi bilan boshqaring.
+                                    {t('branch_structure_desc', 'Filialdagi smenani tanlang, unga tegishli sinflar va o‘quvchilarni ko‘ring hamda Hikvision tizimi bilan boshqaring.')}
                                 </p>
                             </div>
 
@@ -270,15 +270,15 @@ export default function BranchShowPage({
                             </span>
                             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
                             <span className={activeShift ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : ''}>
-                                {activeShift ? activeShift.name : 'Barcha smenalar'}
+                                {activeShift ? activeShift.name : t('all_shifts', 'Barcha smenalar')}
                             </span>
                             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
                             <span className={activeClass ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : ''}>
-                                {activeClass ? `${activeClass.name} sinf` : 'Barcha sinflar'}
+                                {activeClass ? `${activeClass.name} ${t('class', 'sinf')}` : t('all_classes', 'Barcha sinflar')}
                             </span>
                             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
                             <span className="text-foreground font-semibold">
-                                {students.total} ta o‘quvchi
+                                {students.total} {t('students.count', 'ta o‘quvchi')}
                             </span>
                         </div>
                     </div>
@@ -288,7 +288,7 @@ export default function BranchShowPage({
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                                 <Clock className="w-3.5 h-3.5 text-amber-500" />
-                                <span>1-bosqich: Smenani tanlang</span>
+                                <span>{t('step_shift', '1-bosqich: Smenani tanlang')}</span>
                             </span>
                         </div>
 
@@ -303,7 +303,7 @@ export default function BranchShowPage({
                                         : ''
                                 }`}
                             >
-                                <span>Barcha smenalar</span>
+                                <span>{t('all_shifts', 'Barcha smenalar')}</span>
                                 <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-white/10">
                                     {shifts.length}
                                 </span>
@@ -335,7 +335,7 @@ export default function BranchShowPage({
                                             ({shift.start_time?.slice(0, 5)} - {shift.end_time?.slice(0, 5)})
                                         </span>
                                         <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-white/10">
-                                            {classCount} sinf • {studentCount} o‘quvchi
+                                            {classCount} {t('sidebar.classes', 'sinf')} • {studentCount} {t('sidebar.students', 'o‘quvchi')}
                                         </span>
                                     </Button>
                                 );
@@ -346,7 +346,7 @@ export default function BranchShowPage({
                                 trigger={
                                     <Button size="sm" variant="ghost" className="h-8 text-xs font-medium gap-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50">
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>Smena qo‘shish</span>
+                                        <span>{t('add_shift', 'Smena qo‘shish')}</span>
                                     </Button>
                                 }
                             />
@@ -358,10 +358,10 @@ export default function BranchShowPage({
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                                 <GraduationCap className="w-3.5 h-3.5 text-sky-500" />
-                                <span>2-bosqich: Sinfni tanlang</span>
+                                <span>{t('step_class', '2-bosqich: Sinfni tanlang')}</span>
                                 {activeShift && (
                                     <span className="text-[11px] font-normal text-muted-foreground normal-case">
-                                        ({activeShift.name}ga tegishli sinflar)
+                                        ({activeShift.name})
                                     </span>
                                 )}
                             </span>
@@ -378,7 +378,7 @@ export default function BranchShowPage({
                                         : ''
                                 }`}
                             >
-                                <span>Barcha sinflar</span>
+                                <span>{t('all_classes', 'Barcha sinflar')}</span>
                                 <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-white/10">
                                     {visibleClasses.length}
                                 </span>
@@ -400,10 +400,10 @@ export default function BranchShowPage({
                                                 : ''
                                         }`}
                                     >
-                                        <span>{cls.name} sinf</span>
+                                        <span>{cls.name} {t('class', 'sinf')}</span>
                                         {studentCount > 0 && (
                                             <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-white/10">
-                                                {studentCount} ta
+                                                {studentCount} {t('common.items', 'ta')}
                                             </span>
                                         )}
                                     </Button>
@@ -416,7 +416,7 @@ export default function BranchShowPage({
                                 trigger={
                                     <Button size="sm" variant="ghost" className="h-8 text-xs font-medium gap-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50">
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>Sinf qo‘shish</span>
+                                        <span>{t('add_class', 'Sinf qo‘shish')}</span>
                                     </Button>
                                 }
                             />
@@ -430,9 +430,9 @@ export default function BranchShowPage({
                             <div>
                                 <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
                                     <Users className="w-4 h-4 text-emerald-500" />
-                                    <span>3-bosqich: O‘quvchilar va Hikvision amallari</span>
+                                    <span>{t('step_students', '3-bosqich: O‘quvchilar va Hikvision amallari')}</span>
                                     <span className="text-xs font-normal text-muted-foreground">
-                                        ({students.total} ta o‘quvchi)
+                                        ({students.total} {t('students.count', 'ta o‘quvchi')})
                                     </span>
                                 </h4>
                             </div>
@@ -466,12 +466,12 @@ export default function BranchShowPage({
                             <table className="w-full text-left text-xs">
                                 <thead className="border-b border-border bg-muted/60 text-muted-foreground font-semibold uppercase tracking-wider">
                                     <tr>
-                                        <th className="px-4 py-3">O‘quvchi</th>
-                                        <th className="px-4 py-3">Smena / Sinf</th>
-                                        <th className="px-4 py-3">Hikvision ID</th>
-                                        <th className="px-4 py-3">Face ID Holati</th>
-                                        <th className="px-4 py-3 text-center">Holat</th>
-                                        <th className="px-4 py-3 text-right">Hikvision Amallari</th>
+                                        <th className="px-4 py-3">{t('students.student', 'O‘quvchi')}</th>
+                                        <th className="px-4 py-3">{t('sidebar.shifts', 'Smena')} / {t('sidebar.classes', 'Sinf')}</th>
+                                        <th className="px-4 py-3">{t('students.hikvision_id', 'Hikvision ID')}</th>
+                                        <th className="px-4 py-3">{t('face_id_status', 'Face ID Holati')}</th>
+                                        <th className="px-4 py-3 text-center">{t('status', 'Holat')}</th>
+                                        <th className="px-4 py-3 text-right">{t('hikvision_actions', 'Hikvision Amallari')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
@@ -481,10 +481,10 @@ export default function BranchShowPage({
                                                 <div className="max-w-sm mx-auto space-y-2">
                                                     <Users className="w-8 h-8 mx-auto text-muted-foreground/50" />
                                                     <p className="font-semibold text-foreground">
-                                                        Ushbu tanlovda o‘quvchilar topilmadi
+                                                        {t('no_students_found', 'Ushbu tanlovda o‘quvchilar topilmadi')}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        Yangi o‘quvchi qo‘shish orqali sinfga biriktiring va Hikvision tizimida qayd eting.
+                                                        {t('no_students_found_desc', 'Yangi o‘quvchi qo‘shish orqali sinfga biriktiring va Hikvision tizimida qayd eting.')}
                                                     </p>
                                                     <div className="pt-2">
                                                         <CreateBranchStudentModal
@@ -576,12 +576,12 @@ export default function BranchShowPage({
                                                         {hasFace ? (
                                                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">
                                                                 <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                                                                <span>Yuz yuklangan</span>
+                                                                <span>{t('face_enrolled', 'Yuz yuklangan')}</span>
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
                                                                 <AlertCircle className="w-3 h-3" />
-                                                                <span>Yuz yo‘q</span>
+                                                                <span>{t('face_none', 'Yuz yo‘q')}</span>
                                                             </span>
                                                         )}
                                                     </td>
@@ -611,10 +611,10 @@ export default function BranchShowPage({
                                                                     setIsEventModalOpen(true);
                                                                 }}
                                                                 className="h-7 px-2 text-[11px] gap-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
-                                                                title="Hikvision turniket hodisalarini ko‘rish"
+                                                                title={t('hikvision_events', 'Turniket hodisalari')}
                                                             >
                                                                 <CalendarCheck className="w-3 h-3" />
-                                                                <span className="hidden sm:inline">Hodisalar</span>
+                                                                <span className="hidden sm:inline">{t('hikvision_events', 'Hodisalar')}</span>
                                                             </Button>
 
                                                             {/* Edit Student */}
@@ -626,7 +626,7 @@ export default function BranchShowPage({
                                                                     setIsStudentModalOpen(true);
                                                                 }}
                                                                 className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                                                                title="Tahrirlash"
+                                                                title={t('edit', 'Tahrirlash')}
                                                             >
                                                                 <Edit className="w-3.5 h-3.5" />
                                                             </Button>
@@ -637,7 +637,7 @@ export default function BranchShowPage({
                                                                 variant="ghost"
                                                                 onClick={() => handleDeleteStudent(st)}
                                                                 className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                                title="O‘chirish"
+                                                                title={t('delete', 'O‘chirish')}
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
                                                             </Button>

@@ -139,7 +139,7 @@ export default function StudentHikvisionEventsModal({
                                     </span>
                                 </DialogTitle>
                                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                                    Hikvision turniketidan o‘tish va yuzni tanish hodisalari jurnali
+                                    {t('hikvision_events_desc', 'Hikvision turniketidan o‘tish va yuzni tanish hodisalari jurnali')}
                                 </DialogDescription>
                             </div>
                         </div>
@@ -150,7 +150,7 @@ export default function StudentHikvisionEventsModal({
                             onClick={loadEvents}
                             disabled={loading}
                             className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                            title="Yangilash"
+                            title={t('refresh', 'Yangilash')}
                         >
                             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         </Button>
@@ -162,16 +162,16 @@ export default function StudentHikvisionEventsModal({
                     {loading ? (
                         <div className="py-12 flex flex-col items-center justify-center text-muted-foreground gap-2">
                             <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-                            <span className="text-xs">Hikvision hodisalari yuklanmoqda...</span>
+                            <span className="text-xs">{t('events_loading', 'Hikvision hodisalari yuklanmoqda...')}</span>
                         </div>
                     ) : events.length === 0 ? (
                         <div className="py-12 text-center rounded-xl border border-dashed border-border bg-card/40 p-6">
                             <ScanFace className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
                             <h4 className="text-sm font-semibold text-foreground mb-1">
-                                Hodisalar topilmadi
+                                {t('events_not_found', 'Hodisalar topilmadi')}
                             </h4>
                             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                                Ushbu o‘quvchining ({student.employeeNoString}) ID raqami bo‘yicha terminaldan o‘tish yozuvlari hali mavjud emas.
+                                {t('events_not_found_desc', 'Ushbu o‘quvchining ID raqami bo‘yicha terminaldan o‘tish yozuvlari hali mavjud emas.')}
                             </p>
                         </div>
                     ) : (
@@ -261,7 +261,7 @@ export default function StudentHikvisionEventsModal({
                                 className="w-full h-auto rounded-xl object-contain max-h-[70vh]"
                             />
                             <p className="text-center text-xs text-muted-foreground mt-2 py-1">
-                                Turniket kamerasi orqali qayd etilgan surat
+                                {t('zoom_capture_hint', 'Turniket kamerasi orqali qayd etilgan surat')}
                             </p>
                         </div>
                     </div>

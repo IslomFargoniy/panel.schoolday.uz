@@ -146,7 +146,7 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
                                                         size="sm"
                                                         onClick={() => handleSettingClick(item)}
                                                         className="h-8 w-8 p-0 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg"
-                                                        title={t('settings', 'Sozlamalar')}
+                                                        title={t('common.settings', 'Sozlamalar')}
                                                     >
                                                         <Settings className="w-4 h-4" />
                                                     </Button>

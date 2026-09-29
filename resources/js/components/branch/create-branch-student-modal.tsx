@@ -154,7 +154,7 @@ export default function CreateBranchStudentModal({
                         </span>
                     </DialogTitle>
                     <DialogDescription className="text-xs">
-                        {branch.name} filialidagi sinfga o‘quvchi biriktirish va Hikvision Face ID parametrlarini sozlash.
+                        {t('create_student_desc', 'Filialdagi sinfga o‘quvchi biriktirish va Hikvision Face ID parametrlarini sozlash.')}
                     </DialogDescription>
                 </DialogHeader>
 

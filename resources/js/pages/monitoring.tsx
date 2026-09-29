@@ -16,6 +16,7 @@ import {
     WifiOff,
 } from 'lucide-react';
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppearance } from '@/hooks/use-appearance';
 
 interface StudentData {
@@ -47,6 +48,7 @@ interface MonitoringData {
 }
 
 export default function Monitoring() {
+    const { t } = useTranslation();
     const { appearance, updateAppearance } = useAppearance();
     const [data, setData] = useState<MonitoringData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -120,10 +122,10 @@ export default function Monitoring() {
     return (
         <>
             <Head>
-                <title>Monitoring — SchoolDay</title>
+                <title>{t('sidebar.monitoring', 'Monitoring')} — SchoolDay</title>
                 <meta
                     name="description"
-                    content="Real-vaqt davomat monitoring"
+                    content={t('monitoring.subtitle', 'Real-vaqt davomat monitoring')}
                 />
             </Head>
 
@@ -148,7 +150,7 @@ export default function Monitoring() {
                             <div className="flex items-center gap-2">
                                 <Activity className="h-5 w-5 text-emerald-500" />
                                 <h1 className="text-lg font-bold sm:text-xl">
-                                    Monitoring
+                                    {t('sidebar.monitoring', 'Monitoring')}
                                 </h1>
                             </div>
                         </div>
@@ -163,7 +165,7 @@ export default function Monitoring() {
                                           ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400'
                                           : 'border-slate-500/20 bg-slate-500/10 text-slate-500 dark:bg-slate-500/20 dark:text-slate-400'
                                 }`}
-                                title={`Reverb WebSocket holati: ${connectionStatus}`}
+                                title={`Reverb WebSocket: ${connectionStatus}`}
                             >
                                 <span className="relative flex h-2 w-2">
                                     {isWsConnected && (
@@ -181,10 +183,10 @@ export default function Monitoring() {
                                 </span>
                                 <span>
                                     {isWsConnected
-                                        ? 'Reverb: Jonli'
+                                        ? t('monitoring.reverb_live', 'Reverb: Jonli')
                                         : isWsConnecting
-                                          ? 'Reverb: Ulanmoqda...'
-                                          : 'Oflayn (polling)'}
+                                          ? t('monitoring.reverb_connecting', 'Reverb: Ulanmoqda...')
+                                          : t('monitoring.offline_polling', 'Oflayn (polling)')}
                                 </span>
                             </div>
 
@@ -197,7 +199,7 @@ export default function Monitoring() {
                             <button
                                 onClick={() => fetchData()}
                                 disabled={loading}
-                                title="Yangilash"
+                                title={t('refresh', 'Yangilash')}
                                 className="rounded-xl bg-black/5 p-2 transition-colors hover:bg-black/10 disabled:opacity-50 dark:bg-white/10 dark:hover:bg-white/20"
                             >
                                 <RefreshCw
@@ -229,7 +231,7 @@ export default function Monitoring() {
                                 {totalStudents}
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                Jami o'quvchilar
+                                {t('monitoring.total_students', 'Jami o‘quvchilar')}
                             </p>
                         </div>
 
@@ -243,7 +245,7 @@ export default function Monitoring() {
                                 {presentStudents}
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                Kelganlar
+                                {t('monitoring.present', 'Kelganlar')}
                             </p>
                         </div>
 
@@ -257,7 +259,7 @@ export default function Monitoring() {
                                 {absentStudents}
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                Kelmaganlar
+                                {t('monitoring.absent', 'Kelmaganlar')}
                             </p>
                         </div>
 
@@ -273,7 +275,7 @@ export default function Monitoring() {
                                 {attendanceRate}%
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                Davomat foizi
+                                {t('monitoring.attendance_rate', 'Davomat foizi')}
                             </p>
                         </div>
                     </div>
@@ -283,7 +285,7 @@ export default function Monitoring() {
                         <div className="flex flex-col items-center justify-center gap-4 py-24">
                             <RefreshCw className="h-8 w-8 animate-spin text-emerald-500" />
                             <p className="text-slate-400">
-                                Ma'lumotlar yuklanmoqda...
+                                {t('monitoring.loading', 'Ma‘lumotlar yuklanmoqda...')}
                             </p>
                         </div>
                     ) : (
@@ -312,10 +314,10 @@ export default function Monitoring() {
                                             <div className="ml-auto flex items-center gap-2 text-xs">
                                                 <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-600 dark:text-emerald-400">
                                                     {branch.present_students}{' '}
-                                                    kelgan
+                                                    {t('monitoring.present_short', 'kelgan')}
                                                 </span>
                                                 <span className="rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-500 dark:text-red-400">
-                                                    {branchAbsent} kelmagan
+                                                    {branchAbsent} {t('monitoring.absent_short', 'kelmagan')}
                                                 </span>
                                                 <span className="hidden rounded-full bg-blue-500/10 px-2.5 py-1 font-medium text-blue-600 sm:inline dark:text-blue-400">
                                                     {branchRate}%
@@ -326,7 +328,7 @@ export default function Monitoring() {
                                         {/* Class Cards Grid */}
                                         {branch.classes.length === 0 ? (
                                             <p className="px-1 text-sm text-slate-400 italic">
-                                                Sinflar topilmadi
+                                                {t('monitoring.no_classes', 'Sinflar topilmadi')}
                                             </p>
                                         ) : (
                                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -418,8 +420,8 @@ export default function Monitoring() {
                                                                                 }`}
                                                                             >
                                                                                 {student.is_present
-                                                                                    ? 'Kelgan'
-                                                                                    : 'Kelmagan'}
+                                                                                    ? t('monitoring.status_present', 'Kelgan')
+                                                                                    : t('monitoring.status_absent', 'Kelmagan')}
                                                                             </span>
                                                                         </div>
                                                                     ),
@@ -428,8 +430,7 @@ export default function Monitoring() {
                                                                     .length ===
                                                                     0 && (
                                                                     <p className="px-4 py-3 text-xs text-slate-400 italic">
-                                                                        O'quvchilar
-                                                                        topilmadi
+                                                                        {t('monitoring.no_students', 'O‘quvchilar topilmadi')}
                                                                     </p>
                                                                 )}
                                                             </div>
@@ -447,8 +448,7 @@ export default function Monitoring() {
 
                 {/* Footer */}
                 <footer className="relative z-10 px-4 py-6 text-center text-xs text-slate-400">
-                    Real-vaqt (WebSocket) rejimida yangilanadi • SchoolDay
-                    Monitoring
+                    {t('monitoring.footer', 'Real-vaqt (WebSocket) rejimida yangilanadi • SchoolDay Monitoring')}
                 </footer>
             </div>
         </>

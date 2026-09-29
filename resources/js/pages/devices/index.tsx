@@ -79,23 +79,39 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-    const handleSync = (device: BranchDevice) => {
+    const handleSync = async (device: BranchDevice) => {
         setSyncingId(device.id);
-        router.post(
-            `/branch_device/${device.id}/sync`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setSyncingId(null);
-                    toast.success(t('sync_success', 'ISUP hodisalar muvaffaqiyatli sinxronlandi'));
+        try {
+            const xsrfToken = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1];
+
+            const response = await fetch(`/branch_device/${device.id}/sync`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
                 },
-                onError: (err: any) => {
-                    setSyncingId(null);
-                    toast.error(err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik'));
-                },
-            },
-        );
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success !== false) {
+                const count = data.synced_count ?? 0;
+                toast.success(
+                    t('sync_success', `ISUP hodisalar muvaffaqiyatli sinxronlandi (${count} ta)`),
+                );
+                router.reload({ only: ['devices'] });
+            } else {
+                toast.error(data.message || t('sync_failed', 'Sinxronizatsiyada xatolik'));
+            }
+        } catch (err: any) {
+            toast.error(err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik'));
+        } finally {
+            setSyncingId(null);
+        }
     };
 
     const handleDelete = (id: number) => {
@@ -219,8 +235,8 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
                                     <th className="px-4 py-3">{t('device_name', 'Qurilma nomi')}</th>
                                     <th className="px-4 py-3">{t('branch', 'Filial')}</th>
                                     <th className="px-4 py-3">{t('connection_type', 'Protokol')}</th>
-                                    <th className="px-4 py-3">Device ID</th>
-                                    <th className="px-4 py-3">MAC manzil</th>
+                                    <th className="px-4 py-3">{t('device_id', 'Device ID')}</th>
+                                    <th className="px-4 py-3">{t('mac_address', 'MAC manzil')}</th>
                                     <th className="px-4 py-3 text-center">{t('status', 'Holat')}</th>
                                     <th className="px-4 py-3">{t('last_seen', 'Oxirgi aloqa')}</th>
                                     <th className="px-4 py-3 text-right">{t('actions', 'Amallar')}</th>
