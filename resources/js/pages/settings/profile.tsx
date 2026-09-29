@@ -1,20 +1,24 @@
+import { type Auth, type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import DeleteUser from '@/components/delete-user';
-import Heading from '@/components/heading';
+
+import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PhoneInput } from '@/components/ui/phone-input';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { edit } from '@/routes/profile';
+import { edit, update } from '@/routes/profile';
 import { send } from '@/routes/verification';
-import type { BreadcrumbItem } from '@/types';
+
+type ProfileForm = {
+    name: string;
+    phone: string;
+    email: string;
+};
 
 export default function Profile({
     mustVerifyEmail,
@@ -23,9 +27,8 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const { t } = useTranslation();
-    const [phone, setPhone] = useState(auth.user.phone || '');
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -34,196 +37,187 @@ export default function Profile({
         },
     ];
 
+    const { data, setData, patch, errors, processing, recentlySuccessful } =
+        useForm<Required<ProfileForm>>({
+            name: auth.user.name,
+            phone: (auth.user.phone as string) || '',
+            email: auth.user.email,
+        });
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+
+        patch(update().url, {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.profile', 'Profile settings')} />
 
-            <h1 className="sr-only">
-                {t('settings.profile_settings', 'Profile Settings')}
-            </h1>
-
             <SettingsLayout>
                 <div className="space-y-6">
-                    <Heading
-                        variant="small"
+                    <HeadingSmall
                         title={t(
                             'settings.profile_info',
                             'Profile information',
                         )}
                         description={t(
                             'settings.update_info',
-                            'Update your name and email address',
+                            'Update your name, phone and email address',
                         )}
                     />
 
-                    <Form
-                        {...ProfileController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
-                        className="space-y-6"
-                    >
-                        {({ processing, recentlySuccessful, errors }) => (
-                            <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">
-                                        {t('settings.name', 'Name')}
-                                    </Label>
+                    <form onSubmit={submit} className="space-y-6">
+                        <div className="grid gap-2">
+                            <Label htmlFor="name">
+                                {t('settings.name', 'Name')}
+                            </Label>
 
-                                    <Input
-                                        id="name"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.name}
-                                        name="name"
-                                        required
-                                        autoComplete="name"
-                                        placeholder={t(
-                                            'settings.placeholder_name',
-                                            'Full name',
-                                        )}
-                                    />
+                            <Input
+                                id="name"
+                                className="mt-1 block w-full"
+                                value={data.name}
+                                onChange={(e) =>
+                                    setData('name', e.target.value)
+                                }
+                                required
+                                autoComplete="name"
+                                placeholder={t(
+                                    'settings.placeholder_name',
+                                    'Full name',
+                                )}
+                            />
 
-                                    <InputError
-                                        className="mt-2"
-                                        message={errors.name}
-                                    />
-                                </div>
+                            <InputError
+                                className="mt-2"
+                                message={errors.name}
+                            />
+                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="email">
-                                        {t('settings.email', 'Email address')}
-                                    </Label>
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">
+                                {t('settings.phone', 'Phone Number')}
+                            </Label>
 
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        defaultValue={auth.user.email}
-                                        name="email"
-                                        required
-                                        autoComplete="username"
-                                        placeholder={t(
-                                            'settings.placeholder_email',
-                                            'Email address',
-                                        )}
-                                    />
+                            <Input
+                                id="phone"
+                                className="mt-1 block w-full"
+                                value={data.phone}
+                                onChange={(e) =>
+                                    setData('phone', e.target.value)
+                                }
+                                autoComplete="tel"
+                                placeholder="+99890XXXXXXX"
+                            />
 
-                                    <InputError
-                                        className="mt-2"
-                                        message={errors.email}
-                                    />
-                                </div>
+                            <InputError
+                                className="mt-2"
+                                message={errors.phone}
+                            />
+                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="phone">
-                                        {t('settings.phone', 'Phone Number')}
-                                    </Label>
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">
+                                {t('settings.email', 'Email address')}
+                            </Label>
 
-                                    <PhoneInput
-                                        id="phone"
-                                        className="mt-1 block w-full"
-                                        value={phone}
-                                        onChange={(val) => setPhone(val || '')}
-                                        autoComplete="tel"
-                                        placeholder="+99890XXXXXXX"
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name="phone"
-                                        value={phone}
-                                    />
+                            <Input
+                                id="email"
+                                type="email"
+                                className="mt-1 block w-full"
+                                value={data.email}
+                                onChange={(e) =>
+                                    setData('email', e.target.value)
+                                }
+                                required
+                                autoComplete="username"
+                                placeholder={t(
+                                    'settings.placeholder_email',
+                                    'Email address',
+                                )}
+                            />
 
-                                    <InputError
-                                        className="mt-2"
-                                        message={errors.phone as string}
-                                    />
-                                </div>
+                            <InputError
+                                className="mt-2"
+                                message={errors.email}
+                            />
+                        </div>
 
-                                <div className="grid gap-2">
-                                    <Label>
-                                        {t(
-                                            'settings.telegram_id',
-                                            'Telegram ID',
-                                        )}
-                                    </Label>
+                        <div className="grid gap-2">
+                            <Label>
+                                {t('settings.telegram_id', 'Telegram ID')}
+                            </Label>
 
-                                    <Input
-                                        readOnly
-                                        disabled
-                                        type="text"
-                                        className="mt-1 block w-full bg-muted"
-                                        value={
-                                            auth.user.telegram_id ||
-                                            t(
-                                                'settings.not_connected',
-                                                'Ulanmagan',
-                                            )
-                                        }
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                        {t(
-                                            'settings.bot_instruction',
-                                            "Botga (/start) buyrug'ini yozganingizda yoki botdan kontakt jo'natganingizda shu yerda yoziladi.",
-                                        )}
+                            <Input
+                                readOnly
+                                disabled
+                                type="text"
+                                className="mt-1 block w-full cursor-not-allowed bg-muted opacity-80"
+                                value={
+                                    auth.user.telegram_id ||
+                                    t('settings.not_connected', 'Ulanmagan')
+                                }
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                {t(
+                                    'settings.bot_instruction',
+                                    "Botga (/start) buyrug'ini yozganingizda yoki botdan kontakt jo'natganingizda shu yerda yoziladi.",
+                                )}
+                            </p>
+                        </div>
+
+                        {mustVerifyEmail &&
+                            auth.user.email_verified_at === null && (
+                                <div>
+                                    <p className="-mt-4 text-sm text-muted-foreground">
+                                        Your email address is unverified.{' '}
+                                        <Link
+                                            href={send()}
+                                            as="button"
+                                            className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                        >
+                                            {t(
+                                                'settings.resend_verification',
+                                                'Click here to resend the verification email.',
+                                            )}
+                                        </Link>
                                     </p>
-                                </div>
 
-                                {mustVerifyEmail &&
-                                    auth.user.email_verified_at === null && (
-                                        <div>
-                                            <p className="-mt-4 text-sm text-muted-foreground">
-                                                Your email address is
-                                                unverified.{' '}
-                                                <Link
-                                                    href={send()}
-                                                    as="button"
-                                                    className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                                >
-                                                    {t(
-                                                        'settings.resend_verification',
-                                                        'Click here to resend the verification email.',
-                                                    )}
-                                                </Link>
-                                            </p>
-
-                                            {status ===
-                                                'verification-link-sent' && (
-                                                <div className="mt-2 text-sm font-medium text-green-600">
-                                                    {t(
-                                                        'settings.verification_sent',
-                                                        'A new verification link has been sent to your email address.',
-                                                    )}
-                                                </div>
+                                    {status === 'verification-link-sent' && (
+                                        <div className="mt-2 text-sm font-medium text-green-600">
+                                            {t(
+                                                'settings.verification_sent',
+                                                'A new verification link has been sent to your email address.',
                                             )}
                                         </div>
                                     )}
-
-                                <div className="flex items-center gap-4">
-                                    <Button
-                                        disabled={processing}
-                                        data-test="update-profile-button"
-                                    >
-                                        {t('settings.save', 'Save')}
-                                    </Button>
-
-                                    <Transition
-                                        show={recentlySuccessful}
-                                        enter="transition ease-in-out"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <p className="text-sm text-neutral-600">
-                                            {t('settings.saved', 'Saved')}
-                                        </p>
-                                    </Transition>
                                 </div>
-                            </>
-                        )}
-                    </Form>
-                </div>
+                            )}
 
-                <DeleteUser />
+                        <div className="flex items-center gap-4">
+                            <Button
+                                disabled={processing}
+                                data-test="update-profile-button"
+                            >
+                                {t('settings.save', 'Save')}
+                            </Button>
+
+                            <Transition
+                                show={recentlySuccessful}
+                                enter="transition ease-in-out"
+                                enterFrom="opacity-0"
+                                leave="transition ease-in-out"
+                                leaveTo="opacity-0"
+                            >
+                                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                    {t('settings.saved', 'Saved')}
+                                </p>
+                            </Transition>
+                        </div>
+                    </form>
+                </div>
             </SettingsLayout>
         </AppLayout>
     );

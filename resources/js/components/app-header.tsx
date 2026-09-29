@@ -1,7 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import LanguageBar from '@/components/language';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -208,6 +210,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 ))}
                             </div>
                         </div>
+                        <LanguageBar />
+                        <AppearanceToggleDropdown />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button

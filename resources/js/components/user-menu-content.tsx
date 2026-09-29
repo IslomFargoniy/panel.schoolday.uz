@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings, Monitor, Moon, Sun } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     DropdownMenuGroup,
@@ -8,7 +8,6 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
-import { useAppearance } from '@/hooks/use-appearance';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -20,8 +19,7 @@ type Props = {
 
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
-    const { t, i18n } = useTranslation();
-    const { appearance, updateAppearance } = useAppearance();
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         cleanup();
@@ -35,58 +33,6 @@ export function UserMenuContent({ user }: Props) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">
-                    {t('settings.appearance', 'Appearance')}
-                </DropdownMenuLabel>
-                <div className="flex gap-2 px-2 py-1">
-                    <button
-                        onClick={() => updateAppearance('light')}
-                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        <Sun className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                        onClick={() => updateAppearance('dark')}
-                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        <Moon className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                        onClick={() => updateAppearance('system')}
-                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'system' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        <Monitor className="h-3.5 w-3.5" />
-                    </button>
-                </div>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">
-                    {t('sidebar.language', 'Language')}
-                </DropdownMenuLabel>
-                <div className="flex gap-2 px-2 py-1">
-                    <button
-                        onClick={() => i18n.changeLanguage('uz')}
-                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'uz' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        UZ
-                    </button>
-                    <button
-                        onClick={() => i18n.changeLanguage('ru')}
-                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'ru' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        RU
-                    </button>
-                    <button
-                        onClick={() => i18n.changeLanguage('en')}
-                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'en' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
-                    >
-                        EN
-                    </button>
-                </div>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
