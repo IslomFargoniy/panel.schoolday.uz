@@ -14,7 +14,8 @@
         "platform": "Platforma",
         "repository": "Repozitoriy",
         "telegram": "Telegram",
-        "school": "Maktablar"
+        "school": "Maktablar",
+        "devices": "Qurilmalar"
     },
     "common": {
         "per_page": "Ko'rsatish",

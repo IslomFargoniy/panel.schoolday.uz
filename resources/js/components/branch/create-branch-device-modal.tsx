@@ -29,8 +29,10 @@ import {
 import type { Branch } from '@/types';
 
 interface CreateBranchDeviceModalProps {
-    branch: Branch;
+    branch?: Branch;
+    branches?: Branch[];
     onCreated?: () => void;
+    trigger?: React.ReactNode;
 }
 
 type FormData = {
@@ -44,19 +46,23 @@ type FormData = {
 
 export default function CreateBranchDeviceModal({
     branch,
+    branches = [],
     onCreated,
+    trigger,
 }: CreateBranchDeviceModalProps) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
+    const initialBranchId = branch?.id || (branches.length > 0 ? branches[0].id : 1);
+
     const { data, setData, post, processing, reset, errors, clearErrors } =
         useForm<FormData>({
-            branch_id: branch.id,
+            branch_id: initialBranchId,
             name: '',
             mac_address: '',
-            device_id: `branch${branch.id}`,
+            device_id: `branch${initialBranchId}`,
             connection_type: 'isup',
-            encryption_key: `SchoolDay${branch.id}2026`,
+            encryption_key: `SchoolDay${initialBranchId}2026`,
         });
 
     const submit: FormEventHandler = (e) => {
@@ -91,10 +97,14 @@ export default function CreateBranchDeviceModal({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700">
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>{t('create_device', 'Qurilma qo‘shish')}</span>
-                </Button>
+                {trigger ? (
+                    trigger
+                ) : (
+                    <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700">
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>{t('create_device', 'Qurilma qo‘shish')}</span>
+                    </Button>
+                )}
             </DialogTrigger>
 
             <DialogContent className="max-w-md rounded-2xl border-slate-200 bg-card p-6 text-card-foreground shadow-xl dark:border-slate-800">
@@ -111,14 +121,54 @@ export default function CreateBranchDeviceModal({
                         </span>
                     </DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">
-                        {t('branch', 'Filial')}:{' '}
-                        <strong className="font-semibold text-foreground">
-                            {branch.name}
-                        </strong>
+                        {branch ? (
+                            <>
+                                {t('branch', 'Filial')}:{' '}
+                                <strong className="font-semibold text-foreground">
+                                    {branch.name}
+                                </strong>
+                            </>
+                        ) : (
+                            t(
+                                'modal.create_device_desc',
+                                'Hikvision ISUP 5.0 yoki HTTP Listening terminal parametrlarini kiriting',
+                            )
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={submit} className="space-y-4 pt-1">
+                    {!branch && branches.length > 0 && (
+                        <div className="space-y-1.5">
+                            <Label htmlFor="branch_id" className="text-xs font-medium">
+                                {t('branch', 'Filial')} <span className="text-rose-500">*</span>
+                            </Label>
+                            <Select
+                                value={String(data.branch_id)}
+                                onValueChange={(val) => {
+                                    const bId = Number(val);
+                                    setData((prev) => ({
+                                        ...prev,
+                                        branch_id: bId,
+                                        device_id: `branch${bId}`,
+                                        encryption_key: `SchoolDay${bId}2026`,
+                                    }));
+                                }}
+                            >
+                                <SelectTrigger className="h-9 rounded-lg border-input text-xs sm:text-sm">
+                                    <SelectValue placeholder={t('select_branch', 'Filialni tanlang')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {branches.map((b) => (
+                                        <SelectItem key={b.id} value={String(b.id)}>
+                                            {b.name} {(b as any).school ? `(${((b as any).school.name)})` : ''}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <InputError message={errors.branch_id} />
+                        </div>
+                    )}
                     <div className="space-y-1.5">
                         <Label htmlFor="name" className="text-xs font-medium">
                             {t('device_name', 'Qurilma nomi')}

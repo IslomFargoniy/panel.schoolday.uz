@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { ScanFace } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
@@ -86,9 +87,12 @@ export function BranchesTable({
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="text-base font-medium">
+                                            <Link
+                                                href={`/branches/${branch.id}`}
+                                                className="text-base font-semibold text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                            >
                                                 {branch.name}
-                                            </span>
+                                            </Link>
                                             <span className="mt-0.5 text-xs text-muted-foreground">
                                                 {branch.description || '-'}
                                             </span>
@@ -208,24 +212,24 @@ export function BranchesTable({
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            onClick={() =>
-                                                onManageDevices(branch)
-                                            }
+                                            asChild
                                             className="gap-1.5 border-indigo-200 text-xs text-indigo-600 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                                         >
-                                            <ScanFace className="h-3.5 w-3.5" />
-                                            <span>
-                                                {t(
-                                                    'branches.devices',
-                                                    'Qurilmalar',
-                                                )}{' '}
-                                                (
-                                                {branch.devices?.length ||
-                                                    branch.mac_address_list
-                                                        ?.length ||
-                                                    0}
-                                                )
-                                            </span>
+                                            <Link href={`/branches/${branch.id}`}>
+                                                <ScanFace className="h-3.5 w-3.5" />
+                                                <span>
+                                                    {t(
+                                                        'branches.devices',
+                                                        'Qurilmalar',
+                                                    )}{' '}
+                                                    (
+                                                    {branch.devices?.length ||
+                                                        branch.mac_address_list
+                                                            ?.length ||
+                                                        0}
+                                                    )
+                                                </span>
+                                            </Link>
                                         </Button>
                                         <Button
                                             size="sm"

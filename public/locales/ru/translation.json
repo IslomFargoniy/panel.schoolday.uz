@@ -14,7 +14,8 @@
         "platform": "Платформа",
         "repository": "Репозиторий",
         "telegram": "Телеграм",
-        "school": "Школы"
+        "school": "Школы",
+        "devices": "Устройства"
     },
     "common": {
         "per_page": "Показывать",

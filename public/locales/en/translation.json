@@ -14,7 +14,8 @@
         "platform": "Platform",
         "repository": "Repository",
         "telegram": "Telegram",
-        "school": "Schools"
+        "school": "Schools",
+        "devices": "Devices"
     },
     "common": {
         "per_page": "Show",

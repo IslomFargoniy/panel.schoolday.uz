@@ -87,6 +87,47 @@ class BranchController extends Controller
         ]);
     }
 
+    public function show(Request $request, Branch $branch)
+    {
+        // Multi-tenant check: non-admins must belong to the branch's school
+        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id')->toArray();
+            if (!in_array($branch->school_id, $userSchoolIds)) {
+                abort(403, 'Ushbu filialga kirish huquqi yo‘q.');
+            }
+        }
+
+        $branch->load([
+            'school',
+            'devices' => fn ($q) => $q->latest(),
+            'shifts' => function ($q) {
+                $q->withCount('classes')
+                  ->with(['classes' => fn ($c) => $c->withCount('students')]);
+            },
+        ]);
+
+        $studentsQuery = \App\Models\Student::with(['schoolClass'])
+            ->whereHas('schoolClass.shift', function ($q) use ($branch) {
+                $q->where('branch_id', $branch->id);
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $studentsQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $students = $studentsQuery->paginate($request->input('per_page', 15))->withQueryString();
+
+        return Inertia::render('branches/show', [
+            'branch' => $branch,
+            'students' => $students,
+            'filters' => $request->only(['search', 'per_page']),
+        ]);
+    }
+
     public function store(\App\Http\Requests\BranchRequest $request)
     {
         $validated = $request->validated();

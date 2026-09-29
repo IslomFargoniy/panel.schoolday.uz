@@ -11,6 +11,38 @@ use Illuminate\Validation\ValidationException;
 class BranchDeviceController extends Controller
 {
     /**
+     * Display a listing of devices across branches.
+     */
+    public function index(\Illuminate\Http\Request $request)
+    {
+        $query = BranchDevice::with(['branch.school'])->latest();
+
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
+        if ($request->filled('connection_type')) {
+            $query->where('connection_type', $request->connection_type);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('mac_address', 'like', "%{$search}%")
+                  ->orWhere('device_id', 'like', "%{$search}%");
+            });
+        }
+
+        $devices = $query->paginate($request->input('per_page', 20))->withQueryString();
+        $branches = \App\Models\Branch::with('school')->get(['id', 'name', 'school_id']);
+
+        return \Inertia\Inertia::render('devices/index', [
+            'devices' => $devices,
+            'branches' => $branches,
+            'filters' => $request->only(['search', 'branch_id', 'connection_type', 'per_page']),
+        ]);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreBranchDeviceRequest $request)
