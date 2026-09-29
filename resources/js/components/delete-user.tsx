@@ -26,13 +26,21 @@ export default function DeleteUser() {
             <Heading
                 variant="small"
                 title={t('settings.delete_account', 'Delete account')}
-                description={t('settings.delete_description', 'Delete your account and all of its resources')}
+                description={t(
+                    'settings.delete_description',
+                    'Delete your account and all of its resources',
+                )}
             />
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                    <p className="font-medium">{t('settings.warning', 'Warning')}</p>
+                    <p className="font-medium">
+                        {t('settings.warning', 'Warning')}
+                    </p>
                     <p className="text-sm">
-                        {t('settings.warning_text', 'Please proceed with caution, this cannot be undone.')}
+                        {t(
+                            'settings.warning_text',
+                            'Please proceed with caution, this cannot be undone.',
+                        )}
                     </p>
                 </div>
 
@@ -47,10 +55,16 @@ export default function DeleteUser() {
                     </DialogTrigger>
                     <DialogContent>
                         <DialogTitle>
-                            {t('settings.delete_confirm', 'Are you sure you want to delete your account?')}
+                            {t(
+                                'settings.delete_confirm',
+                                'Are you sure you want to delete your account?',
+                            )}
                         </DialogTitle>
                         <DialogDescription>
-                            {t('settings.delete_warning', 'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.')}
+                            {t(
+                                'settings.delete_warning',
+                                'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+                            )}
                         </DialogDescription>
 
                         <Form
@@ -77,7 +91,10 @@ export default function DeleteUser() {
                                             type="password"
                                             name="password"
                                             ref={passwordInput}
-                                            placeholder={t('settings.password', 'Password')}
+                                            placeholder={t(
+                                                'settings.password',
+                                                'Password',
+                                            )}
                                             autoComplete="current-password"
                                         />
 
@@ -105,7 +122,10 @@ export default function DeleteUser() {
                                                 type="submit"
                                                 data-test="confirm-delete-user-button"
                                             >
-                                                {t('settings.delete_account', 'Delete account')}
+                                                {t(
+                                                    'settings.delete_account',
+                                                    'Delete account',
+                                                )}
                                             </button>
                                         </Button>
                                     </DialogFooter>

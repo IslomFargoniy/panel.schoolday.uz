@@ -1,4 +1,7 @@
-export default function AppLogoIcon({ className, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
+export default function AppLogoIcon({
+    className,
+    ...props
+}: React.ImgHTMLAttributes<HTMLImageElement>) {
     return (
         <img
             src="/image/logo.jpg"

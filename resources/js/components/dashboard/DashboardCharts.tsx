@@ -19,7 +19,7 @@ ChartJS.register(
     ArcElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
 );
 
 interface DashboardChartsProps {
@@ -45,20 +45,23 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
                     padding: 20,
                     usePointStyle: true,
                     font: {
-                        size: 12
-                    }
-                }
+                        size: 12,
+                    },
+                },
             },
             tooltip: {
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 padding: 12,
                 cornerRadius: 8,
-            }
+            },
         },
     };
 
     const attendanceData = {
-        labels: [t('reports.status_present', 'Kelganlar'), t('reports.status_absent', 'Kelmaganlar')],
+        labels: [
+            t('reports.status_present', 'Kelganlar'),
+            t('reports.status_absent', 'Kelmaganlar'),
+        ],
         datasets: [
             {
                 data: [stats.present_today, stats.absent_today],
@@ -70,7 +73,10 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
     };
 
     const latenessData = {
-        labels: [t('reports.on_time', 'Vaqtida'), t('reports.late', 'Kechikkan')],
+        labels: [
+            t('reports.on_time', 'Vaqtida'),
+            t('reports.late', 'Kechikkan'),
+        ],
         datasets: [
             {
                 data: [stats.on_time_today, stats.late_arrivals],
@@ -90,7 +96,7 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
                 labels: {
                     padding: 20,
                     usePointStyle: true,
-                }
+                },
             },
             tooltip: {
                 mode: 'index' as const,
@@ -113,29 +119,29 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
     };
 
     const barData = {
-        labels: monthlyStats.map(s => s.date),
+        labels: monthlyStats.map((s) => s.date),
         datasets: [
             {
                 label: t('reports.status_present', 'Kelganlar'),
-                data: monthlyStats.map(s => s.present),
+                data: monthlyStats.map((s) => s.present),
                 backgroundColor: '#10b981',
                 borderRadius: 4,
             },
             {
                 label: t('reports.status_absent', 'Kelmaganlar'),
-                data: monthlyStats.map(s => s.absent),
+                data: monthlyStats.map((s) => s.absent),
                 backgroundColor: '#f59e0b',
                 borderRadius: 4,
             },
             {
                 label: t('reports.late', 'Kechikkanlar'),
-                data: monthlyStats.map(s => s.late),
+                data: monthlyStats.map((s) => s.late),
                 backgroundColor: '#ef4444',
                 borderRadius: 4,
             },
             {
                 label: t('reports.on_time', 'Vaqtida'),
-                data: monthlyStats.map(s => s.on_time),
+                data: monthlyStats.map((s) => s.on_time),
                 backgroundColor: '#3b82f6',
                 borderRadius: 4,
             },
@@ -144,11 +150,14 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card className="overflow-hidden">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-base font-semibold">
-                            {t('dashboard.attendance_overview', 'Bugungi davomat umumiy ko\'rinishi')}
+                            {t(
+                                'dashboard.attendance_overview',
+                                "Bugungi davomat umumiy ko'rinishi",
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] p-4">
@@ -159,7 +168,10 @@ export function DashboardCharts({ stats, monthlyStats }: DashboardChartsProps) {
                 <Card className="overflow-hidden">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-base font-semibold">
-                            {t('dashboard.lateness_overview', 'Bugungi kechikish umumiy ko\'rinishi')}
+                            {t(
+                                'dashboard.lateness_overview',
+                                "Bugungi kechikish umumiy ko'rinishi",
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] p-4">

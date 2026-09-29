@@ -18,16 +18,16 @@ type Props = {
     canRegister?: boolean;
 };
 
-export default function Login({
-    status,
-    canResetPassword,
-}: Props) {
+export default function Login({ status, canResetPassword }: Props) {
     const { t } = useTranslation();
 
     return (
         <AuthLayout
             title={t('auth.login_title', 'Log in to your account')}
-            description={t('auth.login_desc', 'Enter your email and password below to log in')}
+            description={t(
+                'auth.login_desc',
+                'Enter your email and password below to log in',
+            )}
         >
             <Head title={t('auth.login', 'Log in')} />
 
@@ -40,7 +40,9 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t('auth.email', 'Email or Phone')}</Label>
+                                <Label htmlFor="email">
+                                    {t('auth.email', 'Email or Phone')}
+                                </Label>
                                 <Input
                                     id="email"
                                     type="text"
@@ -56,14 +58,19 @@ export default function Login({
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">{t('auth.password', 'Password')}</Label>
+                                    <Label htmlFor="password">
+                                        {t('auth.password', 'Password')}
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            {t('auth.forgot', 'Forgot password?')}
+                                            {t(
+                                                'auth.forgot',
+                                                'Forgot password?',
+                                            )}
                                         </TextLink>
                                     )}
                                 </div>
@@ -85,7 +92,9 @@ export default function Login({
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">{t('auth.remember', 'Remember me')}</Label>
+                                <Label htmlFor="remember">
+                                    {t('auth.remember', 'Remember me')}
+                                </Label>
                             </div>
 
                             <Button

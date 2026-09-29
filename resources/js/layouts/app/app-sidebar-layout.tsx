@@ -9,7 +9,6 @@ import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { Toaster } from '@/components/ui/sonner';
 import type { AppLayoutProps } from '@/types';
 
-
 export default function AppSidebarLayout({
     children,
     breadcrumbs = [],

@@ -17,8 +17,12 @@ export default function AuthSimpleLayout({
                             href={home()}
                             className="flex flex-col items-center gap-2 font-medium"
                         >
-                            <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden shadow-lg">
-                                <img src="/image/logo.jpg" alt="SchoolDay Logo" className="h-12 w-12 object-cover" />
+                            <div className="mb-1 flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl shadow-lg">
+                                <img
+                                    src="/image/logo.jpg"
+                                    alt="SchoolDay Logo"
+                                    className="h-12 w-12 object-cover"
+                                />
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>

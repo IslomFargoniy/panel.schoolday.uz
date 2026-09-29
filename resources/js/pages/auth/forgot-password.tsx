@@ -17,7 +17,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
     return (
         <AuthLayout
             title={t('auth.forgot_title', 'Forgot password')}
-            description={t('auth.forgot_desc', 'Enter your email to receive a password reset link')}
+            description={t(
+                'auth.forgot_desc',
+                'Enter your email to receive a password reset link',
+            )}
         >
             <Head title={t('auth.forgot_title', 'Forgot password')} />
 
@@ -32,7 +35,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t('auth.email_address', 'Email address')}</Label>
+                                <Label htmlFor="email">
+                                    {t('auth.email_address', 'Email address')}
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -54,7 +59,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     {processing && (
                                         <LoaderCircle className="h-4 w-4 animate-spin" />
                                     )}
-                                    {t('auth.email_reset_link', 'Email password reset link')}
+                                    {t(
+                                        'auth.email_reset_link',
+                                        'Email password reset link',
+                                    )}
                                 </Button>
                             </div>
                         </>
@@ -63,7 +71,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
                     <span>{t('auth.or_return_to', 'Or, return to')} </span>
-                    <TextLink href={login()}>{t('auth.login', 'log in')}</TextLink>
+                    <TextLink href={login()}>
+                        {t('auth.login', 'log in')}
+                    </TextLink>
                 </div>
             </div>
         </AuthLayout>

@@ -1,5 +1,5 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import type { FormEvent} from 'react';
+import type { FormEvent } from 'react';
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,7 +9,12 @@ import { StudentForm } from '@/components/students/StudentForm';
 import { StudentImportModal } from '@/components/students/StudentImportModal';
 import { StudentsTable } from '@/components/students/StudentsTable';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Student, SchoolClass, PaginatedResponse } from '@/types';
+import type {
+    BreadcrumbItem,
+    Student,
+    SchoolClass,
+    PaginatedResponse,
+} from '@/types';
 
 interface StudentsPageFilters {
     class_id?: string;
@@ -35,7 +40,9 @@ export default function StudentsPage({
 }: StudentsPageProps) {
     const { t } = useTranslation();
 
-    const breadcrumbs: BreadcrumbItem[] = [{ title: t('students.title', 'Students'), href: '/students' }];
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('students.title', 'Students'), href: '/students' },
+    ];
 
     // ─── Filters ────────────────────────────────────────────────────────────────
     const { data: filterData, setData: setFilterData } = useForm({
@@ -46,7 +53,10 @@ export default function StudentsPage({
     });
 
     const handleFilter = () => {
-        router.get('/students', filterData, { preserveState: true, replace: true });
+        router.get('/students', filterData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     const clearFilters = () => {
@@ -56,7 +66,9 @@ export default function StudentsPage({
 
     // ─── Form ────────────────────────────────────────────────────────────────────
     const [editing, setEditing] = useState<Student | null>(null);
-    const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
+    const [formImagePreview, setFormImagePreview] = useState<string | null>(
+        null,
+    );
     const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,8 +98,6 @@ export default function StudentsPage({
         valid_begin: '',
         valid_end: '',
     });
-
-
 
     // ─── Handlers ────────────────────────────────────────────────────────────────
     const handleSubmit = async (e: FormEvent) => {
@@ -130,7 +140,7 @@ export default function StudentsPage({
                         'plan_template_no',
                         'valid_enabled',
                         'valid_begin',
-                        'valid_end'
+                        'valid_end',
                     );
                 },
             });
@@ -154,13 +164,22 @@ export default function StudentsPage({
             door_right: student.door_right || '1',
             plan_template_no: student.plan_template_no || '1',
             valid_enabled: student.valid_enabled ?? false,
-            valid_begin: student.valid_begin ? student.valid_begin.slice(0, 16) : '',
+            valid_begin: student.valid_begin
+                ? student.valid_begin.slice(0, 16)
+                : '',
             valid_end: student.valid_end ? student.valid_end.slice(0, 16) : '',
         });
     };
 
     const handleDelete = async (student: Student) => {
-        if (confirm(t('students.delete_confirm', 'Are you sure you want to delete this student?'))) {
+        if (
+            confirm(
+                t(
+                    'students.delete_confirm',
+                    'Are you sure you want to delete this student?',
+                ),
+            )
+        ) {
             destroy(`/students/${student.id}`);
         }
     };
@@ -187,14 +206,17 @@ export default function StudentsPage({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('students.title', 'Students')} />
 
-            <ImageModal imageUrl={imageModalUrl} onClose={() => setImageModalUrl(null)} />
+            <ImageModal
+                imageUrl={imageModalUrl}
+                onClose={() => setImageModalUrl(null)}
+            />
             <StudentImportModal
                 isOpen={isImportModalOpen}
                 onClose={() => setIsImportModalOpen(false)}
                 classes={classes}
             />
 
-            <div className="p-6 grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
+            <div className="grid grid-cols-1 items-start gap-6 p-6 xl:grid-cols-4">
                 {/* Left – Form */}
                 <StudentForm
                     editing={editing}
@@ -210,7 +232,7 @@ export default function StudentsPage({
                 />
 
                 {/* Right – Filters + Table */}
-                <div className="xl:col-span-3 flex flex-col gap-4">
+                <div className="flex flex-col gap-4 xl:col-span-3">
                     <StudentFilters
                         filterData={filterData}
                         classes={classes}
@@ -223,7 +245,7 @@ export default function StudentsPage({
                         students={students}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
-                        onImageClick={url => setImageModalUrl(url)}
+                        onImageClick={(url) => setImageModalUrl(url)}
                         onImportClick={() => setIsImportModalOpen(true)}
                     />
                 </div>

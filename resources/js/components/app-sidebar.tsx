@@ -1,5 +1,19 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutDashboard, Clock, GraduationCap, PieChart, Users, Building2, Activity, BarChart3, UserCog, Github, Send } from 'lucide-react';
+import {
+    BookOpen,
+    Folder,
+    LayoutDashboard,
+    Clock,
+    GraduationCap,
+    PieChart,
+    Users,
+    Building2,
+    Activity,
+    BarChart3,
+    UserCog,
+    Github,
+    Send,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -16,7 +30,6 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
-
 
 const getMainNavItems = (t: any, user: any): NavItem[] => {
     const items: NavItem[] = [
@@ -106,8 +119,11 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-gray-100/50 dark:border-gray-800/50 p-4">
-                <NavFooter items={footerNavItems} className="mb-4 opacity-70 hover:opacity-100 transition-opacity" />
+            <SidebarFooter className="border-t border-gray-100/50 p-4 dark:border-gray-800/50">
+                <NavFooter
+                    items={footerNavItems}
+                    className="mb-4 opacity-70 transition-opacity hover:opacity-100"
+                />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

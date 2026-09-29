@@ -27,15 +27,27 @@ export default function TwoFactorChallenge() {
         if (showRecoveryInput) {
             return {
                 title: t('auth.recovery_code_title', 'Recovery Code'),
-                description: t('auth.recovery_code_desc', 'Please confirm access to your account by entering one of your emergency recovery codes.'),
-                toggleText: t('auth.login_with_auth', 'login using an authentication code'),
+                description: t(
+                    'auth.recovery_code_desc',
+                    'Please confirm access to your account by entering one of your emergency recovery codes.',
+                ),
+                toggleText: t(
+                    'auth.login_with_auth',
+                    'login using an authentication code',
+                ),
             };
         }
 
         return {
             title: t('auth.auth_code_title', 'Authentication Code'),
-            description: t('auth.auth_code_desc', 'Enter the authentication code provided by your authenticator application.'),
-            toggleText: t('auth.login_with_recovery', 'login using a recovery code'),
+            description: t(
+                'auth.auth_code_desc',
+                'Enter the authentication code provided by your authenticator application.',
+            ),
+            toggleText: t(
+                'auth.login_with_recovery',
+                'login using a recovery code',
+            ),
         };
     }, [showRecoveryInput, t]);
 
@@ -50,7 +62,9 @@ export default function TwoFactorChallenge() {
             title={authConfigContent.title}
             description={authConfigContent.description}
         >
-            <Head title={t('settings.two_factor', 'Two-Factor Authentication')} />
+            <Head
+                title={t('settings.two_factor', 'Two-Factor Authentication')}
+            />
 
             <div className="space-y-6">
                 <Form
@@ -66,7 +80,10 @@ export default function TwoFactorChallenge() {
                                     <Input
                                         name="recovery_code"
                                         type="text"
-                                        placeholder={t('auth.enter_recovery', 'Enter recovery code')}
+                                        placeholder={t(
+                                            'auth.enter_recovery',
+                                            'Enter recovery code',
+                                        )}
                                         autoFocus={showRecoveryInput}
                                         required
                                     />
@@ -111,7 +128,9 @@ export default function TwoFactorChallenge() {
                             </Button>
 
                             <div className="text-center text-sm text-muted-foreground">
-                                <span>{t('auth.or_you_can', 'or you can')} </span>
+                                <span>
+                                    {t('auth.or_you_can', 'or you can')}{' '}
+                                </span>
                                 <button
                                     type="button"
                                     className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"

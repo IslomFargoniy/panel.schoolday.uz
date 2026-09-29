@@ -17,7 +17,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
     const { t } = useTranslation();
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -26,7 +26,9 @@ export function StatsGrid({ stats }: StatsGridProps) {
                     <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{stats.total_students}</div>
+                    <div className="text-2xl font-bold">
+                        {stats.total_students}
+                    </div>
                 </CardContent>
             </Card>
             <Card>
@@ -37,7 +39,9 @@ export function StatsGrid({ stats }: StatsGridProps) {
                     <Clock className="h-4 w-4 text-emerald-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-500">{stats.present_today}</div>
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-500">
+                        {stats.present_today}
+                    </div>
                 </CardContent>
             </Card>
             <Card>
@@ -48,7 +52,9 @@ export function StatsGrid({ stats }: StatsGridProps) {
                     <AlertCircle className="h-4 w-4 text-rose-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-rose-600 dark:text-rose-500">{stats.late_arrivals}</div>
+                    <div className="text-2xl font-bold text-rose-600 dark:text-rose-500">
+                        {stats.late_arrivals}
+                    </div>
                 </CardContent>
             </Card>
             <Card>
@@ -59,7 +65,9 @@ export function StatsGrid({ stats }: StatsGridProps) {
                     <UserX className="h-4 w-4 text-amber-500" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-amber-600 dark:text-amber-500">{stats.absent_today}</div>
+                    <div className="text-2xl font-bold text-amber-600 dark:text-amber-500">
+                        {stats.absent_today}
+                    </div>
                 </CardContent>
             </Card>
         </div>

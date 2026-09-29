@@ -16,7 +16,6 @@ import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { BreadcrumbItem } from '@/types';
 
-
 export default function Profile({
     mustVerifyEmail,
     status,
@@ -39,14 +38,22 @@ export default function Profile({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.profile', 'Profile settings')} />
 
-            <h1 className="sr-only">{t('settings.profile_settings', 'Profile Settings')}</h1>
+            <h1 className="sr-only">
+                {t('settings.profile_settings', 'Profile Settings')}
+            </h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title={t('settings.profile_info', 'Profile information')}
-                        description={t('settings.update_info', 'Update your name and email address')}
+                        title={t(
+                            'settings.profile_info',
+                            'Profile information',
+                        )}
+                        description={t(
+                            'settings.update_info',
+                            'Update your name and email address',
+                        )}
                     />
 
                     <Form
@@ -59,7 +66,9 @@ export default function Profile({
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">{t('settings.name', 'Name')}</Label>
+                                    <Label htmlFor="name">
+                                        {t('settings.name', 'Name')}
+                                    </Label>
 
                                     <Input
                                         id="name"
@@ -68,7 +77,10 @@ export default function Profile({
                                         name="name"
                                         required
                                         autoComplete="name"
-                                        placeholder={t('settings.placeholder_name', 'Full name')}
+                                        placeholder={t(
+                                            'settings.placeholder_name',
+                                            'Full name',
+                                        )}
                                     />
 
                                     <InputError
@@ -78,7 +90,9 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">{t('settings.email', 'Email address')}</Label>
+                                    <Label htmlFor="email">
+                                        {t('settings.email', 'Email address')}
+                                    </Label>
 
                                     <Input
                                         id="email"
@@ -88,7 +102,10 @@ export default function Profile({
                                         name="email"
                                         required
                                         autoComplete="username"
-                                        placeholder={t('settings.placeholder_email', 'Email address')}
+                                        placeholder={t(
+                                            'settings.placeholder_email',
+                                            'Email address',
+                                        )}
                                     />
 
                                     <InputError
@@ -98,7 +115,9 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="phone">{t('settings.phone', 'Phone Number')}</Label>
+                                    <Label htmlFor="phone">
+                                        {t('settings.phone', 'Phone Number')}
+                                    </Label>
 
                                     <PhoneInput
                                         id="phone"
@@ -108,7 +127,11 @@ export default function Profile({
                                         autoComplete="tel"
                                         placeholder="+99890XXXXXXX"
                                     />
-                                    <input type="hidden" name="phone" value={phone} />
+                                    <input
+                                        type="hidden"
+                                        name="phone"
+                                        value={phone}
+                                    />
 
                                     <InputError
                                         className="mt-2"
@@ -117,16 +140,32 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>{t('settings.telegram_id', 'Telegram ID')}</Label>
+                                    <Label>
+                                        {t(
+                                            'settings.telegram_id',
+                                            'Telegram ID',
+                                        )}
+                                    </Label>
 
                                     <Input
                                         readOnly
                                         disabled
                                         type="text"
                                         className="mt-1 block w-full bg-muted"
-                                        value={auth.user.telegram_id || t('settings.not_connected', 'Ulanmagan')}
+                                        value={
+                                            auth.user.telegram_id ||
+                                            t(
+                                                'settings.not_connected',
+                                                'Ulanmagan',
+                                            )
+                                        }
                                     />
-                                    <p className="text-xs text-muted-foreground">{t('settings.bot_instruction', 'Botga (/start) buyrug\'ini yozganingizda yoki botdan kontakt jo\'natganingizda shu yerda yoziladi.')}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t(
+                                            'settings.bot_instruction',
+                                            "Botga (/start) buyrug'ini yozganingizda yoki botdan kontakt jo'natganingizda shu yerda yoziladi.",
+                                        )}
+                                    </p>
                                 </div>
 
                                 {mustVerifyEmail &&
@@ -140,16 +179,22 @@ export default function Profile({
                                                     as="button"
                                                     className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                                 >
-                                                    {t('settings.resend_verification', 'Click here to resend the verification email.')}
+                                                    {t(
+                                                        'settings.resend_verification',
+                                                        'Click here to resend the verification email.',
+                                                    )}
                                                 </Link>
                                             </p>
 
                                             {status ===
                                                 'verification-link-sent' && (
-                                                    <div className="mt-2 text-sm font-medium text-green-600">
-                                                        {t('settings.verification_sent', 'A new verification link has been sent to your email address.')}
-                                                    </div>
-                                                )}
+                                                <div className="mt-2 text-sm font-medium text-green-600">
+                                                    {t(
+                                                        'settings.verification_sent',
+                                                        'A new verification link has been sent to your email address.',
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 

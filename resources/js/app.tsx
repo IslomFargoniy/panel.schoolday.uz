@@ -8,7 +8,8 @@ import './i18n';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
 
-const reverbKey = import.meta.env.VITE_REVERB_APP_KEY || 'schoolday_reverb_key_918237';
+const reverbKey =
+    import.meta.env.VITE_REVERB_APP_KEY || 'schoolday_reverb_key_918237';
 const reverbHost = import.meta.env.VITE_REVERB_HOST;
 const reverbPort = import.meta.env.VITE_REVERB_PORT;
 const reverbScheme = import.meta.env.VITE_REVERB_SCHEME;
@@ -18,14 +19,12 @@ const isHttps =
     (typeof window !== 'undefined' && window.location.protocol === 'https:');
 
 const isLocalHost =
-    !reverbHost ||
-    reverbHost === 'localhost' ||
-    reverbHost === '127.0.0.1';
+    !reverbHost || reverbHost === 'localhost' || reverbHost === '127.0.0.1';
 
 const wsHost =
     typeof window !== 'undefined' && isLocalHost
         ? window.location.hostname
-        : (reverbHost || 'localhost');
+        : reverbHost || 'localhost';
 
 const defaultPort = isHttps ? 443 : 8080;
 const resolvedPort = Number(reverbPort || defaultPort);

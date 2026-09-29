@@ -24,7 +24,10 @@ export default function Welcome() {
     };
 
     const toggleTheme = () => {
-        const isDark = appearance === 'dark' || (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const isDark =
+            appearance === 'dark' ||
+            (appearance === 'system' &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches);
         updateAppearance(isDark ? 'light' : 'dark');
     };
 
@@ -32,43 +35,57 @@ export default function Welcome() {
         <>
             <Head>
                 <title>{t('seo.welcome_title')}</title>
-                <meta name="description" content={t('seo.welcome_description')} />
+                <meta
+                    name="description"
+                    content={t('seo.welcome_description')}
+                />
                 <meta name="keywords" content={t('seo.welcome_keywords')} />
 
                 {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={window.location.href} />
                 <meta property="og:title" content={t('seo.og_title')} />
-                <meta property="og:description" content={t('seo.og_description')} />
+                <meta
+                    property="og:description"
+                    content={t('seo.og_description')}
+                />
                 <meta property="og:image" content="/images/og-image.jpg" />
 
                 {/* Twitter */}
                 <meta property="twitter:card" content="summary_large_image" />
                 <meta property="twitter:url" content={window.location.href} />
                 <meta property="twitter:title" content={t('seo.og_title')} />
-                <meta property="twitter:description" content={t('seo.og_description')} />
+                <meta
+                    property="twitter:description"
+                    content={t('seo.og_description')}
+                />
                 <meta property="twitter:image" content="/images/og-image.jpg" />
 
                 <link rel="canonical" href={window.location.href} />
             </Head>
-            <div className="relative min-h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden flex flex-col items-center text-slate-800 dark:text-slate-100 font-sans selection:bg-orange-500 selection:text-white transition-colors duration-300">
-
+            <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-slate-50 font-sans text-slate-800 transition-colors duration-300 selection:bg-orange-500 selection:text-white dark:bg-slate-900 dark:text-slate-100">
                 {/* Immersive Background Effects */}
-                <div className="absolute inset-0 pointer-events-none z-0">
-                    <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/10 dark:bg-blue-600/20 blur-[128px]"></div>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-indigo-500/5 dark:bg-indigo-500/10 blur-[128px]"></div>
-                    <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-orange-500/10 dark:bg-orange-500/20 blur-[128px]"></div>
-                    <div className="absolute inset-0 bg-white/20 dark:bg-[#0f172a]/20 mix-blend-overlay backdrop-blur-[1px]"></div>
+                <div className="pointer-events-none absolute inset-0 z-0">
+                    <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-600/10 blur-[128px] dark:bg-blue-600/20"></div>
+                    <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/5 blur-[128px] dark:bg-indigo-500/10"></div>
+                    <div className="absolute -right-32 -bottom-32 h-96 w-96 rounded-full bg-orange-500/10 blur-[128px] dark:bg-orange-500/20"></div>
+                    <div className="absolute inset-0 bg-white/20 mix-blend-overlay backdrop-blur-[1px] dark:bg-[#0f172a]/20"></div>
                 </div>
 
                 {/* Header Navigation */}
-                <header className={`fixed top-0 w-full z-100 transition-all duration-300 flex justify-center ${isScrolled ? 'py-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-lg border-b border-black/5 dark:border-white/10' : 'py-6 bg-transparent'}`}>
-                    <div className="w-full max-w-7xl px-6 flex justify-between items-center">
+                <header
+                    className={`fixed top-0 z-100 flex w-full justify-center transition-all duration-300 ${isScrolled ? 'border-b border-black/5 bg-white/80 py-3 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80' : 'bg-transparent py-6'}`}
+                >
+                    <div className="flex w-full max-w-7xl items-center justify-between px-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-orange-500/30">
-                                <img src="/image/logo.jpg" alt="SchoolDay Logo" className="w-10 h-10 object-cover" />
+                            <div className="h-10 w-10 overflow-hidden rounded-xl shadow-lg shadow-orange-500/30">
+                                <img
+                                    src="/image/logo.jpg"
+                                    alt="SchoolDay Logo"
+                                    className="h-10 w-10 object-cover"
+                                />
                             </div>
-                            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">
+                            <span className="hidden text-2xl font-bold tracking-tight text-slate-900 sm:block dark:text-white">
                                 SchoolDay
                             </span>
                         </div>
@@ -76,44 +93,59 @@ export default function Welcome() {
                         <nav className="flex items-center gap-2 sm:gap-4">
                             <Link
                                 href="/monitoring"
-                                className="hidden md:flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-full transition-all border border-emerald-500/20"
+                                className="hidden items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-600 transition-all hover:bg-emerald-500/20 hover:text-emerald-700 md:flex dark:text-emerald-400 dark:hover:text-emerald-300"
                             >
-                                <Activity className="w-4 h-4" />
+                                <Activity className="h-4 w-4" />
                                 Monitoring
                             </Link>
                             <a
                                 href="#contact"
-                                className="hidden md:block px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                                className="hidden px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-orange-500 md:block dark:text-slate-300 dark:hover:text-orange-400"
                             >
-                                {t('welcome.contact_nav', 'Bog\'lanish')}
+                                {t('welcome.contact_nav', "Bog'lanish")}
                             </a>
 
                             <button
                                 onClick={toggleTheme}
-                                className="p-2 sm:py-2.5 sm:px-3 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/10 rounded-full transition-all backdrop-blur-md flex items-center justify-center shadow-sm"
+                                className="flex items-center justify-center rounded-full border border-black/5 bg-black/5 p-2 text-slate-600 shadow-sm backdrop-blur-md transition-all hover:bg-black/10 hover:text-slate-900 sm:px-3 sm:py-2.5 dark:border-white/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-white/20 dark:hover:text-white"
                                 aria-label="Toggle theme"
                             >
-                                <Sun className="h-4 w-4 hidden dark:block" />
-                                <Moon className="h-4 w-4 block dark:hidden" />
+                                <Sun className="hidden h-4 w-4 dark:block" />
+                                <Moon className="block h-4 w-4 dark:hidden" />
                             </button>
 
-                            <div className="flex bg-black/5 dark:bg-white/10 p-1 rounded-full border border-black/5 dark:border-white/10 backdrop-blur-md">
-                                <button onClick={() => changeLanguage('uz')} className={`px-3 py-1 text-xs sm:text-sm rounded-full transition-colors ${i18n.language === 'uz' ? 'bg-orange-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}>UZ</button>
-                                <button onClick={() => changeLanguage('ru')} className={`px-3 py-1 text-xs sm:text-sm rounded-full transition-colors ${i18n.language === 'ru' ? 'bg-orange-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}>RU</button>
-                                <button onClick={() => changeLanguage('en')} className={`px-3 py-1 text-xs sm:text-sm rounded-full transition-colors ${i18n.language === 'en' ? 'bg-orange-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}>EN</button>
+                            <div className="flex rounded-full border border-black/5 bg-black/5 p-1 backdrop-blur-md dark:border-white/10 dark:bg-white/10">
+                                <button
+                                    onClick={() => changeLanguage('uz')}
+                                    className={`rounded-full px-3 py-1 text-xs transition-colors sm:text-sm ${i18n.language === 'uz' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'}`}
+                                >
+                                    UZ
+                                </button>
+                                <button
+                                    onClick={() => changeLanguage('ru')}
+                                    className={`rounded-full px-3 py-1 text-xs transition-colors sm:text-sm ${i18n.language === 'ru' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'}`}
+                                >
+                                    RU
+                                </button>
+                                <button
+                                    onClick={() => changeLanguage('en')}
+                                    className={`rounded-full px-3 py-1 text-xs transition-colors sm:text-sm ${i18n.language === 'en' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'}`}
+                                >
+                                    EN
+                                </button>
                             </div>
 
                             {auth.user ? (
                                 <Link
                                     href="/dashboard"
-                                    className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/10 text-slate-800 dark:text-white backdrop-blur-md transition-all font-medium text-xs sm:text-sm shadow-sm"
+                                    className="rounded-full border border-black/5 bg-black/5 px-4 py-2 text-xs font-medium text-slate-800 shadow-sm backdrop-blur-md transition-all hover:bg-black/10 sm:px-6 sm:py-2.5 sm:text-sm dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
                                 >
                                     {t('welcome.dashboard', 'Dashboard')}
                                 </Link>
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/10 text-slate-800 dark:text-white backdrop-blur-md transition-all font-medium text-xs sm:text-sm shadow-sm"
+                                    className="rounded-full border border-black/5 bg-black/5 px-4 py-2 text-xs font-medium text-slate-800 shadow-sm backdrop-blur-md transition-all hover:bg-black/10 sm:px-6 sm:py-2.5 sm:text-sm dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
                                 >
                                     {t('welcome.login', 'Log in')}
                                 </Link>
@@ -123,50 +155,71 @@ export default function Welcome() {
                 </header>
 
                 {/* Hero Content */}
-                <main className="z-10 w-full max-w-7xl px-6 pt-32 sm:pt-40 lg:pt-48 flex flex-col items-center">
-
-                    <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-10 w-full mb-20">
-                        <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-2xl">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-xs sm:text-sm mb-6 text-orange-600 dark:text-orange-200 backdrop-blur-sm shadow-inner transition-all hover:bg-black/10 dark:hover:bg-white/10 cursor-default">
+                <main className="z-10 flex w-full max-w-7xl flex-col items-center px-6 pt-32 sm:pt-40 lg:pt-48">
+                    <div className="mb-20 flex w-full flex-col items-center justify-between gap-12 lg:flex-row lg:gap-10">
+                        <div className="flex max-w-2xl flex-col items-center text-center lg:items-start lg:text-left">
+                            <div className="mb-6 inline-flex cursor-default items-center gap-2 rounded-full border border-black/5 bg-black/5 px-4 py-2 text-xs text-orange-600 shadow-inner backdrop-blur-sm transition-all hover:bg-black/10 sm:text-sm dark:border-white/10 dark:bg-white/5 dark:text-orange-200 dark:hover:bg-white/10">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500"></span>
                                 </span>
-                                {t('welcome.badge', 'Next Generation School Management')}
+                                {t(
+                                    'welcome.badge',
+                                    'Next Generation School Management',
+                                )}
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight mb-6 leading-[1.15]">
-                                {t('welcome.heading_part1', 'Manage your school with')} <br className="hidden md:block" />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-rose-400 to-indigo-400">
-                                    {t('welcome.heading_part2', 'ultimate precision')}
+                            <h1 className="mb-6 text-4xl leading-[1.15] font-extrabold tracking-tight sm:text-5xl md:text-6xl xl:text-7xl">
+                                {t(
+                                    'welcome.heading_part1',
+                                    'Manage your school with',
+                                )}{' '}
+                                <br className="hidden md:block" />
+                                <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-indigo-400 bg-clip-text text-transparent">
+                                    {t(
+                                        'welcome.heading_part2',
+                                        'ultimate precision',
+                                    )}
                                 </span>
                             </h1>
 
-                            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-xl leading-relaxed font-light">
-                                {t('welcome.description', 'SchoolDay provides a highly integrated ecosystem for attendance tracking, intelligent student management, and real-time Hikvision access control.')}
+                            <p className="mb-8 max-w-xl text-base leading-relaxed font-light text-slate-600 sm:text-lg md:text-xl dark:text-slate-300">
+                                {t(
+                                    'welcome.description',
+                                    'SchoolDay provides a highly integrated ecosystem for attendance tracking, intelligent student management, and real-time Hikvision access control.',
+                                )}
                             </p>
 
-                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-5 w-full sm:w-auto">
+                            <div className="flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row sm:gap-5 lg:justify-start">
                                 {auth.user ? (
                                     <Link
                                         href="/dashboard"
-                                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-semibold transition-all shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)] hover:shadow-[0_0_60px_-15px_rgba(249,115,22,0.7)] hover:-translate-y-1 duration-300 text-sm sm:text-base text-center"
+                                        className="w-full rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)] transition-all duration-300 hover:-translate-y-1 hover:from-orange-600 hover:to-rose-600 hover:shadow-[0_0_60px_-15px_rgba(249,115,22,0.7)] sm:w-auto sm:px-8 sm:py-4 sm:text-base"
                                     >
-                                        {t('welcome.enter_dashboard', 'Enter Dashboard')}
+                                        {t(
+                                            'welcome.enter_dashboard',
+                                            'Enter Dashboard',
+                                        )}
                                     </Link>
                                 ) : (
                                     <>
                                         <Link
                                             href="/login"
-                                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-semibold transition-all shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)] hover:shadow-[0_0_60px_-15px_rgba(249,115,22,0.7)] hover:-translate-y-1 duration-300 text-sm sm:text-base text-center"
+                                            className="w-full rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)] transition-all duration-300 hover:-translate-y-1 hover:from-orange-600 hover:to-rose-600 hover:shadow-[0_0_60px_-15px_rgba(249,115,22,0.7)] sm:w-auto sm:px-8 sm:py-4 sm:text-base"
                                         >
-                                            {t('welcome.login_account', 'Log in to your account')}
+                                            {t(
+                                                'welcome.login_account',
+                                                'Log in to your account',
+                                            )}
                                         </Link>
                                         <a
                                             href="#contact"
-                                            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-slate-800 dark:text-white font-medium transition-all backdrop-blur-sm hover:-translate-y-1 duration-300 text-sm sm:text-base text-center"
+                                            className="w-full rounded-full border border-black/10 bg-black/5 px-6 py-3 text-center text-sm font-medium text-slate-800 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-black/10 sm:w-auto sm:px-8 sm:py-4 sm:text-base dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                                         >
-                                            {t('welcome.btn_contact', 'Bog\'lanish')}
+                                            {t(
+                                                'welcome.btn_contact',
+                                                "Bog'lanish",
+                                            )}
                                         </a>
                                     </>
                                 )}
@@ -174,27 +227,29 @@ export default function Welcome() {
                         </div>
 
                         {/* Hikvision Device Showcase */}
-                        <div className="relative flex justify-center items-center lg:justify-end flex-1 w-full lg:w-auto">
+                        <div className="relative flex w-full flex-1 items-center justify-center lg:w-auto lg:justify-end">
                             {/* Glow */}
                             <div
-                                className="absolute w-72 h-72 sm:w-88 sm:h-88 md:w-96 md:h-96 rounded-full blur-[40px] z-0"
+                                className="absolute z-0 h-72 w-72 rounded-full blur-[40px] sm:h-88 sm:w-88 md:h-96 md:w-96"
                                 style={{
-                                    background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, rgba(249,115,22,0.15) 50%, transparent 70%)',
-                                    animation: 'showcaseGlow 4s ease-in-out infinite alternate',
+                                    background:
+                                        'radial-gradient(circle, rgba(99,102,241,0.25) 0%, rgba(249,115,22,0.15) 50%, transparent 70%)',
+                                    animation:
+                                        'showcaseGlow 4s ease-in-out infinite alternate',
                                 }}
                             />
                             {/* Card */}
-                            <div className="relative z-10 flex flex-col items-center gap-4 p-6 sm:p-8 md:p-10 rounded-3xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_35px_60px_-15px_rgba(99,102,241,0.15),0_0_40px_-10px_rgba(249,115,22,0.1)] group cursor-default">
+                            <div className="group relative z-10 flex cursor-default flex-col items-center gap-4 rounded-3xl border border-black/5 bg-white/50 p-6 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_35px_60px_-15px_rgba(99,102,241,0.15),0_0_40px_-10px_rgba(249,115,22,0.1)] sm:p-8 md:p-10 dark:border-white/10 dark:bg-white/5">
                                 <img
                                     src="/image/hikvision.png"
                                     alt="Hikvision Face ID Terminal - Yuzni tanish qurilmasi"
-                                    className="w-48 sm:w-60 md:w-72 h-auto object-contain rounded-xl drop-shadow-[0_10px_25px_rgba(0,0,0,0.15)] transition-transform duration-300 group-hover:scale-105"
+                                    className="h-auto w-48 rounded-xl object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.15)] transition-transform duration-300 group-hover:scale-105 sm:w-60 md:w-72"
                                 />
-                                <div className="flex items-center gap-2 flex-wrap justify-center">
-                                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400 text-white text-[0.65rem] font-bold tracking-wider uppercase">
+                                <div className="flex flex-wrap items-center justify-center gap-2">
+                                    <span className="inline-block rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400 px-2.5 py-0.5 text-[0.65rem] font-bold tracking-wider text-white uppercase">
                                         Hikvision
                                     </span>
-                                    <span className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
+                                    <span className="text-xs font-medium text-slate-500 sm:text-sm dark:text-slate-400">
                                         Face Recognition Terminal
                                     </span>
                                 </div>
@@ -211,57 +266,90 @@ export default function Welcome() {
                     `}</style>
 
                     {/* SEO Semantic Content (visually balanced) */}
-                    <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-left w-full max-w-6xl pb-20">
-                        <div className="p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                            <h2 className="text-xl font-bold mb-4 text-orange-500">{t('seo.feature_attendance_title', 'Maktab Davomat Tizimi')}</h2>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {t('seo.feature_attendance_desc', 'Maktabingiz uchun zamonaviy elektron davomat tizimi. Har bir o\'quvchi harakati real vaqt rejimida qayd etiladi va hisobotlar avtomatik shakllanadi.')}
+                    <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-8 pb-20 text-left md:grid-cols-3">
+                        <div className="rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+                            <h2 className="mb-4 text-xl font-bold text-orange-500">
+                                {t(
+                                    'seo.feature_attendance_title',
+                                    'Maktab Davomat Tizimi',
+                                )}
+                            </h2>
+                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                {t(
+                                    'seo.feature_attendance_desc',
+                                    "Maktabingiz uchun zamonaviy elektron davomat tizimi. Har bir o'quvchi harakati real vaqt rejimida qayd etiladi va hisobotlar avtomatik shakllanadi.",
+                                )}
                             </p>
                         </div>
-                        <div className="p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                            <h2 className="text-xl font-bold mb-4 text-rose-500">{t('seo.feature_turnstile_title', 'Turniket va Face ID')}</h2>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {t('seo.feature_turnstile_desc', 'Eng so\'nggi Hikvision turniket tizimlari va yuzni tanish texnologiyasi. Bog\'cha va maktab kirish joylarida xavfsizlikni eng yuqori darajaga olib chiqing.')}
+                        <div className="rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+                            <h2 className="mb-4 text-xl font-bold text-rose-500">
+                                {t(
+                                    'seo.feature_turnstile_title',
+                                    'Turniket va Face ID',
+                                )}
+                            </h2>
+                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                {t(
+                                    'seo.feature_turnstile_desc',
+                                    "Eng so'nggi Hikvision turniket tizimlari va yuzni tanish texnologiyasi. Bog'cha va maktab kirish joylarida xavfsizlikni eng yuqori darajaga olib chiqing.",
+                                )}
                             </p>
                         </div>
-                        <div className="p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm">
-                            <h2 className="text-xl font-bold mb-4 text-indigo-500">{t('seo.feature_notif_title', 'Telegram Xabarnomalar')}</h2>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {t('seo.feature_notif_desc', 'Farzandingiz maktabga kelganida yoki ketganida darhol xabar oling. Ota-onalar xotirjamligi uchun Telegram bot orqali tezkor integratsiya.')}
+                        <div className="rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+                            <h2 className="mb-4 text-xl font-bold text-indigo-500">
+                                {t(
+                                    'seo.feature_notif_title',
+                                    'Telegram Xabarnomalar',
+                                )}
+                            </h2>
+                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                {t(
+                                    'seo.feature_notif_desc',
+                                    'Farzandingiz maktabga kelganida yoki ketganida darhol xabar oling. Ota-onalar xotirjamligi uchun Telegram bot orqali tezkor integratsiya.',
+                                )}
                             </p>
                         </div>
                     </div>
 
                     {/* Contact Section */}
                     <div id="contact" className="w-full max-w-6xl pb-20">
-                        <div className="text-center mb-10">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-3">
-                                {t('welcome.contact_title', 'Biz bilan bog\'laning')}
+                        <div className="mb-10 text-center">
+                            <h2 className="mb-3 text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
+                                {t(
+                                    'welcome.contact_title',
+                                    "Biz bilan bog'laning",
+                                )}
                             </h2>
-                            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-                                {t('welcome.contact_desc', 'Savollaringiz bormi? Biz bilan quyidagi usullar orqali bog\'laning.')}
+                            <p className="mx-auto max-w-lg text-sm text-slate-500 sm:text-base dark:text-slate-400">
+                                {t(
+                                    'welcome.contact_desc',
+                                    "Savollaringiz bormi? Biz bilan quyidagi usullar orqali bog'laning.",
+                                )}
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                             {/* Telegram */}
                             <a
                                 href="https://t.me/IslomFargniy"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 cursor-pointer"
+                                className="group cursor-pointer rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-lg hover:shadow-blue-500/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                             >
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-                                    <Send className="w-6 h-6 text-white" />
+                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20 transition-transform duration-300 group-hover:scale-110">
+                                    <Send className="h-6 w-6 text-white" />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                                <h3 className="mb-1 text-lg font-bold text-slate-900 dark:text-white">
                                     Telegram
                                 </h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-                                    {t('welcome.contact_telegram_desc', 'Telegram orqali tez aloqa')}
+                                <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+                                    {t(
+                                        'welcome.contact_telegram_desc',
+                                        'Telegram orqali tez aloqa',
+                                    )}
                                 </p>
-                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 group-hover:text-blue-400 transition-colors">
-                                    <MessageCircle className="w-4 h-4" />
+                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 transition-colors group-hover:text-blue-400">
+                                    <MessageCircle className="h-4 w-4" />
                                     @IslomFargniy
                                 </span>
                             </a>
@@ -269,19 +357,22 @@ export default function Welcome() {
                             {/* Phone 1 */}
                             <a
                                 href="tel:+998911157709"
-                                className="group p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer"
+                                className="group cursor-pointer rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-lg hover:shadow-orange-500/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                             >
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-orange-500 to-rose-500 flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-300">
-                                    <Phone className="w-6 h-6 text-white" />
+                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-orange-500 to-rose-500 shadow-lg shadow-orange-500/20 transition-transform duration-300 group-hover:scale-110">
+                                    <Phone className="h-6 w-6 text-white" />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                                <h3 className="mb-1 text-lg font-bold text-slate-900 dark:text-white">
                                     {t('welcome.contact_phone', 'Telefon')}
                                 </h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-                                    {t('welcome.contact_phone_desc', 'Bizga qo\'ng\'iroq qiling')}
+                                <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+                                    {t(
+                                        'welcome.contact_phone_desc',
+                                        "Bizga qo'ng'iroq qiling",
+                                    )}
                                 </p>
-                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-orange-500 group-hover:text-orange-400 transition-colors">
-                                    <Phone className="w-4 h-4" />
+                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-orange-500 transition-colors group-hover:text-orange-400">
+                                    <Phone className="h-4 w-4" />
                                     +998 91 115 77 09
                                 </span>
                             </a>
@@ -289,19 +380,22 @@ export default function Welcome() {
                             {/* Phone 2 */}
                             <a
                                 href="tel:+998993033484"
-                                className="group p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/10 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer"
+                                className="group cursor-pointer rounded-2xl border border-black/5 bg-white/50 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-lg hover:shadow-indigo-500/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                             >
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
-                                    <Phone className="w-6 h-6 text-white" />
+                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/20 transition-transform duration-300 group-hover:scale-110">
+                                    <Phone className="h-6 w-6 text-white" />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                                <h3 className="mb-1 text-lg font-bold text-slate-900 dark:text-white">
                                     {t('welcome.contact_phone', 'Telefon')}
                                 </h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-                                    {t('welcome.contact_phone_desc2', 'Qo\'shimcha telefon raqam')}
+                                <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+                                    {t(
+                                        'welcome.contact_phone_desc2',
+                                        "Qo'shimcha telefon raqam",
+                                    )}
                                 </p>
-                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-500 group-hover:text-indigo-400 transition-colors">
-                                    <Phone className="w-4 h-4" />
+                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-500 transition-colors group-hover:text-indigo-400">
+                                    <Phone className="h-4 w-4" />
                                     +998 99 303 34 84
                                 </span>
                             </a>
@@ -310,8 +404,9 @@ export default function Welcome() {
                 </main>
 
                 {/* Footer */}
-                <footer className="w-full z-10 text-center text-slate-500 text-xs sm:text-sm font-light px-4 py-6">
-                    &copy; {year} SchoolDay Ecosystem. {t('welcome.all_rights', 'All rights reserved.')}
+                <footer className="z-10 w-full px-4 py-6 text-center text-xs font-light text-slate-500 sm:text-sm">
+                    &copy; {year} SchoolDay Ecosystem.{' '}
+                    {t('welcome.all_rights', 'All rights reserved.')}
                 </footer>
             </div>
         </>

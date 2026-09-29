@@ -1,5 +1,13 @@
 import { router } from '@inertiajs/react';
-import { Trash2, Copy, Check, ScanFace, Radio, Network, RefreshCw } from 'lucide-react';
+import {
+    Trash2,
+    Copy,
+    Check,
+    ScanFace,
+    Radio,
+    Network,
+    RefreshCw,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -20,17 +28,31 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
     const devices = branch.devices || [];
 
     const handleDelete = (id: number) => {
-        if (!confirm(t('confirm_delete_device', 'Haqiqatan ham bu qurilmani o‘chirmoqchimisiz?'))) {
+        if (
+            !confirm(
+                t(
+                    'confirm_delete_device',
+                    'Haqiqatan ham bu qurilmani o‘chirmoqchimisiz?',
+                ),
+            )
+        ) {
             return;
         }
 
         router.delete(`/branch_device/${id}`, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(t('deleted_successfully', 'Qurilma muvaffaqiyatli o‘chirildi'));
+                toast.success(
+                    t(
+                        'deleted_successfully',
+                        'Qurilma muvaffaqiyatli o‘chirildi',
+                    ),
+                );
             },
             onError: (err: any) => {
-                const errorMessage = err?.error || t('delete_failed', 'O‘chirishda xatolik yuz berdi');
+                const errorMessage =
+                    err?.error ||
+                    t('delete_failed', 'O‘chirishda xatolik yuz berdi');
                 toast.error(errorMessage);
             },
         });
@@ -38,17 +60,29 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
 
     const handleSync = (device: BranchDevice) => {
         setSyncingId(device.id);
-        router.post(`/branch_device/${device.id}/sync`, {}, {
-            preserveScroll: true,
-            onSuccess: (page: any) => {
-                setSyncingId(null);
-                toast.success(t('sync_success', 'ISUP hodisalar muvaffaqiyatli sinxronlandi'));
+        router.post(
+            `/branch_device/${device.id}/sync`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: (page: any) => {
+                    setSyncingId(null);
+                    toast.success(
+                        t(
+                            'sync_success',
+                            'ISUP hodisalar muvaffaqiyatli sinxronlandi',
+                        ),
+                    );
+                },
+                onError: (err: any) => {
+                    setSyncingId(null);
+                    toast.error(
+                        err?.message ||
+                            t('sync_failed', 'Sinxronizatsiyada xatolik'),
+                    );
+                },
             },
-            onError: (err: any) => {
-                setSyncingId(null);
-                toast.error(err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik'));
-            },
-        });
+        );
     };
 
     const copyToClipboard = (text: string, deviceId: number) => {
@@ -74,21 +108,27 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
     return (
         <div className="space-y-4">
             {/* Header bar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-card p-4 rounded-xl border border-border shadow-xs">
+            <div className="flex flex-col items-start justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-xs sm:flex-row sm:items-center">
                 <div>
-                    <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-                        <ScanFace className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <span>{t('connected_devices', 'Hikvision Qurilmalari')}</span>
+                    <h3 className="flex items-center gap-2 text-sm font-bold text-foreground sm:text-base">
+                        <ScanFace className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                        <span>
+                            {t('connected_devices', 'Hikvision Qurilmalari')}
+                        </span>
                         <span className="text-xs font-normal text-muted-foreground">
-                            ({devices.length} {t('devices_count', 'ta qurilma')})
+                            ({devices.length} {t('devices_count', 'ta qurilma')}
+                            )
                         </span>
                     </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                        {t('device_table_desc', 'Filialga biriktirilgan ISUP 5.0 va HTTP Listening terminallari')}
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                        {t(
+                            'device_table_desc',
+                            'Filialga biriktirilgan ISUP 5.0 va HTTP Listening terminallari',
+                        )}
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex flex-wrap items-center gap-2">
                     <DeviceConnectionGuideModal branch={branch} />
                     <CreateBranchDeviceModal branch={branch} />
                 </div>
@@ -96,15 +136,18 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
 
             {/* Empty state */}
             {devices.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border p-8 text-center bg-card/50">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto mb-3">
-                        <ScanFace className="w-6 h-6" />
+                <div className="rounded-xl border border-dashed border-border bg-card/50 p-8 text-center">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                        <ScanFace className="h-6 w-6" />
                     </div>
-                    <h4 className="text-sm font-semibold text-foreground mb-1">
+                    <h4 className="mb-1 text-sm font-semibold text-foreground">
                         {t('no_devices_title', 'Hozircha qurilma ulanmagan')}
                     </h4>
-                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
-                        {t('no_devices_desc', 'Hikvision MinMoe yuz terminalini ISUP 5.0 yoki HTTP listening orqali ulang.')}
+                    <p className="mx-auto mb-4 max-w-sm text-xs text-muted-foreground">
+                        {t(
+                            'no_devices_desc',
+                            'Hikvision MinMoe yuz terminalini ISUP 5.0 yoki HTTP listening orqali ulang.',
+                        )}
                     </p>
                     <div className="flex items-center justify-center gap-2">
                         <DeviceConnectionGuideModal branch={branch} />
@@ -113,7 +156,7 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                 </div>
             ) : (
                 /* Devices Grid */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {devices.map((item, index) => {
                         const isIsup = item.connection_type === 'isup';
                         const isOnline = item.is_online;
@@ -127,14 +170,15 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                     {/* Top Row: Device Name & Connection Pill */}
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                                                <ScanFace className="w-5 h-5" />
+                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
+                                                <ScanFace className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <h4 className="text-xs sm:text-sm font-bold text-foreground leading-tight">
-                                                    {item.name || `Hikvision Terminal #${index + 1}`}
+                                                <h4 className="text-xs leading-tight font-bold text-foreground sm:text-sm">
+                                                    {item.name ||
+                                                        `Hikvision Terminal #${index + 1}`}
                                                 </h4>
-                                                <p className="text-[10px] text-muted-foreground font-mono">
+                                                <p className="font-mono text-[10px] text-muted-foreground">
                                                     MinMoe Face Terminal
                                                 </p>
                                             </div>
@@ -142,13 +186,13 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
 
                                         <div className="flex items-center gap-1.5">
                                             {isIsup ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-                                                    <Network className="w-3 h-3" />
+                                                <span className="inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                                                    <Network className="h-3 w-3" />
                                                     <span>ISUP 5.0</span>
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                                                    <Radio className="w-3 h-3" />
+                                                <span className="inline-flex items-center gap-1 rounded border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                                                    <Radio className="h-3 w-3" />
                                                     <span>HTTP</span>
                                                 </span>
                                             )}
@@ -156,22 +200,26 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleDelete(item.id)}
-                                                className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                onClick={() =>
+                                                    handleDelete(item.id)
+                                                }
+                                                className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                 title={t('delete', 'O‘chirish')}
                                             >
-                                                <Trash2 className="w-3.5 h-3.5" />
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
                                         </div>
                                     </div>
 
                                     {/* Specs / Properties Box */}
-                                    <div className="rounded-lg bg-muted/60 border border-border p-2.5 space-y-1.5 text-xs font-mono">
+                                    <div className="space-y-1.5 rounded-lg border border-border bg-muted/60 p-2.5 font-mono text-xs">
                                         {/* Device ID */}
                                         {item.device_id && (
                                             <div className="flex items-center justify-between text-[11px]">
-                                                <span className="text-muted-foreground font-sans">Device ID:</span>
-                                                <span className="text-indigo-600 dark:text-indigo-400 font-semibold px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800">
+                                                <span className="font-sans text-muted-foreground">
+                                                    Device ID:
+                                                </span>
+                                                <span className="rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 font-semibold text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-400">
                                                     {item.device_id}
                                                 </span>
                                             </div>
@@ -179,29 +227,45 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
 
                                         {/* MAC Address with copy */}
                                         <div className="flex items-center justify-between text-[11px]">
-                                            <span className="text-muted-foreground font-sans">MAC:</span>
+                                            <span className="font-sans text-muted-foreground">
+                                                MAC:
+                                            </span>
                                             <div className="flex items-center gap-1.5">
-                                                <span className="text-foreground">{item.mac_address}</span>
+                                                <span className="text-foreground">
+                                                    {item.mac_address}
+                                                </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => copyToClipboard(item.mac_address, item.id)}
-                                                    className="text-muted-foreground hover:text-foreground p-0.5 rounded"
-                                                    title={t('copy_mac', 'MAC manzilni nusxalash')}
+                                                    onClick={() =>
+                                                        copyToClipboard(
+                                                            item.mac_address,
+                                                            item.id,
+                                                        )
+                                                    }
+                                                    className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                                                    title={t(
+                                                        'copy_mac',
+                                                        'MAC manzilni nusxalash',
+                                                    )}
                                                 >
                                                     {copiedId === item.id ? (
-                                                        <Check className="w-3 h-3 text-emerald-500" />
+                                                        <Check className="h-3 w-3 text-emerald-500" />
                                                     ) : (
-                                                        <Copy className="w-3 h-3" />
+                                                        <Copy className="h-3 w-3" />
                                                     )}
                                                 </button>
                                             </div>
                                         </div>
 
                                         {/* Port & Protocol */}
-                                        <div className="flex items-center justify-between text-[11px] pt-1 border-t border-border">
-                                            <span className="text-muted-foreground font-sans">Port / Protocol:</span>
-                                            <span className="text-foreground font-sans text-[11px]">
-                                                {isIsup ? 'Port 7660 (ISUP)' : 'Port 80/443 (HTTP)'}
+                                        <div className="flex items-center justify-between border-t border-border pt-1 text-[11px]">
+                                            <span className="font-sans text-muted-foreground">
+                                                Port / Protocol:
+                                            </span>
+                                            <span className="font-sans text-[11px] text-foreground">
+                                                {isIsup
+                                                    ? 'Port 7660 (ISUP)'
+                                                    : 'Port 80/443 (HTTP)'}
                                             </span>
                                         </div>
                                     </div>
@@ -212,20 +276,26 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                             {isOnline ? (
                                                 <>
                                                     <span className="relative flex h-2 w-2">
-                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                                                     </span>
-                                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-sans">
-                                                        {t('online_active', 'Online • Faol')}
+                                                    <span className="font-sans font-semibold text-emerald-600 dark:text-emerald-400">
+                                                        {t(
+                                                            'online_active',
+                                                            'Online • Faol',
+                                                        )}
                                                     </span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <span className="relative flex h-2 w-2">
-                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
                                                     </span>
-                                                    <span className="text-rose-500 font-medium font-sans">
-                                                        {t('offline_inactive', 'Offline • Aloqada emas')}
+                                                    <span className="font-sans font-medium text-rose-500">
+                                                        {t(
+                                                            'offline_inactive',
+                                                            'Offline • Aloqada emas',
+                                                        )}
                                                     </span>
                                                 </>
                                             )}
@@ -236,23 +306,47 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    disabled={syncingId === item.id}
-                                                    onClick={() => handleSync(item)}
-                                                    className="h-6 px-2 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
-                                                    title={t('sync_now', 'ISUP orqali hodisalarni tortib olish')}
+                                                    disabled={
+                                                        syncingId === item.id
+                                                    }
+                                                    onClick={() =>
+                                                        handleSync(item)
+                                                    }
+                                                    className="h-6 gap-1 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                                                    title={t(
+                                                        'sync_now',
+                                                        'ISUP orqali hodisalarni tortib olish',
+                                                    )}
                                                 >
-                                                    <RefreshCw className={`w-3 h-3 ${syncingId === item.id ? 'animate-spin' : ''}`} />
-                                                    <span>{t('sync', 'Sinxronlash')}</span>
+                                                    <RefreshCw
+                                                        className={`h-3 w-3 ${syncingId === item.id ? 'animate-spin' : ''}`}
+                                                    />
+                                                    <span>
+                                                        {t(
+                                                            'sync',
+                                                            'Sinxronlash',
+                                                        )}
+                                                    </span>
                                                 </Button>
                                             )}
 
                                             {item.last_seen_at ? (
-                                                <span className="text-[10px] text-muted-foreground font-mono">
-                                                    {t('last_seen', 'Oxirgi aloqa')}: {formatLastSeen(item.last_seen_at)}
+                                                <span className="font-mono text-[10px] text-muted-foreground">
+                                                    {t(
+                                                        'last_seen',
+                                                        'Oxirgi aloqa',
+                                                    )}
+                                                    :{' '}
+                                                    {formatLastSeen(
+                                                        item.last_seen_at,
+                                                    )}
                                                 </span>
                                             ) : (
-                                                <span className="text-[10px] text-muted-foreground font-mono">
-                                                    {t('biometric_sync', 'Biometric Sync')}
+                                                <span className="font-mono text-[10px] text-muted-foreground">
+                                                    {t(
+                                                        'biometric_sync',
+                                                        'Biometric Sync',
+                                                    )}
                                                 </span>
                                             )}
                                         </div>

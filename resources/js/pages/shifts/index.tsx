@@ -1,5 +1,5 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import type { FormEvent} from 'react';
+import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -23,7 +23,9 @@ export default function ShiftsPage({
 }: ShiftsPageProps) {
     const { t } = useTranslation();
 
-    const breadcrumbs: BreadcrumbItem[] = [{ title: t('shifts.title', 'Shifts'), href: '/shifts' }];
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('shifts.title', 'Shifts'), href: '/shifts' },
+    ];
 
     const { data: filterData, setData: setFilterData } = useForm({
         per_page: filters?.per_page || '20',
@@ -31,18 +33,34 @@ export default function ShiftsPage({
 
     const handleFilter = (val: string) => {
         setFilterData('per_page', val);
-        router.get('/shifts', { per_page: val }, { preserveState: true, replace: true });
+        router.get(
+            '/shifts',
+            { per_page: val },
+            { preserveState: true, replace: true },
+        );
     };
 
     const [editing, setEditing] = useState<Shift | null>(null);
-    const { data: formData, setData, post, put, delete: destroy, reset, errors, clearErrors } = useForm({
+    const {
+        data: formData,
+        setData,
+        post,
+        put,
+        delete: destroy,
+        reset,
+        errors,
+        clearErrors,
+    } = useForm({
         name: '',
         start_time: '',
         end_time: '',
         branch_id: '',
     });
 
-    const handleTimeChange = (field: 'start_time' | 'end_time', val: string) => {
+    const handleTimeChange = (
+        field: 'start_time' | 'end_time',
+        val: string,
+    ) => {
         if (val.length < formData[field].length) {
             setData(field, val);
             return;
@@ -65,7 +83,12 @@ export default function ShiftsPage({
             return;
         }
         if (editing) {
-            put(`/shifts/${editing.id}`, { onSuccess: () => { setEditing(null); reset(); } });
+            put(`/shifts/${editing.id}`, {
+                onSuccess: () => {
+                    setEditing(null);
+                    reset();
+                },
+            });
         } else {
             post('/shifts', { onSuccess: () => reset() });
         }
@@ -76,14 +99,23 @@ export default function ShiftsPage({
         clearErrors();
         setData({
             name: shift.name,
-            start_time: shift.start_time ? shift.start_time.substring(0, 5) : '',
+            start_time: shift.start_time
+                ? shift.start_time.substring(0, 5)
+                : '',
             end_time: shift.end_time ? shift.end_time.substring(0, 5) : '',
             branch_id: shift.branch_id ? String(shift.branch_id) : '',
         });
     };
 
     const handleDelete = (id: number) => {
-        if (confirm(t('shifts.delete_confirm', 'Are you sure you want to delete this shift?'))) {
+        if (
+            confirm(
+                t(
+                    'shifts.delete_confirm',
+                    'Are you sure you want to delete this shift?',
+                ),
+            )
+        ) {
             destroy(`/shifts/${id}`);
         }
     };
@@ -91,7 +123,7 @@ export default function ShiftsPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('shifts.title', 'Shifts Management')} />
-            <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <div className="grid grid-cols-1 items-start gap-6 p-6 lg:grid-cols-3">
                 <ShiftForm
                     editing={editing}
                     formData={formData}
@@ -100,7 +132,11 @@ export default function ShiftsPage({
                     setData={setData}
                     onTimeChange={handleTimeChange}
                     onSubmit={handleSubmit}
-                    onCancel={() => { setEditing(null); reset(); clearErrors(); }}
+                    onCancel={() => {
+                        setEditing(null);
+                        reset();
+                        clearErrors();
+                    }}
                 />
                 <ShiftsTable
                     shifts={shifts}

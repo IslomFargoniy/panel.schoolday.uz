@@ -54,7 +54,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         <div className="px-4 py-6">
             <Heading
                 title={t('sidebar.settings', 'Settings')}
-                description={t('settings.manage', 'Manage your profile and account settings')}
+                description={t(
+                    'settings.manage',
+                    'Manage your profile and account settings',
+                )}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

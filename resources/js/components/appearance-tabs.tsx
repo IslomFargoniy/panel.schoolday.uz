@@ -16,7 +16,11 @@ export default function AppearanceToggleTab({
     const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
         { value: 'light', icon: Sun, label: t('settings.light', 'Light') },
         { value: 'dark', icon: Moon, label: t('settings.dark', 'Dark') },
-        { value: 'system', icon: Monitor, label: t('settings.system_theme', 'System') },
+        {
+            value: 'system',
+            icon: Monitor,
+            label: t('settings.system_theme', 'System'),
+        },
     ];
 
     return (

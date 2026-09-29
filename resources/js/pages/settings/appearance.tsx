@@ -19,16 +19,26 @@ export default function Appearance() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={t('settings.appearance_title', 'Appearance settings')} />
+            <Head
+                title={t('settings.appearance_title', 'Appearance settings')}
+            />
 
-            <h1 className="sr-only">{t('settings.appearance_settings', 'Appearance Settings')}</h1>
+            <h1 className="sr-only">
+                {t('settings.appearance_settings', 'Appearance Settings')}
+            </h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title={t('settings.appearance_title', 'Appearance settings')}
-                        description={t('settings.appearance_desc', 'Update your account\'s appearance settings')}
+                        title={t(
+                            'settings.appearance_title',
+                            'Appearance settings',
+                        )}
+                        description={t(
+                            'settings.appearance_desc',
+                            "Update your account's appearance settings",
+                        )}
                     />
                     <AppearanceTabs />
                 </div>

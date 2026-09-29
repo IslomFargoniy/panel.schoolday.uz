@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
-
 interface StatData {
     total_students: number;
     present_today: number;
@@ -41,23 +40,34 @@ export default function Dashboard() {
     const { props } = usePage();
     const { t } = useTranslation();
 
-    const stats = (props.stats as StatData) || { total_students: 0, present_today: 0, late_arrivals: 0, on_time_today: 0, absent_today: 0 };
+    const stats = (props.stats as StatData) || {
+        total_students: 0,
+        present_today: 0,
+        late_arrivals: 0,
+        on_time_today: 0,
+        absent_today: 0,
+    };
     const recentEvents = (props.recent_events as EventData[]) || [];
     const monthlyStats = (props.monthly_stats as MonthlyStat[]) || [];
 
-    const breadcrumbs: BreadcrumbItem[] = [{ title: t('dashboard.title', 'Dashboard'), href: dashboard().url }];
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('dashboard.title', 'Dashboard'), href: dashboard().url },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('dashboard.title', 'Dashboard')} />
-            <div className="flex flex-1 flex-col gap-6 p-6 overflow-x-auto">
+            <div className="flex flex-1 flex-col gap-6 overflow-x-auto p-6">
                 <StatsGrid stats={stats} />
 
                 <DashboardCharts stats={stats} monthlyStats={monthlyStats} />
 
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold tracking-tight">
-                        {t('dashboard.recent_events', 'Recent Access Events (Live Feed)')}
+                        {t(
+                            'dashboard.recent_events',
+                            'Recent Access Events (Live Feed)',
+                        )}
                     </h2>
                 </div>
 

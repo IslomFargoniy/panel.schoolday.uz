@@ -37,26 +37,54 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">{t('settings.appearance', 'Appearance')}</DropdownMenuLabel>
-                <div className="flex px-2 py-1 gap-2">
-                    <button onClick={() => updateAppearance('light')} className={`flex items-center gap-1.5 text-xs px-2 py-1 flex-1 justify-center rounded border transition-colors ${appearance === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">
+                    {t('settings.appearance', 'Appearance')}
+                </DropdownMenuLabel>
+                <div className="flex gap-2 px-2 py-1">
+                    <button
+                        onClick={() => updateAppearance('light')}
+                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
                         <Sun className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => updateAppearance('dark')} className={`flex items-center gap-1.5 text-xs px-2 py-1 flex-1 justify-center rounded border transition-colors ${appearance === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+                    <button
+                        onClick={() => updateAppearance('dark')}
+                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
                         <Moon className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => updateAppearance('system')} className={`flex items-center gap-1.5 text-xs px-2 py-1 flex-1 justify-center rounded border transition-colors ${appearance === 'system' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+                    <button
+                        onClick={() => updateAppearance('system')}
+                        className={`flex flex-1 items-center justify-center gap-1.5 rounded border px-2 py-1 text-xs transition-colors ${appearance === 'system' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
                         <Monitor className="h-3.5 w-3.5" />
                     </button>
                 </div>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">{t('sidebar.language', 'Language')}</DropdownMenuLabel>
-                <div className="flex px-2 py-1 gap-2">
-                    <button onClick={() => i18n.changeLanguage('uz')} className={`text-xs px-2 py-1 rounded border ${i18n.language === 'uz' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>UZ</button>
-                    <button onClick={() => i18n.changeLanguage('ru')} className={`text-xs px-2 py-1 rounded border ${i18n.language === 'ru' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>RU</button>
-                    <button onClick={() => i18n.changeLanguage('en')} className={`text-xs px-2 py-1 rounded border ${i18n.language === 'en' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>EN</button>
+                <DropdownMenuLabel className="text-xs text-muted-foreground uppercase">
+                    {t('sidebar.language', 'Language')}
+                </DropdownMenuLabel>
+                <div className="flex gap-2 px-2 py-1">
+                    <button
+                        onClick={() => i18n.changeLanguage('uz')}
+                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'uz' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
+                        UZ
+                    </button>
+                    <button
+                        onClick={() => i18n.changeLanguage('ru')}
+                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'ru' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
+                        RU
+                    </button>
+                    <button
+                        onClick={() => i18n.changeLanguage('en')}
+                        className={`rounded border px-2 py-1 text-xs ${i18n.language === 'en' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                    >
+                        EN
+                    </button>
                 </div>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

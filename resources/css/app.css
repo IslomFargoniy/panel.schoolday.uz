@@ -146,7 +146,7 @@ html {
     }
 
     .PhoneInputCountrySelect {
-        @apply bg-background text-foreground appearance-none;
+        @apply appearance-none bg-background text-foreground;
     }
 
     .PhoneInputCountrySelect option {

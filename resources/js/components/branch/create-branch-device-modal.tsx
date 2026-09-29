@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Plus, Cpu, Network, Radio } from 'lucide-react';
-import type { FormEventHandler} from 'react';
+import type { FormEventHandler } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +19,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import type { Branch } from '@/types';
 
 interface CreateBranchDeviceModalProps {
@@ -36,18 +42,22 @@ type FormData = {
     encryption_key: string;
 };
 
-export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBranchDeviceModalProps) {
+export default function CreateBranchDeviceModal({
+    branch,
+    onCreated,
+}: CreateBranchDeviceModalProps) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
-    const { data, setData, post, processing, reset, errors, clearErrors } = useForm<FormData>({
-        branch_id: branch.id,
-        name: '',
-        mac_address: '',
-        device_id: `branch${branch.id}`,
-        connection_type: 'isup',
-        encryption_key: `SchoolDay${branch.id}2026`,
-    });
+    const { data, setData, post, processing, reset, errors, clearErrors } =
+        useForm<FormData>({
+            branch_id: branch.id,
+            name: '',
+            mac_address: '',
+            device_id: `branch${branch.id}`,
+            connection_type: 'isup',
+            encryption_key: `SchoolDay${branch.id}2026`,
+        });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -58,13 +68,21 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
                 reset();
                 clearErrors();
                 setOpen(false);
-                toast.success(t('device_created', 'Hikvision qurilmasi muvaffaqiyatli qo‘shildi!'));
+                toast.success(
+                    t(
+                        'device_created',
+                        'Hikvision qurilmasi muvaffaqiyatli qo‘shildi!',
+                    ),
+                );
                 if (onCreated) {
                     onCreated();
                 }
             },
             onError: (err: any) => {
-                const errorMessage = err?.error || err?.mac_address || t('create_failed', 'Xatolik yuz berdi');
+                const errorMessage =
+                    err?.error ||
+                    err?.mac_address ||
+                    t('create_failed', 'Xatolik yuz berdi');
                 toast.error(errorMessage);
             },
         });
@@ -73,22 +91,30 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-8 px-3 rounded-lg shadow-sm flex items-center gap-1.5 text-xs">
-                    <Plus className="w-3.5 h-3.5" />
+                <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700">
+                    <Plus className="h-3.5 w-3.5" />
                     <span>{t('create_device', 'Qurilma qo‘shish')}</span>
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="rounded-2xl border-slate-200 dark:border-slate-800 max-w-md p-6 bg-card text-card-foreground shadow-xl">
+            <DialogContent className="max-w-md rounded-2xl border-slate-200 bg-card p-6 text-card-foreground shadow-xl dark:border-slate-800">
                 <DialogHeader className="space-y-1.5 pb-2">
                     <DialogTitle className="flex items-center gap-2.5 text-base font-bold text-foreground">
-                        <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                            <Cpu className="w-4 h-4" />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
+                            <Cpu className="h-4 w-4" />
                         </div>
-                        <span>{t('modal.create_device_title', 'Yangi Hikvision Qurilmasi Qo‘shish')}</span>
+                        <span>
+                            {t(
+                                'modal.create_device_title',
+                                'Yangi Hikvision Qurilmasi Qo‘shish',
+                            )}
+                        </span>
                     </DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">
-                        {t('branch', 'Filial')}: <strong className="font-semibold text-foreground">{branch.name}</strong>
+                        {t('branch', 'Filial')}:{' '}
+                        <strong className="font-semibold text-foreground">
+                            {branch.name}
+                        </strong>
                     </DialogDescription>
                 </DialogHeader>
 
@@ -99,7 +125,10 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
                         </Label>
                         <Input
                             id="name"
-                            placeholder={t('device_name_placeholder', 'Masalan: Bosh kirish turniketi')}
+                            placeholder={t(
+                                'device_name_placeholder',
+                                'Masalan: Bosh kirish turniketi',
+                            )}
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             className="h-9 rounded-lg border-input text-xs sm:text-sm"
@@ -108,42 +137,63 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="mac_address" className="text-xs font-medium">
-                            {t('mac_address', 'MAC manzil')} <span className="text-rose-500">*</span>
+                        <Label
+                            htmlFor="mac_address"
+                            className="text-xs font-medium"
+                        >
+                            {t('mac_address', 'MAC manzil')}{' '}
+                            <span className="text-rose-500">*</span>
                         </Label>
                         <Input
                             id="mac_address"
                             placeholder="88:de:39:32:d8:0f"
                             value={data.mac_address}
-                            onChange={(e) => setData('mac_address', e.target.value)}
-                            className="h-9 rounded-lg border-input text-xs sm:text-sm font-mono"
+                            onChange={(e) =>
+                                setData('mac_address', e.target.value)
+                            }
+                            className="h-9 rounded-lg border-input font-mono text-xs sm:text-sm"
                             required
                         />
                         <InputError message={errors.mac_address} />
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="connection_type" className="text-xs font-medium">
+                        <Label
+                            htmlFor="connection_type"
+                            className="text-xs font-medium"
+                        >
                             {t('connection_type', 'Ulanish turi')}
                         </Label>
                         <Select
                             value={data.connection_type}
-                            onValueChange={(val: 'isup' | 'http_listening') => setData('connection_type', val)}
+                            onValueChange={(val: 'isup' | 'http_listening') =>
+                                setData('connection_type', val)
+                            }
                         >
                             <SelectTrigger className="h-9 rounded-lg border-input text-xs sm:text-sm">
-                                <SelectValue placeholder={t('select_connection_type', 'Ulanish turini tanlang')} />
+                                <SelectValue
+                                    placeholder={t(
+                                        'select_connection_type',
+                                        'Ulanish turini tanlang',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="isup">
                                     <div className="flex items-center gap-2">
-                                        <Network className="w-3.5 h-3.5 text-purple-500" />
-                                        <span>ISUP 5.0 (2 tomonlama avtomatik sinxronizatsiya)</span>
+                                        <Network className="h-3.5 w-3.5 text-purple-500" />
+                                        <span>
+                                            ISUP 5.0 (2 tomonlama avtomatik
+                                            sinxronizatsiya)
+                                        </span>
                                     </div>
                                 </SelectItem>
                                 <SelectItem value="http_listening">
                                     <div className="flex items-center gap-2">
-                                        <Radio className="w-3.5 h-3.5 text-blue-500" />
-                                        <span>HTTP Listening (1 tomonlama klassik)</span>
+                                        <Radio className="h-3.5 w-3.5 text-blue-500" />
+                                        <span>
+                                            HTTP Listening (1 tomonlama klassik)
+                                        </span>
                                     </div>
                                 </SelectItem>
                             </SelectContent>
@@ -152,36 +202,52 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
                     </div>
 
                     {data.connection_type === 'isup' && (
-                        <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3.5 dark:border-indigo-950 dark:bg-indigo-950/30 space-y-3">
+                        <div className="space-y-3 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3.5 dark:border-indigo-950 dark:bg-indigo-950/30">
                             <div className="space-y-1">
-                                <Label htmlFor="device_id" className="text-xs font-medium text-foreground">
+                                <Label
+                                    htmlFor="device_id"
+                                    className="text-xs font-medium text-foreground"
+                                >
                                     {t('device_id', 'ISUP Device ID')}
                                 </Label>
                                 <Input
                                     id="device_id"
                                     value={data.device_id}
-                                    onChange={(e) => setData('device_id', e.target.value)}
-                                    className="h-8.5 rounded-lg border-input text-xs sm:text-sm font-mono bg-background"
+                                    onChange={(e) =>
+                                        setData('device_id', e.target.value)
+                                    }
+                                    className="h-8.5 rounded-lg border-input bg-background font-mono text-xs sm:text-sm"
                                 />
                                 <InputError message={errors.device_id} />
                             </div>
 
                             <div className="space-y-1">
-                                <Label htmlFor="encryption_key" className="text-xs font-medium text-foreground">
-                                    {t('encryption_key', 'Xavfsizlik kaliti (Register Password / Key)')}
+                                <Label
+                                    htmlFor="encryption_key"
+                                    className="text-xs font-medium text-foreground"
+                                >
+                                    {t(
+                                        'encryption_key',
+                                        'Xavfsizlik kaliti (Register Password / Key)',
+                                    )}
                                 </Label>
                                 <Input
                                     id="encryption_key"
                                     value={data.encryption_key}
-                                    onChange={(e) => setData('encryption_key', e.target.value)}
-                                    className="h-8.5 rounded-lg border-input text-xs sm:text-sm font-mono bg-background"
+                                    onChange={(e) =>
+                                        setData(
+                                            'encryption_key',
+                                            e.target.value,
+                                        )
+                                    }
+                                    className="h-8.5 rounded-lg border-input bg-background font-mono text-xs sm:text-sm"
                                 />
                                 <InputError message={errors.encryption_key} />
                             </div>
                         </div>
                     )}
 
-                    <DialogFooter className="gap-2 pt-3 border-t border-border flex items-center justify-end">
+                    <DialogFooter className="flex items-center justify-end gap-2 border-t border-border pt-3">
                         <DialogClose asChild>
                             <Button
                                 variant="outline"
@@ -202,7 +268,7 @@ export default function CreateBranchDeviceModal({ branch, onCreated }: CreateBra
                             type="submit"
                             size="sm"
                             disabled={processing}
-                            className="h-8.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 px-4 text-xs font-semibold text-white shadow-sm"
+                            className="h-8.5 rounded-lg bg-indigo-600 px-4 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700"
                         >
                             {t('save', 'Saqlash')}
                         </Button>

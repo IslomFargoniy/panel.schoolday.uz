@@ -5,7 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { AttendanceTable } from '@/components/reports/AttendanceTable';
 import { ReportFilters } from '@/components/reports/ReportFilters';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, DailyAttendance, Branch, Shift, SchoolClass, Student, PaginatedResponse } from '@/types';
+import type {
+    BreadcrumbItem,
+    DailyAttendance,
+    Branch,
+    Shift,
+    SchoolClass,
+    Student,
+    PaginatedResponse,
+} from '@/types';
 
 interface ReportPageFilters {
     start_date?: string;
@@ -38,7 +46,10 @@ export default function ReportsPage({
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: t('reports.title', 'Daily Attendance Report'), href: '/reports' },
+        {
+            title: t('reports.title', 'Daily Attendance Report'),
+            href: '/reports',
+        },
     ];
 
     const { data: filterData, setData } = useForm({
@@ -54,14 +65,17 @@ export default function ReportsPage({
 
     const handleFilter = (e: FormEvent) => {
         e.preventDefault();
-        router.get('/reports', filterData, { preserveState: true, replace: true });
+        router.get('/reports', filterData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('reports.title', 'Daily Attendance Report')} />
-            <div className="flex flex-1 flex-col gap-4 p-6 overflow-x-auto">
-                <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-1 flex-col gap-4 overflow-x-auto p-6">
+                <div className="mb-2 flex items-center justify-between">
                     <h2 className="text-2xl font-semibold tracking-tight">
                         {t('reports.title', 'Daily Attendance Report')}
                     </h2>
@@ -75,7 +89,10 @@ export default function ReportsPage({
                     setData={setData}
                     onSubmit={handleFilter}
                 />
-                <AttendanceTable attendances={attendances} filters={filterData} />
+                <AttendanceTable
+                    attendances={attendances}
+                    filters={filterData}
+                />
             </div>
         </AppLayout>
     );

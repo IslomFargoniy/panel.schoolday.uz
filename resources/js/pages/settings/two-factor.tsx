@@ -46,7 +46,12 @@ export default function TwoFactor({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Two-Factor Authentication" />
 
-            <h1 className="sr-only">{t('settings.two_factor_settings', 'Two-Factor Authentication Settings')}</h1>
+            <h1 className="sr-only">
+                {t(
+                    'settings.two_factor_settings',
+                    'Two-Factor Authentication Settings',
+                )}
+            </h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
@@ -57,9 +62,14 @@ export default function TwoFactor({
                     />
                     {twoFactorEnabled ? (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="default">{t('settings.enabled', 'Enabled')}</Badge>
+                            <Badge variant="default">
+                                {t('settings.enabled', 'Enabled')}
+                            </Badge>
                             <p className="text-muted-foreground">
-                                {t('settings.two_factor_enabled_desc', 'With two-factor authentication enabled, you will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.')}
+                                {t(
+                                    'settings.two_factor_enabled_desc',
+                                    'With two-factor authentication enabled, you will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.',
+                                )}
                             </p>
 
                             <TwoFactorRecoveryCodes
@@ -84,9 +94,14 @@ export default function TwoFactor({
                         </div>
                     ) : (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="destructive">{t('settings.disabled', 'Disabled')}</Badge>
+                            <Badge variant="destructive">
+                                {t('settings.disabled', 'Disabled')}
+                            </Badge>
                             <p className="text-muted-foreground">
-                                {t('settings.two_factor_enable_desc', 'When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.')}
+                                {t(
+                                    'settings.two_factor_enable_desc',
+                                    'When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.',
+                                )}
                             </p>
 
                             <div>

@@ -14,13 +14,19 @@ export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <AuthLayout
             title={t('auth.verify_title', 'Verify email')}
-            description={t('auth.verify_desc', 'Please verify your email address by clicking on the link we just emailed to you.')}
+            description={t(
+                'auth.verify_desc',
+                'Please verify your email address by clicking on the link we just emailed to you.',
+            )}
         >
             <Head title={t('auth.verify_title', 'Email verification')} />
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {t('auth.verify_link_sent', 'A new verification link has been sent to the email address you provided during registration.')}
+                    {t(
+                        'auth.verify_link_sent',
+                        'A new verification link has been sent to the email address you provided during registration.',
+                    )}
                 </div>
             )}
 
@@ -29,7 +35,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     <>
                         <Button disabled={processing} variant="secondary">
                             {processing && <Spinner />}
-                            {t('auth.resend_verify', 'Resend verification email')}
+                            {t(
+                                'auth.resend_verify',
+                                'Resend verification email',
+                            )}
                         </Button>
 
                         <TextLink

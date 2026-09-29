@@ -15,11 +15,11 @@ export function NavUser() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button
-                    className="flex max-w-[250px] items-center gap-2 rounded-lg p-1 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground outline-none border border-transparent transition-colors md:px-2 md:py-1.5 focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                    className="flex max-w-[250px] items-center gap-2 rounded-lg border border-transparent p-1 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:px-2 md:py-1.5"
                     data-test="sidebar-menu-button"
                 >
                     <UserInfo user={auth.user} />
-                    <ChevronsUpDown className="hidden md:block size-4 shrink-0 text-muted-foreground ml-1" />
+                    <ChevronsUpDown className="ml-1 hidden size-4 shrink-0 text-muted-foreground md:block" />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent

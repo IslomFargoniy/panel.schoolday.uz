@@ -14,7 +14,14 @@ interface BranchFormProps {
     onCancel: () => void;
 }
 
-export function BranchForm({ editing, formData, errors, setData, onSubmit, onCancel }: BranchFormProps) {
+export function BranchForm({
+    editing,
+    formData,
+    errors,
+    setData,
+    onSubmit,
+    onCancel,
+}: BranchFormProps) {
     const { t } = useTranslation();
 
     const addMac = () => {
@@ -22,7 +29,10 @@ export function BranchForm({ editing, formData, errors, setData, onSubmit, onCan
     };
 
     const removeMac = (index: number) => {
-        setData('mac_addresses', formData.mac_addresses.filter((_, i) => i !== index));
+        setData(
+            'mac_addresses',
+            formData.mac_addresses.filter((_, i) => i !== index),
+        );
     };
 
     const updateMac = (index: number, value: string) => {
@@ -32,57 +42,93 @@ export function BranchForm({ editing, formData, errors, setData, onSubmit, onCan
     };
 
     return (
-        <div className="bg-card p-6 rounded-xl border border-sidebar-border dark:border-sidebar-border shadow-sm sticky top-6">
-            <h3 className="text-xl font-semibold tracking-tight mb-4">
-                {editing ? t('branches.edit', 'Edit Branch') : t('branches.add_new', 'Add New Branch')}
+        <div className="sticky top-6 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm dark:border-sidebar-border">
+            <h3 className="mb-4 text-xl font-semibold tracking-tight">
+                {editing
+                    ? t('branches.edit', 'Edit Branch')
+                    : t('branches.add_new', 'Add New Branch')}
             </h3>
             <form onSubmit={onSubmit} className="space-y-4">
                 {/* Name */}
                 <div className="space-y-2">
-                    <Label htmlFor="name">{t('branches.name', 'Branch Name')}</Label>
+                    <Label htmlFor="name">
+                        {t('branches.name', 'Branch Name')}
+                    </Label>
                     <Input
                         id="name"
-                        placeholder={t('branches.placeholder_name', 'e.g. Main Branch')}
+                        placeholder={t(
+                            'branches.placeholder_name',
+                            'e.g. Main Branch',
+                        )}
                         value={formData.name}
-                        onChange={e => setData('name', e.target.value)}
+                        onChange={(e) => setData('name', e.target.value)}
                         required
                     />
-                    {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                    {errors.name && (
+                        <p className="text-xs text-destructive">
+                            {errors.name}
+                        </p>
+                    )}
                 </div>
 
                 {/* Description */}
                 <div className="space-y-2">
-                    <Label htmlFor="description">{t('branches.description', 'Description')}</Label>
+                    <Label htmlFor="description">
+                        {t('branches.description', 'Description')}
+                    </Label>
                     <Input
                         id="description"
-                        placeholder={t('branches.placeholder_description', 'Optional')}
+                        placeholder={t(
+                            'branches.placeholder_description',
+                            'Optional',
+                        )}
                         value={formData.description}
-                        onChange={e => setData('description', e.target.value)}
+                        onChange={(e) => setData('description', e.target.value)}
                     />
-                    {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
+                    {errors.description && (
+                        <p className="text-xs text-destructive">
+                            {errors.description}
+                        </p>
+                    )}
                 </div>
 
                 {/* MAC Addresses */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <Label>{t('branches.mac_addresses', 'MAC Addresses')}</Label>
-                        <Button type="button" variant="ghost" size="sm" onClick={addMac} className="h-7 gap-1 text-xs">
+                        <Label>
+                            {t('branches.mac_addresses', 'MAC Addresses')}
+                        </Label>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={addMac}
+                            className="h-7 gap-1 text-xs"
+                        >
                             <Plus className="h-3.5 w-3.5" />
                             {t('branches.add_mac', 'Add')}
                         </Button>
                     </div>
                     {formData.mac_addresses.length === 0 && (
                         <p className="text-xs text-muted-foreground">
-                            {t('branches.mac_hint', 'No MAC addresses. All devices will be accepted.')}
+                            {t(
+                                'branches.mac_hint',
+                                'No MAC addresses. All devices will be accepted.',
+                            )}
                         </p>
                     )}
                     <div className="space-y-2">
                         {formData.mac_addresses.map((mac, index) => (
-                            <div key={index} className="flex items-center gap-2">
+                            <div
+                                key={index}
+                                className="flex items-center gap-2"
+                            >
                                 <Input
                                     placeholder="AA:BB:CC:DD:EE:FF"
                                     value={mac}
-                                    onChange={e => updateMac(index, e.target.value)}
+                                    onChange={(e) =>
+                                        updateMac(index, e.target.value)
+                                    }
                                     className="font-mono text-sm"
                                 />
                                 <Button
@@ -99,12 +145,19 @@ export function BranchForm({ editing, formData, errors, setData, onSubmit, onCan
                     </div>
                 </div>
 
-                <div className="flex gap-2 pt-2 items-center">
+                <div className="flex items-center gap-2 pt-2">
                     <Button type="submit" className="flex-1">
-                        {editing ? t('branches.edit', 'Update Branch') : t('branches.save', 'Save Branch')}
+                        {editing
+                            ? t('branches.edit', 'Update Branch')
+                            : t('branches.save', 'Save Branch')}
                     </Button>
                     {editing && (
-                        <Button type="button" variant="outline" className="flex-1" onClick={onCancel}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={onCancel}
+                        >
                             {t('branches.cancel', 'Cancel')}
                         </Button>
                     )}

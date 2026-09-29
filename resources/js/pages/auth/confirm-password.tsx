@@ -14,15 +14,22 @@ export default function ConfirmPassword() {
     return (
         <AuthLayout
             title={t('settings.confirm_pass_title', 'Confirm your password')}
-            description={t('settings.confirm_pass_desc', 'This is a secure area of the application. Please confirm your password before continuing.')}
+            description={t(
+                'settings.confirm_pass_desc',
+                'This is a secure area of the application. Please confirm your password before continuing.',
+            )}
         >
-            <Head title={t('settings.confirm_pass_title', 'Confirm password')} />
+            <Head
+                title={t('settings.confirm_pass_title', 'Confirm password')}
+            />
 
             <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">{t('settings.password', 'Password')}</Label>
+                            <Label htmlFor="password">
+                                {t('settings.password', 'Password')}
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -42,7 +49,10 @@ export default function ConfirmPassword() {
                                 data-test="confirm-password-button"
                             >
                                 {processing && <Spinner />}
-                                {t('settings.confirm_password', 'Confirm password')}
+                                {t(
+                                    'settings.confirm_password',
+                                    'Confirm password',
+                                )}
                             </Button>
                         </div>
                     </div>
