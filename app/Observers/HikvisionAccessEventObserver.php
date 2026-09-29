@@ -2,14 +2,12 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendTelegramNotificationJob;
 use App\Models\DailyAttendance;
 use App\Models\HikvisionAccessEvent;
 use App\Models\Student;
-use App\Services\Telegram\TelegramService;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class HikvisionAccessEventObserver
 {
@@ -155,60 +153,14 @@ class HikvisionAccessEventObserver
             }
         });
 
-        // Send Telegram notification outside transaction
+        // Send Telegram notification asynchronously via Queue
         if ($statusToNotify) {
-            $this->sendTelegramNotification($student, $event, $statusToNotify, $now);
-        }
-    }
-
-    /**
-     * Send Telegram notification safely.
-     */
-    protected function sendTelegramNotification(
-        Student $student,
-        HikvisionAccessEvent $event,
-        string $statusLine,
-        Carbon $now
-    ): void {
-        $groupId = $student->schoolClass->telegram_group_id ?? null;
-        if (! $student->telegram_id && ! $groupId) {
-            return;
-        }
-
-        try {
-            $telegramService = new TelegramService;
-            if (! $telegramService->hasToken()) {
-                return;
-            }
-
-            $datetime = $now->format('Y-m-d H:i:s');
-            $className = $student->schoolClass->name ?? '-';
-            $shiftName = $student->schoolClass->shift->name ?? '-';
-            $branchName = $student->schoolClass->shift->branch->name ?? '-';
-
-            $message = "👤 <b>O'quvchi:</b> {$student->name}\n🏫 <b>Sinf:</b> {$className}\n🕗 <b>Smena:</b> {$shiftName}\n🏢 <b>Filial:</b> {$branchName}\n——\n{$statusLine}\n📅 <b>Sana:</b> {$datetime}";
-
-            $targets = [];
-            if ($student->telegram_id) {
-                $targets[] = $student->telegram_id;
-            }
-            if ($groupId) {
-                $targets[] = $groupId;
-            }
-
-            foreach ($targets as $targetId) {
-                try {
-                    if (! empty($event->picture)) {
-                        $telegramService->sendPhotoWithFallback($targetId, $event->picture, $message);
-                    } else {
-                        $telegramService->sendSafeMessage($targetId, $message);
-                    }
-                } catch (Exception $e) {
-                    Log::error("Telegram yuborishda xato ({$targetId}): " . $e->getMessage());
-                }
-            }
-        } catch (Exception $e) {
-            Log::error('Telegram bildirishnoma yuborishda xato: ' . $e->getMessage());
+            SendTelegramNotificationJob::dispatch(
+                $student,
+                $event,
+                $statusToNotify,
+                $now->format('Y-m-d H:i:s')
+            )->afterCommit();
         }
     }
 }

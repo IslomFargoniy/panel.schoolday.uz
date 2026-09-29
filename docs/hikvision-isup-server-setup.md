@@ -265,3 +265,40 @@ Terminalning veb paneliga kiring (`http://192.168.1.64` yoki mahalliy IP):
 | `Device ID invalid` xatosi | Terminaldagi Device ID panel bilan bir xil emas | Terminaldagi Device ID SchoolDay panelidagi filial qurilmasi `device_id` maydoni bilan harfma-harf bir xil bo‘lishi lozim. |
 | `Key error / 401 Unauthorized` | Shifrlash kaliti noto‘g‘ri | Terminaldagi Device Key panelda kiritilgan kalit bilan bir xil bo‘lishi kerak (standart: `SchoolDay142026`). |
 | Davomat kelyapti, lekin rasmlar ko‘rinmayapti | Rasmlar papkasiga ruxsat yetarli emas | `chmod -R 775 storage/app/public/hikvision` buyrug‘ini bering. |
+| Telegram xabarnomalari bormayapti | Queue worker ishlamayapti | `php artisan queue:work` ishga tushirilganligini yoki Supervisor workerini tekshiring (`sudo supervisorctl status schoolday-worker:*`). |
+
+---
+
+## 9. Telegram Bildirishnomalari uchun Queue Worker (Supervisor)
+
+Turniketdan o'quvchilar soniyasiga o'nlab o'tganda server qotib qolmasligi uchun barcha Telegram xabarlari `SendTelegramNotificationJob` orqali navbatga (Queue) qo'yiladi.
+
+Buni serverda doimiy (fon rejimida) ushlab turish uchun Supervisor fayli yarating:
+
+```bash
+sudo nano /etc/supervisor/conf.d/schoolday-worker.conf
+```
+
+Quyidagi konfiguratsiyani kiriting:
+```ini
+[program:schoolday-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/schoolday/artisan queue:work --sleep=2 --tries=3 --timeout=30 --max-time=3600
+directory=/var/www/schoolday
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/var/www/schoolday/storage/logs/worker.log
+```
+
+Supervisor'ni yangilang:
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start schoolday-worker:*
+```
+

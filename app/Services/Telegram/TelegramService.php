@@ -12,22 +12,32 @@ use Telegram\Bot\Keyboard\Keyboard;
 
 class TelegramService
 {
-    protected Api $telegram;
+    protected ?Api $telegram = null;
 
-    protected string $token;
+    protected string $token = '';
 
-    public function __construct()
+    public function __construct(?string $token = null)
     {
-        $bot = Setting::where('key', '=', 'telegram_bot_token')->first();
+        if ($token !== null) {
+            $this->token = $token;
+        } else {
+            $bot = Setting::where('key', '=', 'telegram_bot_token')->first();
+            $this->token = $bot ? (string) $bot->value : '';
+        }
 
-        // Ensure token exists, else pass empty string to avoid crashes immediately
-        $this->token = $bot ? $bot->value : '';
-        $this->telegram = new Api($this->token);
+        if (! empty($this->token)) {
+            try {
+                $this->telegram = new Api($this->token);
+            } catch (Exception $e) {
+                Log::error('Telegram API init error: ' . $e->getMessage());
+                $this->telegram = null;
+            }
+        }
     }
 
     public function hasToken(): bool
     {
-        return ! empty($this->token);
+        return ! empty($this->token) && $this->telegram !== null;
     }
 
     public function setWebhook(string $url): void
@@ -192,6 +202,10 @@ class TelegramService
      */
     protected function sendUnknownCommand(int|string $chatId): void
     {
+        if (! $this->hasToken()) {
+            return;
+        }
+
         try {
             $this->telegram->sendMessage([
                 'chat_id' => $chatId,
@@ -205,8 +219,12 @@ class TelegramService
     /**
      * Safe message sender
      */
-    public function sendSafeMessage(int|string $chatId, string $text, ?Keyboard $keyboard = null): void
+    public function sendSafeMessage(int|string $chatId, string $text, ?Keyboard $keyboard = null): bool
     {
+        if (! $this->hasToken()) {
+            return false;
+        }
+
         try {
             $params = [
                 'chat_id' => $chatId,
@@ -219,23 +237,29 @@ class TelegramService
             }
 
             $this->telegram->sendMessage($params);
+
+            return true;
         } catch (Exception $e) {
             Log::error('Telegram sendMessage error: ' . $e->getMessage());
+
+            return false;
         }
     }
 
     /**
      * Send photo with fallback to standard message
      */
-    public function sendPhotoWithFallback(int|string $chatId, string $photoPath, string $caption): void
+    public function sendPhotoWithFallback(int|string $chatId, string $photoPath, string $caption): bool
     {
+        if (! $this->hasToken()) {
+            return false;
+        }
+
         try {
             // First check if photo exists
             $fullPath = storage_path('app/public/' . $photoPath);
             if (! file_exists($fullPath)) {
-                $this->sendSafeMessage($chatId, $caption);
-
-                return;
+                return $this->sendSafeMessage($chatId, $caption);
             }
 
             $this->telegram->sendPhoto([
@@ -244,10 +268,13 @@ class TelegramService
                 'caption' => $caption,
                 'parse_mode' => 'HTML',
             ]);
+
+            return true;
         } catch (Exception $e) {
             Log::error('Telegram sendPhoto error: ' . $e->getMessage() . '. Falling back to text message.');
+
             // Fallback to regular text message
-            $this->sendSafeMessage($chatId, $caption);
+            return $this->sendSafeMessage($chatId, $caption);
         }
     }
 }
