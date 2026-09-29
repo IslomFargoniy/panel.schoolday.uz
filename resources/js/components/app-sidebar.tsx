@@ -119,11 +119,8 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-gray-100/50 p-4 dark:border-gray-800/50">
-                <NavFooter
-                    items={footerNavItems}
-                    className="mb-4 opacity-70 transition-opacity hover:opacity-100"
-                />
+            <SidebarFooter>
+                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
