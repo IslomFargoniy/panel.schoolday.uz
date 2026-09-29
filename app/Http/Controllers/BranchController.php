@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\School;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class BranchController extends Controller
@@ -15,8 +17,9 @@ class BranchController extends Controller
 
         $today = \Carbon\Carbon::today()->toDateString();
 
-        $branches = Branch::withCount('shifts')
+        $query = Branch::withCount('shifts')
             ->with([
+                'school',
                 'devices',
                 'shifts' => function ($q) use ($today) {
                     $q->withCount('classes')
@@ -39,8 +42,20 @@ class BranchController extends Controller
                             });
                         }]);
                 },
-            ])
-            ->latest()
+            ]);
+
+        // Filter by school_id if passed
+        if ($request->filled('school_id')) {
+            $query->where('school_id', $request->school_id);
+        }
+
+        // Multi-tenant check: non-admins only see branches of their schools
+        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
+            $query->whereIn('school_id', $userSchoolIds);
+        }
+
+        $branches = $query->latest()
             ->paginate($limit)
             ->through(function ($branch) {
                 $branch->classes_count = $branch->shifts->sum('classes_count');
@@ -54,9 +69,21 @@ class BranchController extends Controller
                 return $branch;
             });
 
+        // List schools accessible to user
+        $schoolsQuery = School::query();
+        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
+            $schoolsQuery->whereIn('id', $userSchoolIds);
+        }
+        $schools = $schoolsQuery->select('id', 'name', 'branch_limit')->get();
+
         return Inertia::render('branches/index', [
             'branches' => $branches,
-            'filters' => ['per_page' => $perPage],
+            'schools' => $schools,
+            'filters' => [
+                'per_page' => $perPage,
+                'school_id' => $request->school_id,
+            ],
         ]);
     }
 
@@ -66,16 +93,28 @@ class BranchController extends Controller
         $macAddresses = $validated['mac_addresses'] ?? [];
         unset($validated['mac_addresses']);
 
-        $limit = \App\Models\Setting::where('key', 'branch_limit')->value('value') ?? 1;
-        if (Branch::count() >= $limit) {
-            return redirect()->back()->with('error', 'Limit bo\'yicha filial qo\'shish mumkin emas.');
+        // Determine school_id
+        $schoolId = $validated['school_id'] ?? null;
+        if (!$schoolId && Auth::check()) {
+            $schoolId = Auth::user()->user_schools()->value('school_id');
+        }
+        if (!$schoolId) {
+            $schoolId = School::first()?->id;
+        }
+
+        if ($schoolId) {
+            $school = School::find($schoolId);
+            if ($school && $school->branch_limit <= $school->branches()->count()) {
+                return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $school->branch_limit . ' ta) tugagan.');
+            }
+            $validated['school_id'] = $schoolId;
         }
 
         $branch = Branch::create($validated);
 
         $this->syncMacAddresses($branch, $macAddresses);
 
-        return redirect()->back()->with('success', 'crud.created');
+        return redirect()->back()->with('success', 'Filial muvaffaqiyatli yaratildi.');
     }
 
     public function update(\App\Http\Requests\BranchRequest $request, Branch $branch)
@@ -88,7 +127,7 @@ class BranchController extends Controller
 
         $this->syncMacAddresses($branch, $macAddresses);
 
-        return redirect()->back()->with('success', 'crud.updated');
+        return redirect()->back()->with('success', 'Filial muvaffaqiyatli yangilandi.');
     }
 
     public function destroy(Branch $branch)
@@ -96,13 +135,13 @@ class BranchController extends Controller
         try {
             $branch->delete();
 
-            return redirect()->back()->with('success', 'crud.deleted');
+            return redirect()->back()->with('success', 'Filial o‘chirildi.');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'crud.delete_branch_error');
+                return redirect()->back()->with('error', 'Bu filialda faol ma\'lumotlar mavjudligi sababli uni o\'chirib bo\'lmaydi.');
             }
 
-            return redirect()->back()->with('error', 'crud.error');
+            return redirect()->back()->with('error', 'O‘chirishda xatolik yuz berdi.');
         }
     }
 

@@ -53,4 +53,16 @@ class BranchDeviceController extends Controller
             ]);
         }
     }
+
+    /**
+     * Sync events from ISUP device
+     */
+    public function sync(BranchDevice $branchDevice, \App\Services\Hikvision\HikvisionSyncService $syncService)
+    {
+        $result = $syncService->syncEventsFromDevice($branchDevice);
+        if ($result['success'] ?? false) {
+            return back()->with('success', $result['message'] ?? 'ISUP hodisalar muvaffaqiyatli sinxronlandi.');
+        }
+        return back()->with('error', $result['message'] ?? 'Sinxronizatsiyada xatolik yuz berdi.');
+    }
 }

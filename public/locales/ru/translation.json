@@ -13,7 +13,8 @@
         "users": "Пользователи",
         "platform": "Платформа",
         "repository": "Репозиторий",
-        "telegram": "Телеграм"
+        "telegram": "Телеграм",
+        "school": "Школы"
     },
     "common": {
         "per_page": "Показывать",

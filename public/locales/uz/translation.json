@@ -13,7 +13,8 @@
         "users": "Foydalanuvchilar",
         "platform": "Platforma",
         "repository": "Repozitoriy",
-        "telegram": "Telegram"
+        "telegram": "Telegram",
+        "school": "Maktablar"
     },
     "common": {
         "per_page": "Ko'rsatish",

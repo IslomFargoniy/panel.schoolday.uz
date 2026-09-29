@@ -14,6 +14,7 @@ class BranchRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'school_id' => 'nullable|exists:schools,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'mac_addresses' => 'nullable|array',

@@ -13,7 +13,8 @@
         "users": "Users",
         "platform": "Platform",
         "repository": "Repository",
-        "telegram": "Telegram"
+        "telegram": "Telegram",
+        "school": "Schools"
     },
     "common": {
         "per_page": "Show",

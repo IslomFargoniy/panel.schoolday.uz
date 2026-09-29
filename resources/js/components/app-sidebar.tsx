@@ -8,6 +8,7 @@ import {
     PieChart,
     Users,
     Building2,
+    Building,
     Activity,
     BarChart3,
     UserCog,
@@ -32,16 +33,39 @@ import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 
 const getMainNavItems = (t: any, user: any): NavItem[] => {
+    const hasRole = (roleName: string) => {
+        if (!user?.roles) return false;
+        if (Array.isArray(user.roles)) {
+            return user.roles.some((r: any) =>
+                typeof r === 'string' ? r.toLowerCase() === roleName.toLowerCase() : r.name?.toLowerCase() === roleName.toLowerCase()
+            );
+        }
+        return false;
+    };
+
+    const isAdmin = hasRole('Admin') || hasRole('Superadmin');
+
     const items: NavItem[] = [
         {
             title: t('sidebar.dashboard', 'Dashboard'),
             href: dashboard().url,
             icon: LayoutDashboard,
         },
+    ];
+
+    if (isAdmin) {
+        items.push({
+            title: t('sidebar.school', 'Maktablar'),
+            href: '/school',
+            icon: Building2,
+        });
+    }
+
+    items.push(
         {
             title: t('sidebar.branches', 'Branches'),
             href: '/branches',
-            icon: Building2,
+            icon: Building,
         },
         {
             title: t('sidebar.shifts', 'Shifts'),
@@ -68,9 +92,9 @@ const getMainNavItems = (t: any, user: any): NavItem[] => {
             href: '/monitoring',
             icon: Activity,
         },
-    ];
+    );
 
-    if (user?.roles?.includes('Superadmin')) {
+    if (hasRole('Superadmin')) {
         items.push({
             title: t('sidebar.users', 'Users'),
             href: '/users',

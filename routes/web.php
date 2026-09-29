@@ -34,6 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', App\Http\Controllers\UserController::class)
         ->except(['create', 'show', 'edit'])
         ->middleware(App\Http\Middleware\SuperadminMiddleware::class);
+    Route::resource('school', App\Http\Controllers\SchoolController::class);
+    Route::resource('user_school', App\Http\Controllers\UserSchoolController::class);
+    Route::resource('school_setting', App\Http\Controllers\SchoolSettingController::class);
     Route::resource('branches', BranchController::class)->except(['create', 'show', 'edit']);
     Route::resource('branch_device', App\Http\Controllers\BranchDeviceController::class);
     Route::post('branch_device/{device}/sync', [App\Http\Controllers\Api\HikvisionController::class, 'syncDeviceEvents'])->name('branch_device.sync');

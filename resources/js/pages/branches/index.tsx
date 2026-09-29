@@ -18,12 +18,14 @@ import type { BreadcrumbItem, Branch, PaginatedResponse } from '@/types';
 
 interface BranchesPageProps {
     branches: PaginatedResponse<Branch>;
+    schools?: { id: number; name: string; branch_limit: number }[];
     filters?: {
         per_page?: string;
+        school_id?: string;
     };
 }
 
-export default function BranchesPage({ branches, filters }: BranchesPageProps) {
+export default function BranchesPage({ branches, schools = [], filters }: BranchesPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -32,13 +34,14 @@ export default function BranchesPage({ branches, filters }: BranchesPageProps) {
 
     const { data: filterData, setData: setFilterData } = useForm({
         per_page: filters?.per_page || '20',
+        school_id: filters?.school_id || '',
     });
 
     const handleFilter = (val: string) => {
         setFilterData('per_page', val);
         router.get(
             '/branches',
-            { per_page: val },
+            { per_page: val, school_id: filterData.school_id },
             { preserveState: true, replace: true },
         );
     };
@@ -56,6 +59,7 @@ export default function BranchesPage({ branches, filters }: BranchesPageProps) {
         errors,
         clearErrors,
     } = useForm({
+        school_id: filters?.school_id || (schools.length > 0 ? String(schools[0].id) : ''),
         name: '',
         description: '',
         mac_addresses: [] as string[],
@@ -79,6 +83,7 @@ export default function BranchesPage({ branches, filters }: BranchesPageProps) {
         setEditing(branch);
         clearErrors();
         setData({
+            school_id: (branch as any).school_id ? String((branch as any).school_id) : '',
             name: branch.name,
             description: branch.description || '',
             mac_addresses: branch.mac_address_list || [],
@@ -114,6 +119,7 @@ export default function BranchesPage({ branches, filters }: BranchesPageProps) {
                     errors={errors}
                     setData={setData}
                     onSubmit={handleSubmit}
+                    schools={schools}
                     onCancel={() => {
                         setEditing(null);
                         reset();

@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 
 interface BranchFormProps {
     editing: any;
-    formData: { name: string; description: string; mac_addresses: string[] };
+    formData: { school_id?: string | number; name: string; description: string; mac_addresses: string[] };
     errors: Record<string, string>;
     setData: (key: string, value: any) => void;
     onSubmit: (e: FormEvent) => void;
     onCancel: () => void;
+    schools?: { id: number; name: string; branch_limit: number }[];
 }
 
 export function BranchForm({
@@ -21,6 +22,7 @@ export function BranchForm({
     setData,
     onSubmit,
     onCancel,
+    schools = [],
 }: BranchFormProps) {
     const { t } = useTranslation();
 
@@ -49,6 +51,32 @@ export function BranchForm({
                     : t('branches.add_new', 'Add New Branch')}
             </h3>
             <form onSubmit={onSubmit} className="space-y-4">
+                {/* School Selection */}
+                {schools.length > 0 && (
+                    <div className="space-y-2">
+                        <Label htmlFor="school_id">
+                            {t('branches.school', 'Maktab')} <span className="text-rose-500">*</span>
+                        </Label>
+                        <select
+                            id="school_id"
+                            value={formData.school_id || ''}
+                            onChange={(e) => setData('school_id', e.target.value)}
+                            className="h-9.5 w-full rounded-xl border border-input bg-background px-3 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                            required
+                        >
+                            <option value="">{t('select_school', 'Maktabni tanlang...')}</option>
+                            {schools.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                    {s.name} ({t('limit', 'limit')}: {s.branch_limit})
+                                </option>
+                            ))}
+                        </select>
+                        {errors.school_id && (
+                            <p className="text-xs text-destructive">{errors.school_id}</p>
+                        )}
+                    </div>
+                )}
+
                 {/* Name */}
                 <div className="space-y-2">
                     <Label htmlFor="name">

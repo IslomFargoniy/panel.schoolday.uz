@@ -52,4 +52,14 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function user_schools()
+    {
+        return $this->hasMany(UserSchool::class, 'user_id');
+    }
+
+    public function schools()
+    {
+        return $this->belongsToMany(School::class, 'user_schools', 'user_id', 'school_id');
+    }
 }
