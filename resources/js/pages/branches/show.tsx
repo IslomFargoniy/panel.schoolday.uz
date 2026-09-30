@@ -28,8 +28,6 @@ import {
 import { toast } from 'sonner';
 import AppLayout from '@/layouts/app-layout';
 import BranchDeviceTable from '@/components/branch/branch-device-table';
-import CreateBranchDeviceModal from '@/components/branch/create-branch-device-modal';
-import DeviceConnectionGuideModal from '@/components/branch/device-connection-guide-modal';
 import CreateBranchShiftModal from '@/components/branch/create-branch-shift-modal';
 import CreateBranchClassModal from '@/components/branch/create-branch-class-modal';
 import CreateBranchStudentModal from '@/components/branch/create-branch-student-modal';
@@ -323,12 +321,6 @@ export default function BranchShowPage({
                         </div>
                     </div>
 
-                    {/* Top Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-2">
-                        <DeviceConnectionGuideModal branch={branch} />
-                        <CreateBranchDeviceModal branch={branch} />
-                        <CreateBranchShiftModal branch={branch} />
-                    </div>
                 </div>
 
                 {/* 2. Hierarchical Drill-down Breadcrumb Navigation Strip */}
