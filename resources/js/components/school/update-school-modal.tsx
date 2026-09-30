@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Building2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import type { School } from '@/types';
@@ -163,12 +164,11 @@ export default function UpdateSchoolModal({ school, open, onOpenChange }: Update
                             <Label htmlFor="edit_valid_date" className="text-xs font-medium text-foreground">
                                 {t('valid_date', 'Amal qilish muddati')}
                             </Label>
-                            <Input
+                            <DatePicker
                                 id="edit_valid_date"
-                                type="date"
                                 value={data.valid_date}
-                                onChange={(e) => setData('valid_date', e.target.value)}
-                                className="h-9.5 rounded-xl text-xs sm:text-sm"
+                                onChange={(val) => setData('valid_date', val)}
+                                placeholder="2027-09-30"
                             />
                             <InputError message={errors.valid_date} />
                         </div>
