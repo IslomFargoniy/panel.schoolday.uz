@@ -33,7 +33,7 @@ log_warn()    { echo -e "${YELLOW}[!]${NC} $1"; }
 log_error()   { echo -e "${RED}[✗]${NC} $1"; }
 
 run_remote() {
-    ssh "$SERVER" "cd $REMOTE_PATH && $1"
+    ssh -o ServerAliveInterval=15 -o ServerAliveCountMax=10 "$SERVER" "cd $REMOTE_PATH && $1"
 }
 
 # ── SSH tekshirish ──────────────────────────────────────────
