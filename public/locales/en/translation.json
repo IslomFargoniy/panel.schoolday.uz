@@ -568,7 +568,9 @@
   "sync_now": "Fetch events via ISUP",
   "sync_success": "ISUP events synchronized successfully",
   "sync_failed": "Synchronization failed",
-  "device_guide": "Device Connection Guide",
+  "device_guide": "Guide",
+  "guide": "Guide",
+  "create": "Create",
   "device_guide_modal": {
     "title": "Hikvision Device Connection Guide",
     "tab_isup": "Method 1: ISUP 5.0 (Recommended)",

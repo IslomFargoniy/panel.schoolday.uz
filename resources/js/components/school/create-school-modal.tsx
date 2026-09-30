@@ -54,9 +54,9 @@ export default function CreateSchoolModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-9 px-3.5 rounded-xl shadow-xs flex items-center gap-1.5 text-xs">
-                    <Plus className="w-4 h-4" />
-                    <span>{t('create_school', 'Maktab qo‘shish')}</span>
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium h-9 px-3.5 rounded-xl shadow-xs flex items-center gap-1.5 text-xs shrink-0">
+                    <Plus className="w-4 h-4 shrink-0" />
+                    <span>Create</span>
                 </Button>
             </DialogTrigger>
 

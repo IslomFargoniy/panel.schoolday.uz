@@ -1,4 +1,4 @@
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -46,10 +46,10 @@ export function StudentsTable({
                         <Button
                             onClick={onCreate}
                             size="sm"
-                            className="gap-1.5 rounded-xl font-medium shadow-xs"
+                            className="gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
                         >
-                            <Plus className="h-4 w-4" />
-                            <span>{t('students.add_new', "O'quvchi qo'shish")}</span>
+                            <Plus className="h-4 w-4 shrink-0" />
+                            <span>Create</span>
                         </Button>
                     )}
                 </div>
@@ -148,21 +148,27 @@ export function StudentsTable({
                                 </td>
 
                                 {/* Actions */}
-                                <td className="flex justify-end gap-2 px-6 py-4 text-right">
-                                    <Button
-                                        size="sm"
-                                        variant="secondary"
-                                        onClick={() => onEdit(student)}
-                                    >
-                                        {t('students.edit', 'Edit')}
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() => onDelete(student)}
-                                    >
-                                        {t('students.delete', 'Delete')}
-                                    </Button>
+                                <td className="px-6 py-4 text-right">
+                                    <div className="flex items-center justify-end gap-1">
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => onEdit(student)}
+                                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                            title={t('students.edit', 'Edit')}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => onDelete(student)}
+                                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                            title={t('students.delete', 'Delete')}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

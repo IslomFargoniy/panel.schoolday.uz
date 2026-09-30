@@ -165,9 +165,9 @@ export default function UsersIndex({
                     <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
                         {t('sidebar.users', 'Users')}
                     </h2>
-                    <Button onClick={openCreateModal} className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        <span>{t('common.add', 'Add')}</span>
+                    <Button onClick={openCreateModal} className="gap-2 shrink-0">
+                        <Plus className="h-4 w-4 shrink-0" />
+                        <span>Create</span>
                     </Button>
                 </div>
 

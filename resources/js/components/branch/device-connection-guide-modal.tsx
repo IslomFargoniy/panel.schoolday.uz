@@ -52,11 +52,11 @@ export default function DeviceConnectionGuideModal({
             <DialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-1.5 border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                    className="flex items-center gap-1.5 border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 shrink-0"
                 >
-                    <BookOpen className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <BookOpen className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>
-                        {t('device_guide', 'Qurilmani ulash yo‘riqnomasi')}
+                        {t('guide', 'Yo‘riqnoma')}
                     </span>
                 </Button>
             </DialogTrigger>

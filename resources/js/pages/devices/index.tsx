@@ -9,6 +9,7 @@ import {
     BookOpen,
     Search,
     RefreshCw,
+    Pencil,
     Trash2,
     Check,
     Copy,
@@ -56,6 +57,8 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [syncingId, setSyncingId] = useState<number | null>(null);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
+    const [deviceToEdit, setDeviceToEdit] = useState<BranchDevice | null>(null);
+    const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.devices', 'Qurilmalar'), href: '/devices' },
@@ -456,6 +459,19 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
+                                                            onClick={() => {
+                                                                setDeviceToEdit(item);
+                                                                setIsDeviceModalOpen(true);
+                                                            }}
+                                                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                                                            title={t('edit', 'Tahrirlash')}
+                                                        >
+                                                            <Pencil className="w-4 h-4" />
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
                                                             onClick={() => handleDelete(item.id)}
                                                             className="h-8 w-8 p-0 text-muted-foreground hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg"
                                                             title={t('delete', 'O‘chirish')}
@@ -479,6 +495,16 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
                     )}
                 </div>
             </div>
+
+            <CreateBranchDeviceModal
+                branches={branches}
+                deviceToEdit={deviceToEdit}
+                open={isDeviceModalOpen}
+                onOpenChange={(open) => {
+                    setIsDeviceModalOpen(open);
+                    if (!open) setDeviceToEdit(null);
+                }}
+            />
 
             <DeleteConfirmDialog
                 open={deleteDeviceId !== null}

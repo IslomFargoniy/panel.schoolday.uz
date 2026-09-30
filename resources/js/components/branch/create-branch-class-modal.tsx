@@ -119,9 +119,9 @@ export default function CreateBranchClassModal({
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             {!trigger && !isControlled && (
                 <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs font-medium">
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>{t('add_class', 'Sinf qo‘shish')}</span>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs font-medium shrink-0">
+                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                        <span>Create</span>
                     </Button>
                 </DialogTrigger>
             )}

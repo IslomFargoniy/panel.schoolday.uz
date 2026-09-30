@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Plus, Cpu, Network, Radio } from 'lucide-react';
 import type { FormEventHandler } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { toast } from 'sonner';
@@ -26,11 +26,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { Branch } from '@/types';
+import type { Branch, BranchDevice } from '@/types';
 
 interface CreateBranchDeviceModalProps {
     branch?: Branch;
     branches?: Branch[];
+    deviceToEdit?: BranchDevice | null;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
     onCreated?: () => void;
     trigger?: React.ReactNode;
 }
@@ -47,15 +50,22 @@ type FormData = {
 export default function CreateBranchDeviceModal({
     branch,
     branches = [],
+    deviceToEdit,
+    open: controlledOpen,
+    onOpenChange: setControlledOpen,
     onCreated,
     trigger,
 }: CreateBranchDeviceModalProps) {
     const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
 
-    const initialBranchId = branch?.id || (branches.length > 0 ? branches[0].id : 1);
+    const isControlled = controlledOpen !== undefined;
+    const open = isControlled ? controlledOpen : internalOpen;
+    const setOpen = isControlled ? setControlledOpen! : setInternalOpen;
 
-    const { data, setData, post, processing, reset, errors, clearErrors } =
+    const initialBranchId = deviceToEdit?.branch_id || branch?.id || (branches.length > 0 ? branches[0].id : 1);
+
+    const { data, setData, post, put, processing, reset, errors, clearErrors } =
         useForm<FormData>({
             branch_id: initialBranchId,
             name: '',
@@ -65,47 +75,101 @@ export default function CreateBranchDeviceModal({
             encryption_key: `SchoolDay${initialBranchId}2026`,
         });
 
+    useEffect(() => {
+        if (deviceToEdit) {
+            setData({
+                branch_id: deviceToEdit.branch_id,
+                name: deviceToEdit.name || '',
+                mac_address: deviceToEdit.mac_address || '',
+                device_id: deviceToEdit.device_id || `branch${deviceToEdit.branch_id}`,
+                connection_type: (deviceToEdit.connection_type as 'isup' | 'http_listening') || 'isup',
+                encryption_key: (deviceToEdit as any).encryption_key || `SchoolDay${deviceToEdit.branch_id}2026`,
+            });
+        } else {
+            const bId = branch?.id || (branches.length > 0 ? branches[0].id : 1);
+            setData({
+                branch_id: bId,
+                name: '',
+                mac_address: '',
+                device_id: `branch${bId}`,
+                connection_type: 'isup',
+                encryption_key: `SchoolDay${bId}2026`,
+            });
+        }
+    }, [deviceToEdit, open, branch?.id]);
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post('/branch_device', {
-            preserveScroll: true,
-            onSuccess: () => {
-                reset();
-                clearErrors();
-                setOpen(false);
-                toast.success(
-                    t(
-                        'device_created',
-                        'Hikvision qurilmasi muvaffaqiyatli qo‘shildi!',
-                    ),
-                );
-                if (onCreated) {
-                    onCreated();
-                }
-            },
-            onError: (err: any) => {
-                const errorMessage =
-                    err?.error ||
-                    err?.mac_address ||
-                    t('create_failed', 'Xatolik yuz berdi');
-                toast.error(errorMessage);
-            },
-        });
+        if (deviceToEdit) {
+            put(`/branch_device/${deviceToEdit.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset();
+                    clearErrors();
+                    setOpen(false);
+                    toast.success(
+                        t(
+                            'device_updated',
+                            'Hikvision qurilmasi muvaffaqiyatli yangilandi!',
+                        ),
+                    );
+                    if (onCreated) {
+                        onCreated();
+                    }
+                },
+                onError: (err: any) => {
+                    const errorMessage =
+                        err?.error ||
+                        err?.mac_address ||
+                        (Object.values(err)[0] as string) ||
+                        t('update_failed', 'Xatolik yuz berdi');
+                    toast.error(errorMessage);
+                },
+            });
+        } else {
+            post('/branch_device', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset();
+                    clearErrors();
+                    setOpen(false);
+                    toast.success(
+                        t(
+                            'device_created',
+                            'Hikvision qurilmasi muvaffaqiyatli qo‘shildi!',
+                        ),
+                    );
+                    if (onCreated) {
+                        onCreated();
+                    }
+                },
+                onError: (err: any) => {
+                    const errorMessage =
+                        err?.error ||
+                        err?.mac_address ||
+                        (Object.values(err)[0] as string) ||
+                        t('create_failed', 'Xatolik yuz berdi');
+                    toast.error(errorMessage);
+                },
+            });
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {trigger ? (
-                    trigger
-                ) : (
-                    <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700">
-                        <Plus className="h-3.5 w-3.5" />
-                        <span>{t('create_device', 'Qurilma qo‘shish')}</span>
-                    </Button>
-                )}
-            </DialogTrigger>
+            {!isControlled && (
+                <DialogTrigger asChild>
+                    {trigger ? (
+                        trigger
+                    ) : (
+                        <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 shrink-0">
+                            <Plus className="h-3.5 w-3.5 shrink-0" />
+                            <span>Create</span>
+                        </Button>
+                    )}
+                </DialogTrigger>
+            )}
 
             <DialogContent className="max-w-md rounded-2xl border-slate-200 bg-card p-6 text-card-foreground shadow-xl dark:border-slate-800">
                 <DialogHeader className="space-y-1.5 pb-2">
@@ -114,10 +178,12 @@ export default function CreateBranchDeviceModal({
                             <Cpu className="h-4 w-4" />
                         </div>
                         <span>
-                            {t(
-                                'modal.create_device_title',
-                                'Yangi Hikvision Qurilmasi Qo‘shish',
-                            )}
+                            {deviceToEdit
+                                ? t('edit_device_title', 'Qurilma Ma’lumotlarini Tahrirlash')
+                                : t(
+                                      'modal.create_device_title',
+                                      'Yangi Hikvision Qurilmasi Qo‘shish',
+                                  )}
                         </span>
                     </DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">

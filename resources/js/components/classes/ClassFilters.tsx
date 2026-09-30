@@ -195,10 +195,10 @@ export function ClassFilters({
                     <Button
                         onClick={onCreate}
                         size="sm"
-                        className="h-9 gap-1.5 rounded-xl font-medium shadow-xs"
+                        className="h-9 gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
                     >
-                        <Plus className="h-4 w-4" />
-                        <span>{t('classes.add_new', 'Sinf qo‘shish')}</span>
+                        <Plus className="h-4 w-4 shrink-0" />
+                        <span>Create</span>
                     </Button>
                 )}
             </div>

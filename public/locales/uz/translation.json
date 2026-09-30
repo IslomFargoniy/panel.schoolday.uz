@@ -568,7 +568,9 @@
   "sync_now": "ISUP orqali hodisalarni tortib olish",
   "sync_success": "ISUP hodisalar muvaffaqiyatli sinxronlandi",
   "sync_failed": "Sinxronizatsiyada xatolik yuz berdi",
-  "device_guide": "Qurilmani ulash yo‘riqnomasi",
+  "device_guide": "Yo‘riqnoma",
+  "guide": "Yo‘riqnoma",
+  "create": "Create",
   "device_guide_modal": {
     "title": "Hikvision Qurilmasini Serverga Ulash Yo‘riqnomasi",
     "tab_isup": "1-Usul: ISUP 5.0 (Tavsiya etiladi)",

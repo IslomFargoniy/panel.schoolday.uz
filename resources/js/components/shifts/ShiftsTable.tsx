@@ -1,4 +1,4 @@
-import { Plus, Search, X } from 'lucide-react';
+import { Plus, Search, X, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -153,10 +153,10 @@ export function ShiftsTable({
                         <Button
                             onClick={onCreate}
                             size="sm"
-                            className="h-9 gap-1.5 rounded-xl font-medium shadow-xs"
+                            className="h-9 gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
                         >
-                            <Plus className="h-4 w-4" />
-                            <span>{t('shifts.add_new', 'Smena qo‘shish')}</span>
+                            <Plus className="h-4 w-4 shrink-0" />
+                            <span>Create</span>
                         </Button>
                     )}
                 </div>
@@ -266,22 +266,26 @@ export function ShiftsTable({
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-2">
+                                        <div className="flex justify-end gap-1">
                                             <Button
-                                                size="sm"
-                                                variant="secondary"
+                                                size="icon"
+                                                variant="ghost"
                                                 onClick={() => onEdit(shift)}
+                                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                                title={t('shifts.edit', 'Edit')}
                                             >
-                                                {t('shifts.edit', 'Edit')}
+                                                <Pencil className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                                size="sm"
-                                                variant="destructive"
+                                                size="icon"
+                                                variant="ghost"
                                                 onClick={() =>
                                                     onDelete(shift.id)
                                                 }
+                                                className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                                title={t('shifts.delete', 'Delete')}
                                             >
-                                                {t('shifts.delete', 'Delete')}
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </td>

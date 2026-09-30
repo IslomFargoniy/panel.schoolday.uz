@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -95,20 +96,24 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <div className="flex justify-end gap-2">
+                                    <div className="flex justify-end gap-1">
                                         <Button
-                                            size="sm"
-                                            variant="secondary"
+                                            size="icon"
+                                            variant="ghost"
                                             onClick={() => onEdit(cls)}
+                                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                            title={t('classes.edit', 'Edit')}
                                         >
-                                            {t('classes.edit', 'Edit')}
+                                            <Pencil className="h-4 w-4" />
                                         </Button>
                                         <Button
-                                            size="sm"
-                                            variant="destructive"
+                                            size="icon"
+                                            variant="ghost"
                                             onClick={() => onDelete(cls.id)}
+                                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                            title={t('classes.delete', 'Delete')}
                                         >
-                                            {t('classes.delete', 'Delete')}
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </td>

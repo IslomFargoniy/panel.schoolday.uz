@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ScanFace, Search, X, Plus } from 'lucide-react';
+import { ScanFace, Search, X, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -112,10 +112,10 @@ export function BranchesTable({
                             type="button"
                             onClick={onCreate}
                             size="sm"
-                            className="h-9 gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 shadow-xs"
+                            className="h-9 gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 shadow-xs shrink-0"
                         >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>{t('branches.add_new', 'Filial qo‘shish')}</span>
+                            <Plus className="w-3.5 h-3.5 shrink-0" />
+                            <span>Create</span>
                         </Button>
                     )}
                 </div>
@@ -299,18 +299,22 @@ export function BranchesTable({
                                             </Link>
                                         </Button>
                                         <Button
-                                            size="sm"
-                                            variant="secondary"
+                                            size="icon"
+                                            variant="ghost"
                                             onClick={() => onEdit(branch)}
+                                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                            title={t('branches.edit', 'Edit')}
                                         >
-                                            {t('branches.edit', 'Edit')}
+                                            <Pencil className="h-4 w-4" />
                                         </Button>
                                         <Button
-                                            size="sm"
-                                            variant="destructive"
+                                            size="icon"
+                                            variant="ghost"
                                             onClick={() => onDelete(branch.id)}
+                                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                            title={t('branches.delete', 'Delete')}
                                         >
-                                            {t('branches.delete', 'Delete')}
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </td>
                                 </tr>

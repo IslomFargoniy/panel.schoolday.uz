@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import {
+    Pencil,
     Trash2,
     Copy,
     Check,
@@ -28,6 +29,8 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [syncingId, setSyncingId] = useState<number | null>(null);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
+    const [deviceToEdit, setDeviceToEdit] = useState<BranchDevice | null>(null);
+    const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
 
     const devices = branch.devices || [];
 
@@ -115,19 +118,18 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
     return (
         <div className="space-y-4">
             {/* Header bar */}
-            <div className="flex flex-col items-start justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-xs sm:flex-row sm:items-center">
-                <div>
+            <div className={`flex flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-xs min-w-0 max-w-full overflow-hidden ${layout === 'stack' ? '' : 'sm:flex-row sm:items-center'}`}>
+                <div className="min-w-0 max-w-full">
                     <h3 className="flex items-center gap-2 text-sm font-bold text-foreground sm:text-base">
-                        <ScanFace className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                        <span>
+                        <ScanFace className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                        <span className="truncate">
                             {t('connected_devices', 'Hikvision Qurilmalari')}
                         </span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                            ({devices.length} {t('devices_count', 'ta qurilma')}
-                            )
+                        <span className="shrink-0 text-xs font-normal text-muted-foreground">
+                            ({devices.length} {t('devices_count', 'ta')})
                         </span>
                     </h3>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
                         {t(
                             'device_table_desc',
                             'Filialga biriktirilgan ISUP 5.0 va HTTP Listening terminallari',
@@ -171,38 +173,51 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                         return (
                             <div
                                 key={item.id}
-                                className="relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:shadow-md"
+                                className="relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:shadow-md min-w-0 max-w-full"
                             >
-                                <div className="space-y-3">
+                                <div className="space-y-3 min-w-0">
                                     {/* Top Row: Device Name & Connection Pill */}
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="flex items-center gap-2.5">
+                                    <div className="flex items-start justify-between gap-2 min-w-0">
+                                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
                                             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                                                 <ScanFace className="h-5 w-5" />
                                             </div>
-                                            <div>
-                                                <h4 className="text-xs leading-tight font-bold text-foreground sm:text-sm">
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="text-xs leading-tight font-bold text-foreground sm:text-sm truncate" title={item.name || `Hikvision Terminal #${index + 1}`}>
                                                     {item.name ||
                                                         `Hikvision Terminal #${index + 1}`}
                                                 </h4>
-                                                <p className="font-mono text-[10px] text-muted-foreground">
+                                                <p className="font-mono text-[10px] text-muted-foreground truncate">
                                                     MinMoe Face Terminal
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1 shrink-0">
                                             {isIsup ? (
-                                                <span className="inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400">
-                                                    <Network className="h-3 w-3" />
+                                                <span className="inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400 shrink-0">
+                                                    <Network className="h-3 w-3 shrink-0" />
                                                     <span>ISUP 5.0</span>
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 rounded border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
-                                                    <Radio className="h-3 w-3" />
+                                                <span className="inline-flex items-center gap-1 rounded border border-blue-500/20 bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 shrink-0">
+                                                    <Radio className="h-3 w-3 shrink-0" />
                                                     <span>HTTP</span>
                                                 </span>
                                             )}
+
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    setDeviceToEdit(item);
+                                                    setIsDeviceModalOpen(true);
+                                                }}
+                                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                title={t('edit', 'Tahrirlash')}
+                                            >
+                                                <Pencil className="h-3.5 w-3.5" />
+                                            </Button>
 
                                             <Button
                                                 variant="ghost"
@@ -350,6 +365,16 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                     })}
                 </div>
             )}
+
+            <CreateBranchDeviceModal
+                branch={branch}
+                deviceToEdit={deviceToEdit}
+                open={isDeviceModalOpen}
+                onOpenChange={(open) => {
+                    setIsDeviceModalOpen(open);
+                    if (!open) setDeviceToEdit(null);
+                }}
+            />
 
             <DeleteConfirmDialog
                 open={deleteDeviceId !== null}

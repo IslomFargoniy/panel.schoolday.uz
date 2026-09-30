@@ -136,9 +136,9 @@ export default function CreateBranchStudentModal({
             {!isControlled && (
                 <DialogTrigger asChild>
                     {trigger || (
-                        <Button size="sm" className="gap-1.5 h-8 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white">
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>{t('add_student', 'O‘quvchi qo‘shish')}</span>
+                        <Button size="sm" className="gap-1.5 h-8 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white shrink-0">
+                            <Plus className="w-3.5 h-3.5 shrink-0" />
+                            <span>Create</span>
                         </Button>
                     )}
                 </DialogTrigger>
