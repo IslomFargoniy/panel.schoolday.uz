@@ -55,24 +55,24 @@ export function StudentsTable({
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+            <div className="overflow-x-auto min-w-0 max-w-full">
+                <table className="w-full min-w-[680px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('students.name', 'Name')} &amp;{' '}
                                 {t('students.status', 'Status')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('students.class', 'Class')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('students.hikvision_id', 'Hikvision ID')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('students.telegram_id', 'Telegram ID')}
                             </th>
-                            <th className="px-6 py-4 text-right font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium">
                                 {t('students.edit', 'Actions')}
                             </th>
                         </tr>

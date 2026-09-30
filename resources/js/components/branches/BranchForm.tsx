@@ -168,7 +168,7 @@ export function BranchForm({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-3 border-t border-border">
                     <Button
                         type="button"
                         variant="outline"

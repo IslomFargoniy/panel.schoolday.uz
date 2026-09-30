@@ -78,7 +78,7 @@ export function StudentForm({
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
                         <Label htmlFor="status">
                             {t('students.status', 'Status')}
@@ -328,7 +328,7 @@ export function StudentForm({
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div className="space-y-2">
                                     <Label>
                                         {t(
@@ -392,7 +392,7 @@ export function StudentForm({
                             </div>
 
                             {formData.valid_enabled && (
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div className="space-y-2">
                                         <Label>
                                             {t(
@@ -432,7 +432,7 @@ export function StudentForm({
                     )}
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-4 border-t border-border/50">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-border/50">
                     <Button
                         type="button"
                         variant="outline"

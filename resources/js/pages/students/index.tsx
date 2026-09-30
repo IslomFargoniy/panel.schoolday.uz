@@ -254,7 +254,7 @@ export default function StudentsPage({
                 classes={classes}
             />
 
-            <div className="flex flex-col gap-4 p-6 w-full">
+            <div className="flex flex-col gap-4 p-4 sm:p-6 w-full min-w-0 max-w-full">
                 <StudentFilters
                     filterData={filterData}
                     schools={schools}

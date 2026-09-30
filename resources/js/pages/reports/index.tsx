@@ -94,9 +94,9 @@ export default function ReportsPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('reports.title', 'Daily Attendance Report')} />
-            <div className="flex flex-1 flex-col gap-4 overflow-x-auto p-6">
+            <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 min-w-0 max-w-full">
                 <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold tracking-tight">
+                    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
                         {t('reports.title', 'Daily Attendance Report')}
                     </h2>
                 </div>

@@ -43,20 +43,20 @@ export function RecentEventsTable({ events }: RecentEventsTableProps) {
 
     return (
         <div className="relative flex-1 overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border">
-            <div className="min-h-[300px] overflow-auto">
-                <table className="w-full text-left text-sm">
+            <div className="min-h-[300px] overflow-x-auto min-w-0 max-w-full">
+                <table className="w-full min-w-[620px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('dashboard.student_info', 'Student Info')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('dashboard.class', 'Class')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('dashboard.time_device', 'Time (Device)')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('dashboard.recorded_at', 'Recorded At')}
                             </th>
                         </tr>

@@ -127,7 +127,7 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('branches.title', 'Branches')} />
-            <div className="p-6">
+            <div className="p-4 sm:p-6 w-full min-w-0 max-w-full">
                 <BranchesTable
                     branches={branches}
                     schools={schools}

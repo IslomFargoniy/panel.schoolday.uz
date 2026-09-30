@@ -364,7 +364,7 @@ export function ReportFilters({
                     </div>
 
                     {/* Actions: Filter & Reset */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                         {hasActiveFilters && onReset && (
                             <Button
                                 type="button"

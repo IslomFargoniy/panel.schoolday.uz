@@ -31,31 +31,31 @@ export function AttendanceTable({
 
     return (
         <div className="relative flex min-h-[60vh] flex-1 flex-col rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border">
-            <div className="flex-1 overflow-x-auto">
-                <table className="w-full text-left text-sm">
+            <div className="flex-1 overflow-x-auto min-w-0 max-w-full">
+                <table className="w-full min-w-[850px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.date', 'Date')}
                             </th>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.student_name', 'Student Info')}
                             </th>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.class', 'Class')}
                             </th>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.first_in', 'First Check-in')}
                             </th>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.last_out', 'Last Check-out')}
                             </th>
-                            <th scope="col" className="px-6 py-4 font-medium">
+                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('reports.details', 'Status')}
                             </th>
                             <th
                                 scope="col"
-                                className="px-6 py-4 text-right font-medium"
+                                className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium"
                             >
                                 <div className="flex items-center justify-end gap-2">
                                     <span>

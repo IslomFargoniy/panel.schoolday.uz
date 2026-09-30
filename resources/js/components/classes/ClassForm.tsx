@@ -95,7 +95,7 @@ export function ClassForm({
                         </p>
                     )}
                 </div>
-                <div className="flex items-center justify-end gap-2 pt-4 border-t border-border/50">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-border/50">
                     <Button
                         type="button"
                         variant="outline"

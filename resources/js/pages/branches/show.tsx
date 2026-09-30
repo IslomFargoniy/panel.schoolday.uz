@@ -680,8 +680,8 @@ export default function BranchShowPage({
                                         </p>
                                     </div>
 
-                                    <div className="flex items-center gap-2">
-                                        <form onSubmit={handleSearch} className="relative w-44 sm:w-56">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <form onSubmit={handleSearch} className="relative w-full sm:w-56">
                                             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                             <Input
                                                 value={searchTerm}
@@ -706,8 +706,8 @@ export default function BranchShowPage({
                                 </div>
 
                                 {/* Table */}
-                                <div className="overflow-x-auto rounded-xl border border-border">
-                                    <table className="w-full text-left text-xs">
+                                <div className="overflow-x-auto min-w-0 max-w-full rounded-xl border border-border">
+                                    <table className="w-full min-w-[560px] text-left text-xs">
                                         <thead className="border-b bg-muted/50 text-[11px] text-muted-foreground uppercase font-semibold">
                                             <tr>
                                                 <th className="px-3 py-3">#</th>

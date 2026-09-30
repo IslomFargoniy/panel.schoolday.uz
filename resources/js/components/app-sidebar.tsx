@@ -132,6 +132,7 @@ const getNavGroups = (t: any, user: any): NavGroup[] => {
 export function AppSidebar() {
     const { t } = useTranslation();
     const { auth } = usePage().props as unknown as { auth: { user: any } };
+    const { isMobile, setOpenMobile } = useSidebar();
     const navGroups = getNavGroups(t, auth?.user);
 
     const footerNavItems: NavItem[] = [
@@ -153,7 +154,14 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()}>
+                            <Link
+                                href={dashboard()}
+                                onClick={() => {
+                                    if (isMobile) {
+                                        setOpenMobile(false);
+                                    }
+                                }}
+                            >
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

@@ -275,9 +275,9 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
                     </div>
 
                     {/* Search box & Pagination limit & Reset */}
-                    <div className="flex items-center gap-2">
-                        <form onSubmit={handleSearch} className="flex items-center gap-2">
-                            <div className="relative w-48 sm:w-56">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 sm:flex-initial">
+                            <div className="relative w-full sm:w-56">
                                 <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     value={searchTerm}

@@ -153,7 +153,7 @@ export default function ShiftsPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('shifts.title', 'Shifts Management')} />
-            <div className="p-6">
+            <div className="p-4 sm:p-6 w-full min-w-0 max-w-full">
                 <ShiftsTable
                     shifts={shifts}
                     schools={schools}

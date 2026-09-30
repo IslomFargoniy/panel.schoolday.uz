@@ -13,23 +13,23 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
 
     return (
         <div className="relative overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border/70">
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+            <div className="overflow-x-auto min-w-0 max-w-full">
+                <table className="w-full min-w-[600px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('classes.details', 'Class Details')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t('classes.students', 'Students')}
                             </th>
-                            <th className="px-6 py-4 font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
                                 {t(
                                     'classes.today_attendance',
                                     "Today's Attendance",
                                 )}
                             </th>
-                            <th className="px-6 py-4 text-right font-medium">
+                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium">
                                 {t('classes.actions', 'Actions')}
                             </th>
                         </tr>

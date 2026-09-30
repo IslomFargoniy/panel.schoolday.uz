@@ -6,6 +6,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavGroup, NavItem } from '@/types';
@@ -18,6 +19,7 @@ interface NavMainProps {
 export function NavMain({ items, groups }: NavMainProps) {
     const { isCurrentUrl } = useCurrentUrl();
     const { t } = useTranslation();
+    const { isMobile, setOpenMobile } = useSidebar();
 
     // If groups are provided, use them; otherwise, fallback to wrapping items in a single group
     const navGroups: NavGroup[] = groups ?? [
@@ -50,7 +52,14 @@ export function NavMain({ items, groups }: NavMainProps) {
                                             tooltip={{ children: item.title }}
                                             className="transition-colors font-medium text-[13px] rounded-lg h-9"
                                         >
-                                            <Link href={item.href}>
+                                            <Link
+                                                href={item.href}
+                                                onClick={() => {
+                                                    if (isMobile) {
+                                                        setOpenMobile(false);
+                                                    }
+                                                }}
+                                            >
                                                 {item.icon && <item.icon className="size-4 shrink-0" />}
                                                 <span>{item.title}</span>
                                             </Link>

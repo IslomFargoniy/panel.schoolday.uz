@@ -160,14 +160,14 @@ export default function UsersIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('sidebar.users', 'Users')} />
 
-            <div className="flex flex-1 flex-col gap-6 p-6">
+            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 min-w-0 max-w-full">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold tracking-tight">
+                    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
                         {t('sidebar.users', 'Users')}
                     </h2>
                     <Button onClick={openCreateModal} className="gap-2">
                         <Plus className="h-4 w-4" />
-                        {t('common.add', 'Add')}
+                        <span>{t('common.add', 'Add')}</span>
                     </Button>
                 </div>
 
@@ -243,26 +243,26 @@ export default function UsersIndex({
                 </div>
 
                 <div className="min-h-[400px] overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                    <div className="overflow-x-auto min-w-0 max-w-full">
+                        <table className="w-full min-w-[700px] text-left text-sm">
                             <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <th className="px-6 py-4">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
                                         {t('users.name', 'Name')}
                                     </th>
-                                    <th className="px-6 py-4">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
                                         {t('users.email', 'Email')}
                                     </th>
-                                    <th className="px-6 py-4">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
                                         {t('users.phone', 'Phone')}
                                     </th>
-                                    <th className="px-6 py-4">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
                                         {t('users.role', 'Role')}
                                     </th>
-                                    <th className="px-6 py-4">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
                                         {t('school', 'Maktab')}
                                     </th>
-                                    <th className="px-6 py-4 text-right">
+                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right">
                                         {t('common.actions', 'Actions')}
                                     </th>
                                 </tr>

@@ -91,7 +91,7 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('dashboard.title', 'Dashboard')} />
-            <div className="flex flex-1 flex-col gap-6 overflow-x-auto p-6">
+            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 min-w-0 max-w-full">
                 {/* Filter Bar (Foreign keys: School -> Branch) */}
                 {(schools.length > 0 || branches.length > 0) && (
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">

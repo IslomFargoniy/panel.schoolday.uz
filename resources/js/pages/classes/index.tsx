@@ -142,7 +142,7 @@ export default function ClassesPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('classes.title', 'Classes')} />
-            <div className="flex flex-col gap-4 p-6 w-full">
+            <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 w-full min-w-0 max-w-full">
                 <ClassFilters
                     filterData={filterData}
                     schools={schools}

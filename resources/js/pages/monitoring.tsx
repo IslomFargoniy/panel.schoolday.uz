@@ -243,7 +243,7 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                     <div className="relative z-10 mx-auto max-w-7xl px-4 pt-4 sm:px-6">
                         <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-black/5 bg-white/60 p-2.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60">
                             {schools.length > 0 && (
-                                <div className="w-48">
+                                <div className="w-full sm:w-48">
                                     <Select
                                         value={selectedSchool || 'all'}
                                         onValueChange={(val) => {
@@ -273,7 +273,7 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                             )}
 
                             {branches.length > 0 && (
-                                <div className="w-48">
+                                <div className="w-full sm:w-48">
                                     <Select
                                         value={selectedBranch || 'all'}
                                         onValueChange={(val) => setSelectedBranch(val === 'all' ? '' : val)}
