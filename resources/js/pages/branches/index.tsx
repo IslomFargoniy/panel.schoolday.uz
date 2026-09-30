@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import BranchDeviceTable from '@/components/branch/branch-device-table';
 import { BranchesTable } from '@/components/branches/BranchesTable';
 import { BranchForm } from '@/components/branches/BranchForm';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import {
     Dialog,
     DialogContent,

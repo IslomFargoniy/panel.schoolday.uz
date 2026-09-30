@@ -182,7 +182,6 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
                         {branches.length > 0 && (
                             <DeviceConnectionGuideModal
                                 branch={branches[0]}
-                                branches={branches}
                             />
                         )}
                         <CreateBranchDeviceModal

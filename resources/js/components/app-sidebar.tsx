@@ -24,6 +24,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavGroup, NavItem } from '@/types';

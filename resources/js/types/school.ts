@@ -1,4 +1,4 @@
-import type { User } from './models';
+import type { User } from './auth';
 import type { Branch } from './branch';
 
 export interface SchoolSetting {

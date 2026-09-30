@@ -1,6 +1,7 @@
 export interface BranchDevice {
     id: number;
     branch_id: number;
+    branch?: Branch;
     name?: string | null;
     mac_address: string;
     device_id?: string | null;
