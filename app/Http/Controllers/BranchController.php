@@ -146,6 +146,7 @@ class BranchController extends Controller
         $students = $studentsQuery->latest()->paginate($request->input('per_page', 20))->withQueryString();
 
         $branchClasses = \App\Models\SchoolClass::with('shift')
+            ->withCount('students')
             ->whereHas('shift', fn ($q) => $q->where('branch_id', $branch->id))
             ->orderBy('name')
             ->get();

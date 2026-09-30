@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Plus, GraduationCap } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -21,21 +21,31 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { Branch, Shift } from '@/types';
+import type { Branch, SchoolClass, Shift } from '@/types';
 
 interface CreateBranchClassModalProps {
     branch: Branch;
     defaultShiftId?: number | string;
+    classToEdit?: SchoolClass | null;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
     trigger?: React.ReactNode;
 }
 
 export default function CreateBranchClassModal({
     branch,
     defaultShiftId,
+    classToEdit,
+    open: controlledOpen,
+    onOpenChange: setControlledOpen,
     trigger,
 }: CreateBranchClassModalProps) {
     const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const isControlled = controlledOpen !== undefined;
+    const open = isControlled ? controlledOpen : internalOpen;
+    const setOpen = isControlled ? setControlledOpen! : setInternalOpen;
 
     const shifts: Shift[] = (branch as any).shifts || [];
     const initialShiftId = defaultShiftId
@@ -44,11 +54,27 @@ export default function CreateBranchClassModal({
           ? String(shifts[0].id)
           : '';
 
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         name: '',
         shift_id: initialShiftId,
         telegram_group_id: '',
     });
+
+    useEffect(() => {
+        if (classToEdit) {
+            setData({
+                name: classToEdit.name || '',
+                shift_id: classToEdit.shift_id ? String(classToEdit.shift_id) : initialShiftId,
+                telegram_group_id: classToEdit.telegram_group_id || '',
+            });
+        } else {
+            setData({
+                name: '',
+                shift_id: initialShiftId,
+                telegram_group_id: '',
+            });
+        }
+    }, [classToEdit, defaultShiftId, open]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,39 +83,60 @@ export default function CreateBranchClassModal({
             return;
         }
 
-        post('/classes', {
-            preserveScroll: true,
-            onSuccess: () => {
-                toast.success(t('class_created_success', 'Sinf muvaffaqiyatli qo‘shildi!'));
-                reset();
-                clearErrors();
-                setOpen(false);
-            },
-            onError: (err) => {
-                const msg = Object.values(err)[0] as string || t('error_occurred', 'Xatolik yuz berdi');
-                toast.error(msg);
-            },
-        });
+        if (classToEdit) {
+            put(`/classes/${classToEdit.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success(t('class_updated_success', 'Sinf muvaffaqiyatli yangilandi!'));
+                    reset();
+                    clearErrors();
+                    setOpen(false);
+                },
+                onError: (err) => {
+                    const msg = (Object.values(err)[0] as string) || t('error_occurred', 'Xatolik yuz berdi');
+                    toast.error(msg);
+                },
+            });
+        } else {
+            post('/classes', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success(t('class_created_success', 'Sinf muvaffaqiyatli qo‘shildi!'));
+                    reset();
+                    clearErrors();
+                    setOpen(false);
+                },
+                onError: (err) => {
+                    const msg = (Object.values(err)[0] as string) || t('error_occurred', 'Xatolik yuz berdi');
+                    toast.error(msg);
+                },
+            });
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
+            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+            {!trigger && !isControlled && (
+                <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs font-medium">
                         <Plus className="w-3.5 h-3.5" />
                         <span>{t('add_class', 'Sinf qo‘shish')}</span>
                     </Button>
-                )}
-            </DialogTrigger>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[440px]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-base font-bold">
                         <GraduationCap className="w-5 h-5 text-indigo-600" />
-                        <span>{t('add_class_to_branch', 'Filialga yangi sinf qo‘shish')}</span>
+                        <span>
+                            {classToEdit
+                                ? t('edit_class_modal_title', 'Sinfni tahrirlash')
+                                : t('add_class_to_branch', 'Filialga yangi sinf qo‘shish')}
+                        </span>
                     </DialogTitle>
                     <DialogDescription className="text-xs">
-                        {branch.name} filiali smenasiga yangi o‘quv sinfini biriktirish.
+                        {branch.name} filiali uchun sinf (masalan: 10-A, 11-B).
                     </DialogDescription>
                 </DialogHeader>
 
@@ -98,27 +145,21 @@ export default function CreateBranchClassModal({
                         <Label htmlFor="class-shift" className="text-xs font-semibold">
                             {t('shift', 'Smena')} *
                         </Label>
-                        {shifts.length === 0 ? (
-                            <p className="text-xs text-amber-600 dark:text-amber-400">
-                                {t('no_shifts_warning', 'Avval kamida bitta smena qo‘shishingiz kerak!')}
-                            </p>
-                        ) : (
-                            <Select
-                                value={data.shift_id}
-                                onValueChange={(val) => setData('shift_id', val)}
-                            >
-                                <SelectTrigger id="class-shift" className="h-9 text-xs">
-                                    <SelectValue placeholder={t('select_shift', 'Smenani tanlang')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {shifts.map((s) => (
-                                        <SelectItem key={s.id} value={String(s.id)} className="text-xs">
-                                            {s.name} ({s.start_time?.slice(0, 5)} - {s.end_time?.slice(0, 5)})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
+                        <Select
+                            value={data.shift_id}
+                            onValueChange={(val) => setData('shift_id', val)}
+                        >
+                            <SelectTrigger id="class-shift" className="text-xs h-9">
+                                <SelectValue placeholder={t('select_shift', 'Smenani tanlang')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {shifts.map((s) => (
+                                    <SelectItem key={s.id} value={String(s.id)} className="text-xs">
+                                        {s.name} ({s.start_time?.substring(0, 5)} - {s.end_time?.substring(0, 5)})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         {errors.shift_id && <p className="text-[11px] text-destructive">{errors.shift_id}</p>}
                     </div>
 
@@ -128,7 +169,7 @@ export default function CreateBranchClassModal({
                         </Label>
                         <Input
                             id="class-name"
-                            placeholder="Masalan: 5-A yoki 10-B"
+                            placeholder="Masalan: 10-A yoki 7-B"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required
@@ -138,16 +179,19 @@ export default function CreateBranchClassModal({
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="telegram-group" className="text-xs font-semibold">
-                            {t('telegram_group_id', 'Telegram guruh ID')} ({t('optional', 'ixtiyoriy')})
+                        <Label htmlFor="class-tg-group" className="text-xs font-semibold">
+                            {t('telegram_group_id', 'Telegram guruh ID (ixtiyoriy)')}
                         </Label>
                         <Input
-                            id="telegram-group"
-                            placeholder="-100xxxxxxxxxx"
+                            id="class-tg-group"
+                            placeholder="-1001234567890"
                             value={data.telegram_group_id}
                             onChange={(e) => setData('telegram_group_id', e.target.value)}
                             className="text-xs h-9 font-mono"
                         />
+                        <p className="text-[10px] text-muted-foreground">
+                            {t('telegram_group_id_hint', 'Davomat xabarnomalarini jo‘natish uchun guruh ID raqami')}
+                        </p>
                         {errors.telegram_group_id && (
                             <p className="text-[11px] text-destructive">{errors.telegram_group_id}</p>
                         )}
@@ -166,10 +210,14 @@ export default function CreateBranchClassModal({
                         <Button
                             type="submit"
                             size="sm"
-                            disabled={processing || shifts.length === 0}
+                            disabled={processing}
                             className="text-xs h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
                         >
-                            {processing ? t('saving', 'Saqlanmoqda...') : t('save', 'Saqlash')}
+                            {processing
+                                ? t('saving', 'Saqlanmoqda...')
+                                : classToEdit
+                                  ? t('save', 'Saqlash')
+                                  : t('add', 'Qo‘shish')}
                         </Button>
                     </div>
                 </form>

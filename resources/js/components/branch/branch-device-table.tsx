@@ -20,9 +20,10 @@ import DeviceConnectionGuideModal from './device-connection-guide-modal';
 
 interface BranchDeviceTableProps {
     branch: Branch;
+    layout?: 'grid' | 'stack';
 }
 
-export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
+export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDeviceTableProps) {
     const { t } = useTranslation();
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [syncingId, setSyncingId] = useState<number | null>(null);
@@ -161,8 +162,8 @@ export default function BranchDeviceTable({ branch }: BranchDeviceTableProps) {
                     </div>
                 </div>
             ) : (
-                /* Devices Grid */
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                /* Devices Container */
+                <div className={layout === 'stack' ? 'flex flex-col gap-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'}>
                     {devices.map((item, index) => {
                         const isIsup = item.connection_type === 'isup';
                         const isOnline = item.is_online;
