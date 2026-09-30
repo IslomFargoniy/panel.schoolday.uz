@@ -843,7 +843,7 @@ export default function BranchShowPage({
                             <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-5">
                                 {/* Header */}
                                 <div className="mb-4 flex flex-col justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-center">
-                                    <div>
+                                    <div className="min-w-0">
                                         <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
                                             <Users className="h-4 w-4 text-emerald-500" />
                                             <span>
@@ -874,10 +874,10 @@ export default function BranchShowPage({
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-2">
+                                    <div className="flex items-center gap-2 shrink-0">
                                         <form
                                             onSubmit={handleSearch}
-                                            className="relative w-full sm:w-56"
+                                            className="relative w-40 sm:w-52 md:w-56"
                                         >
                                             <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                                             <Input
