@@ -57,8 +57,11 @@ export default function TwoFactor({
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Two-Factor Authentication"
-                        description="Manage your two-factor authentication settings"
+                        title={t('settings.two_factor', 'Ikki bosqichli autentifikatsiya')}
+                        description={t(
+                            'settings.two_factor_desc',
+                            'Ikki bosqichli autentifikatsiya sozlamalarini boshqarish',
+                        )}
                     />
                     {twoFactorEnabled ? (
                         <div className="flex flex-col items-start justify-start space-y-4">
@@ -86,7 +89,7 @@ export default function TwoFactor({
                                             type="submit"
                                             disabled={processing}
                                         >
-                                            <ShieldBan /> Disable 2FA
+                                            <ShieldBan /> {t('settings.disable_2fa', '2FA-ni o‘chirish')}
                                         </Button>
                                     )}
                                 </Form>
@@ -110,7 +113,7 @@ export default function TwoFactor({
                                         onClick={() => setShowSetupModal(true)}
                                     >
                                         <ShieldCheck />
-                                        Continue Setup
+                                        {t('settings.continue_setup', 'Sozlashni davom ettirish')}
                                     </Button>
                                 ) : (
                                     <Form
@@ -125,7 +128,7 @@ export default function TwoFactor({
                                                 disabled={processing}
                                             >
                                                 <ShieldCheck />
-                                                Enable 2FA
+                                                {t('settings.enable_2fa', '2FA-ni yoqish')}
                                             </Button>
                                         )}
                                     </Form>

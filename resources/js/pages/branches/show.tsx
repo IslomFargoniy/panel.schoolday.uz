@@ -455,7 +455,7 @@ export default function BranchShowPage({
                                         className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                     >
                                         <Plus className="h-3.5 w-3.5 shrink-0" />
-                                        <span>Create</span>
+                                        <span>{t('create', 'Yaratish')}</span>
                                     </Button>
                                 </div>
 
@@ -485,7 +485,7 @@ export default function BranchShowPage({
                                             className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                                         >
                                             <Plus className="h-3.5 w-3.5" />
-                                            <span>Create</span>
+                                            <span>{t('create', 'Yaratish')}</span>
                                         </Button>
                                     </div>
                                 ) : (
@@ -670,7 +670,7 @@ export default function BranchShowPage({
                                         className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                     >
                                         <Plus className="h-3.5 w-3.5 shrink-0" />
-                                        <span>Create</span>
+                                        <span>{t('create', 'Yaratish')}</span>
                                     </Button>
                                 </div>
 
@@ -700,7 +700,7 @@ export default function BranchShowPage({
                                             className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                                         >
                                             <Plus className="h-3.5 w-3.5" />
-                                            <span>Create</span>
+                                            <span>{t('create', 'Yaratish')}</span>
                                         </Button>
                                     </div>
                                 ) : (
@@ -912,7 +912,7 @@ export default function BranchShowPage({
                                             className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                         >
                                             <Plus className="h-3.5 w-3.5 shrink-0" />
-                                            <span>Create</span>
+                                            <span>{t('create', 'Yaratish')}</span>
                                         </Button>
                                     </div>
                                 </div>

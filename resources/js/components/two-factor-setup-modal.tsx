@@ -64,6 +64,7 @@ function TwoFactorSetupStep({
     errors: string[];
 }) {
     const { resolvedAppearance } = useAppearance();
+    const { t } = useTranslation();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
@@ -104,8 +105,8 @@ function TwoFactorSetupStep({
 
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
-                        <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                        <span className="relative bg-card px-2 py-1 text-xs text-muted-foreground">
+                            {t('auth.enter_code_manually', 'yoki kodni qo‘lda kiriting')}
                         </span>
                     </div>
 
@@ -146,6 +147,7 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
+    const { t } = useTranslation();
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -210,7 +212,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                {t('common.back', 'Orqaga')}
                             </Button>
                             <Button
                                 type="submit"
@@ -219,7 +221,7 @@ function TwoFactorVerificationStep({
                                     processing || code.length < OTP_MAX_LENGTH
                                 }
                             >
-                                Confirm
+                                {t('common.confirm', 'Tasdiqlash')}
                             </Button>
                         </div>
                     </div>
@@ -252,6 +254,7 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
     errors,
 }: Props) {
+    const { t } = useTranslation();
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
@@ -262,29 +265,44 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-Factor Authentication Enabled',
-                description:
-                    'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-                buttonText: 'Close',
+                title: t(
+                    'settings.two_factor_enabled_title',
+                    'Ikki bosqichli autentifikatsiya faollashtirildi',
+                ),
+                description: t(
+                    'settings.two_factor_enabled_modal_desc',
+                    'Ikki bosqichli autentifikatsiya yoqildi. QR kodni skanerlang yoki ilovangizga kalitni kiriting.',
+                ),
+                buttonText: t('common.close', 'Yopish'),
             };
         }
 
         if (showVerificationStep) {
             return {
-                title: 'Verify Authentication Code',
-                description:
-                    'Enter the 6-digit code from your authenticator app',
-                buttonText: 'Continue',
+                title: t(
+                    'settings.verify_auth_code',
+                    'Tasdiqlash kodini tekshirish',
+                ),
+                description: t(
+                    'settings.enter_6_digit_code',
+                    'Autentifikatsiya ilovasidagi 6 xonali kodni kiriting',
+                ),
+                buttonText: t('settings.continue', 'Davom etish'),
             };
         }
 
         return {
-            title: 'Enable Two-Factor Authentication',
-            description:
-                'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-            buttonText: 'Continue',
+            title: t(
+                'settings.enable_2fa_title',
+                'Ikki bosqichli autentifikatsiyani yoqish',
+            ),
+            description: t(
+                'settings.enable_2fa_modal_desc',
+                'Autentifikatsiyani yakunlash uchun QR kodni skanerlang yoki kalitni kiriting',
+            ),
+            buttonText: t('settings.continue', 'Davom etish'),
         };
-    }, [twoFactorEnabled, showVerificationStep]);
+    }, [twoFactorEnabled, showVerificationStep, t]);
 
     const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {

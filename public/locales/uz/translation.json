@@ -44,7 +44,7 @@
     "confirm_delete_title": "O‘chirishni tasdiqlang",
     "confirm_delete_desc": "Haqiqatan ham ushbu ma‘lumotni o‘chirib tashlamoqchimisiz? Ushbu amalni ortga qaytarib bo‘lmaydi.",
     "clear": "Tozalash",
-    "create": "Create",
+    "create": "Yaratish",
     "copy": "Nusxalash",
     "edit": "Tahrirlash",
     "close": "Yopish"
@@ -464,7 +464,7 @@
   "saving": "Saqlanmoqda...",
   "close": "Yopish",
   "optional": "ixtiyoriy",
-  "limit": "limit",
+  "limit": "Cheklov",
   "search": "Qidirish",
   "copied": "Nusxalandi!",
   "error_occurred": "Xatolik yuz berdi",
@@ -595,7 +595,7 @@
   "sync_failed": "Sinxronizatsiyada xatolik yuz berdi",
   "device_guide": "Yo‘riqnoma",
   "guide": "Yo‘riqnoma",
-  "create": "Create",
+  "create": "Yaratish",
   "device_guide_modal": {
     "title": "Hikvision Qurilmasini Serverga Ulash Yo‘riqnomasi",
     "tab_isup": "1-Usul: ISUP 5.0 (Tavsiya etiladi)",

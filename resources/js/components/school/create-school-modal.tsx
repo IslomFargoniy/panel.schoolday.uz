@@ -63,7 +63,7 @@ export default function CreateSchoolModal() {
             <DialogTrigger asChild>
                 <Button className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-medium text-white shadow-xs hover:bg-indigo-700">
                     <Plus className="h-4 w-4 shrink-0" />
-                    <span>Create</span>
+                    <span>{t('create', 'Yaratish')}</span>
                 </Button>
             </DialogTrigger>
 

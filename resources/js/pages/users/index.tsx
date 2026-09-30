@@ -174,7 +174,7 @@ export default function UsersIndex({
                         className="shrink-0 gap-2"
                     >
                         <Plus className="h-4 w-4 shrink-0" />
-                        <span>Create</span>
+                        <span>{t('create', 'Yaratish')}</span>
                     </Button>
                 </div>
 

@@ -52,7 +52,7 @@ export function StudentsTable({
                             className="shrink-0 gap-1.5 rounded-xl font-medium shadow-xs"
                         >
                             <Plus className="h-4 w-4 shrink-0" />
-                            <span>Create</span>
+                            <span>{t('create', 'Yaratish')}</span>
                         </Button>
                     )}
                 </div>

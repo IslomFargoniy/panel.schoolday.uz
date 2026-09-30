@@ -147,7 +147,7 @@ export function BranchesTable({
                             className="h-9 shrink-0 gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                         >
                             <Plus className="h-3.5 w-3.5 shrink-0" />
-                            <span>Create</span>
+                            <span>{t('create', 'Yaratish')}</span>
                         </Button>
                     )}
                 </div>
