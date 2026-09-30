@@ -141,8 +141,7 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
 
     return (
         <>
-            <Head>
-                <title>{t('sidebar.monitoring', 'Monitoring')} — SchoolDay</title>
+            <Head title={`${t('sidebar.monitoring', 'Monitoring')} — SchoolDay`}>
                 <meta
                     name="description"
                     content={t('monitoring.subtitle', 'Real-vaqt davomat monitoring')}

@@ -155,7 +155,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link
-                                href={dashboard()}
+                                href={dashboard().url}
                                 onClick={() => {
                                     if (isMobile) {
                                         setOpenMobile(false);

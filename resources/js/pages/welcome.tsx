@@ -33,8 +33,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head>
-                <title>{t('seo.welcome_title')}</title>
+            <Head title={t('seo.welcome_title')}>
                 <meta
                     name="description"
                     content={t('seo.welcome_description')}
