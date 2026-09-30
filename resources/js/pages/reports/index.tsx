@@ -18,6 +18,7 @@ import type {
 interface ReportPageFilters {
     start_date?: string;
     end_date?: string;
+    school_id?: string;
     branch_id?: string;
     shift_id?: string;
     class_id?: string;
@@ -28,15 +29,17 @@ interface ReportPageFilters {
 
 interface ReportsPageProps {
     attendances: PaginatedResponse<DailyAttendance>;
-    branches: Branch[];
-    shifts: Shift[];
-    classes: SchoolClass[];
-    students: Student[];
+    schools?: { id: number; name: string }[];
+    branches: (Branch & { school_id?: number })[];
+    shifts: (Shift & { branch_id?: number })[];
+    classes: (SchoolClass & { shift_id?: number })[];
+    students: (Student & { class_id?: number })[];
     filters: ReportPageFilters;
 }
 
 export default function ReportsPage({
     attendances,
+    schools = [],
     branches,
     shifts,
     classes,
@@ -55,6 +58,7 @@ export default function ReportsPage({
     const { data: filterData, setData } = useForm({
         start_date: filters?.start_date || '',
         end_date: filters?.end_date || '',
+        school_id: filters?.school_id || '',
         branch_id: filters?.branch_id || '',
         shift_id: filters?.shift_id || '',
         class_id: filters?.class_id || '',
@@ -71,6 +75,22 @@ export default function ReportsPage({
         });
     };
 
+    const handleReset = () => {
+        const today = new Date().toISOString().split('T')[0];
+        const resetData = {
+            start_date: today,
+            end_date: today,
+            school_id: '',
+            branch_id: '',
+            shift_id: '',
+            class_id: '',
+            student_id: '',
+            status: 'all',
+            per_page: '20',
+        };
+        router.get('/reports', resetData, { preserveState: true, replace: true });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('reports.title', 'Daily Attendance Report')} />
@@ -82,12 +102,14 @@ export default function ReportsPage({
                 </div>
                 <ReportFilters
                     filterData={filterData}
+                    schools={schools}
                     branches={branches}
                     shifts={shifts}
                     classes={classes}
                     students={students}
                     setData={setData}
                     onSubmit={handleFilter}
+                    onReset={handleReset}
                 />
                 <AttendanceTable
                     attendances={attendances}

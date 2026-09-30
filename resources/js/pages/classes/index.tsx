@@ -15,6 +15,8 @@ import type {
 } from '@/types';
 
 interface ClassesPageFilters {
+    school_id?: string;
+    branch_id?: string;
     shift_id?: string;
     search?: string;
     per_page?: string;
@@ -22,12 +24,16 @@ interface ClassesPageFilters {
 
 interface ClassesPageProps {
     classes: PaginatedResponse<SchoolClass>;
-    shifts: Shift[];
+    schools?: { id: number; name: string }[];
+    branches?: { id: number; name: string; school_id?: number }[];
+    shifts: (Shift & { branch_id?: number })[];
     filters: ClassesPageFilters;
 }
 
 export default function ClassesPage({
     classes,
+    schools = [],
+    branches = [],
     shifts,
     filters,
 }: ClassesPageProps) {
@@ -37,22 +43,24 @@ export default function ClassesPage({
         { title: t('classes.title', 'Classes'), href: '/classes' },
     ];
 
-    const { data: filterData, setData: setFilterData } = useForm({
+    const [filterData, setFilterData] = useState({
+        school_id: filters?.school_id || '',
+        branch_id: filters?.branch_id || '',
         shift_id: filters?.shift_id || '',
         search: filters?.search || '',
         per_page: filters?.per_page || '20',
     });
 
-    const handleFilter = () => {
-        router.get('/classes', filterData, {
-            preserveState: true,
-            replace: true,
-        });
+    const handleFilterChange = (key: string, value: string) => {
+        const next = { ...filterData, [key]: value };
+        setFilterData(next);
+        router.get('/classes', next, { preserveState: true, replace: true });
     };
 
     const clearFilters = () => {
-        setFilterData({ shift_id: '', search: '', per_page: '20' });
-        router.get('/classes', {}, { preserveState: true, replace: true });
+        const resetData = { school_id: '', branch_id: '', shift_id: '', search: '', per_page: '20' };
+        setFilterData(resetData);
+        router.get('/classes', resetData, { preserveState: true, replace: true });
     };
 
     const [editing, setEditing] = useState<SchoolClass | null>(null);
@@ -132,10 +140,11 @@ export default function ClassesPage({
                 <div className="flex flex-col gap-4 lg:col-span-2">
                     <ClassFilters
                         filterData={filterData}
+                        schools={schools}
+                        branches={branches}
                         shifts={shifts}
-                        setFilterData={setFilterData}
-                        onFilter={handleFilter}
-                        onClear={clearFilters}
+                        onFilterChange={handleFilterChange}
+                        onReset={clearFilters}
                     />
                     <ClassesTable
                         classes={classes}

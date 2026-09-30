@@ -10,14 +10,19 @@ import type { BreadcrumbItem, Shift, Branch, PaginatedResponse } from '@/types';
 
 interface ShiftsPageProps {
     shifts: PaginatedResponse<Shift>;
+    schools?: { id: number; name: string }[];
     branches: Branch[];
     filters?: {
         per_page?: string;
+        school_id?: string;
+        branch_id?: string;
+        search?: string;
     };
 }
 
 export default function ShiftsPage({
     shifts,
+    schools = [],
     branches,
     filters,
 }: ShiftsPageProps) {
@@ -27,17 +32,23 @@ export default function ShiftsPage({
         { title: t('shifts.title', 'Shifts'), href: '/shifts' },
     ];
 
-    const { data: filterData, setData: setFilterData } = useForm({
+    const [filterData, setFilterData] = useState({
         per_page: filters?.per_page || '20',
+        school_id: filters?.school_id || '',
+        branch_id: filters?.branch_id || '',
+        search: filters?.search || '',
     });
 
-    const handleFilter = (val: string) => {
-        setFilterData('per_page', val);
-        router.get(
-            '/shifts',
-            { per_page: val },
-            { preserveState: true, replace: true },
-        );
+    const handleFilterChange = (key: string, value: string) => {
+        const next = { ...filterData, [key]: value };
+        setFilterData(next);
+        router.get('/shifts', next, { preserveState: true, replace: true });
+    };
+
+    const handleResetFilters = () => {
+        const resetData = { per_page: '20', school_id: '', branch_id: '', search: '' };
+        setFilterData(resetData);
+        router.get('/shifts', resetData, { preserveState: true, replace: true });
     };
 
     const [editing, setEditing] = useState<Shift | null>(null);
@@ -140,8 +151,11 @@ export default function ShiftsPage({
                 />
                 <ShiftsTable
                     shifts={shifts}
-                    perPage={filterData.per_page}
-                    onPerPageChange={handleFilter}
+                    schools={schools}
+                    branches={branches}
+                    filterData={filterData}
+                    onFilterChange={handleFilterChange}
+                    onResetFilters={handleResetFilters}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                 />

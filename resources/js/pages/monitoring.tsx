@@ -19,6 +19,15 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppearance } from '@/hooks/use-appearance';
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+
 interface StudentData {
     id: number;
     name: string;
@@ -47,11 +56,18 @@ interface MonitoringData {
     updated_at: string;
 }
 
-export default function Monitoring() {
+interface MonitoringProps {
+    schools?: { id: number; name: string }[];
+    branches?: { id: number; name: string; school_id?: number }[];
+}
+
+export default function Monitoring({ schools = [], branches = [] }: MonitoringProps) {
     const { t } = useTranslation();
     const { appearance, updateAppearance } = useAppearance();
     const [data, setData] = useState<MonitoringData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedSchool, setSelectedSchool] = useState<string>('');
+    const [selectedBranch, setSelectedBranch] = useState<string>('');
 
     const connectionStatus = useConnectionStatus();
 
@@ -66,7 +82,11 @@ export default function Monitoring() {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch('/monitoring/data');
+            const params = new URLSearchParams();
+            if (selectedSchool) params.append('school_id', selectedSchool);
+            if (selectedBranch) params.append('branch_id', selectedBranch);
+            const qs = params.toString() ? `?${params.toString()}` : '';
+            const res = await fetch(`/monitoring/data${qs}`);
             const json = await res.json();
             setData(json);
         } catch (e) {
@@ -74,7 +94,7 @@ export default function Monitoring() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [selectedSchool, selectedBranch]);
 
     useEffect(() => {
         fetchData();
@@ -217,6 +237,81 @@ export default function Monitoring() {
                         </div>
                     </div>
                 </header>
+
+                {/* Foreign Key Filter Bar */}
+                {(schools.length > 0 || branches.length > 0) && (
+                    <div className="relative z-10 mx-auto max-w-7xl px-4 pt-4 sm:px-6">
+                        <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-black/5 bg-white/60 p-2.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60">
+                            {schools.length > 0 && (
+                                <div className="w-48">
+                                    <Select
+                                        value={selectedSchool || 'all'}
+                                        onValueChange={(val) => {
+                                            const newSchool = val === 'all' ? '' : val;
+                                            setSelectedSchool(newSchool);
+                                            if (newSchool && selectedBranch) {
+                                                const valid = branches.some(
+                                                    (b) => String(b.id) === selectedBranch && String(b.school_id) === newSchool
+                                                );
+                                                if (!valid) setSelectedBranch('');
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-8 rounded-xl text-xs bg-transparent">
+                                            <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                            {schools.map((s) => (
+                                                <SelectItem key={s.id} value={String(s.id)}>
+                                                    {s.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {branches.length > 0 && (
+                                <div className="w-48">
+                                    <Select
+                                        value={selectedBranch || 'all'}
+                                        onValueChange={(val) => setSelectedBranch(val === 'all' ? '' : val)}
+                                    >
+                                        <SelectTrigger className="h-8 rounded-xl text-xs bg-transparent">
+                                            <SelectValue placeholder={t('branches.select_branch', 'Barcha filiallar')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">{t('branches.select_branch', 'Barcha filiallar')}</SelectItem>
+                                            {(selectedSchool
+                                                ? branches.filter((b) => String(b.school_id) === selectedSchool)
+                                                : branches
+                                            ).map((b) => (
+                                                <SelectItem key={b.id} value={String(b.id)}>
+                                                    {b.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {(selectedSchool || selectedBranch) && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        setSelectedSchool('');
+                                        setSelectedBranch('');
+                                    }}
+                                    className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+                                >
+                                    {t('cancel', 'Tozalash')}
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 <main className="relative z-10 mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
                     {/* Stats Cards */}

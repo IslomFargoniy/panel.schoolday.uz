@@ -16,6 +16,7 @@ import {
     ShieldCheck,
     Network,
     ArrowUpRight,
+    X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import AppLayout from '@/layouts/app-layout';
@@ -36,16 +37,19 @@ import type { Branch, BranchDevice, BreadcrumbItem, PaginatedResponse } from '@/
 
 interface DevicesPageProps {
     devices: PaginatedResponse<BranchDevice>;
-    branches: Branch[];
+    schools?: { id: number; name: string }[];
+    branches: (Branch & { school_id?: number })[];
     filters?: {
         search?: string;
+        school_id?: string;
         branch_id?: string;
         connection_type?: string;
+        is_online?: string;
         per_page?: string | number;
     };
 }
 
-export default function DevicesPage({ devices, branches, filters }: DevicesPageProps) {
+export default function DevicesPage({ devices, schools = [], branches, filters }: DevicesPageProps) {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -56,11 +60,25 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
     ];
 
     const handleFilterChange = (key: string, value: string) => {
+        const nextFilters: any = { ...filters, [key]: value, search: searchTerm };
+        if (key === 'school_id' && value && nextFilters.branch_id) {
+            const valid = branches.some(
+                (b) => String(b.id) === String(nextFilters.branch_id) && String(b.school_id) === value
+            );
+            if (!valid) {
+                delete nextFilters.branch_id;
+            }
+        }
         router.get(
             '/devices',
-            { ...filters, [key]: value, search: searchTerm },
+            nextFilters,
             { preserveState: true, replace: true },
         );
+    };
+
+    const handleResetFilters = () => {
+        setSearchTerm('');
+        router.get('/devices', {}, { preserveState: true, replace: true });
     };
 
     const handleSearch = (e: React.FormEvent) => {
@@ -171,8 +189,30 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
                 {/* Filter and Search Bar */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 shadow-xs">
                     <div className="flex flex-wrap items-center gap-2 flex-1">
-                        {/* Branch filter */}
-                        <div className="w-48">
+                        {/* School filter (Foreign key: school_id) */}
+                        {schools.length > 0 && (
+                            <div className="w-full sm:w-44">
+                                <Select
+                                    value={filters?.school_id || 'all'}
+                                    onValueChange={(val) => handleFilterChange('school_id', val === 'all' ? '' : val)}
+                                >
+                                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                                        <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                        {schools.map(s => (
+                                            <SelectItem key={s.id} value={String(s.id)}>
+                                                {s.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {/* Branch filter (Foreign key: branch_id) */}
+                        <div className="w-full sm:w-44">
                             <Select
                                 value={filters?.branch_id || 'all'}
                                 onValueChange={(val) => handleFilterChange('branch_id', val === 'all' ? '' : val)}
@@ -182,9 +222,12 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">{t('all_branches', 'Barcha filiallar')}</SelectItem>
-                                    {branches.map(b => (
+                                    {(filters?.school_id
+                                        ? branches.filter(b => String(b.school_id) === String(filters.school_id))
+                                        : branches
+                                    ).map(b => (
                                         <SelectItem key={b.id} value={String(b.id)}>
-                                            {b.name} {(b as any).school ? `(${((b as any).school.name)})` : ''}
+                                            {b.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -192,7 +235,7 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
                         </div>
 
                         {/* Connection type filter */}
-                        <div className="w-40">
+                        <div className="w-full sm:w-36">
                             <Select
                                 value={filters?.connection_type || 'all'}
                                 onValueChange={(val) => handleFilterChange('connection_type', val === 'all' ? '' : val)}
@@ -207,23 +250,74 @@ export default function DevicesPage({ devices, branches, filters }: DevicesPageP
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        {/* Online status filter */}
+                        <div className="w-full sm:w-36">
+                            <Select
+                                value={filters?.is_online || 'all'}
+                                onValueChange={(val) => handleFilterChange('is_online', val === 'all' ? '' : val)}
+                            >
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
+                                    <SelectValue placeholder={t('all_status', 'Barcha holatlar')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">{t('all_status', 'Barcha holatlar')}</SelectItem>
+                                    <SelectItem value="1">{t('online', 'Online')}</SelectItem>
+                                    <SelectItem value="0">{t('offline', 'Offline')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
-                    {/* Search box */}
-                    <form onSubmit={handleSearch} className="flex items-center gap-2">
-                        <div className="relative flex-1 sm:w-64">
-                            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder={t('search_devices_ph', 'Nomi, MAC yoki Device ID...')}
-                                className="h-9 pl-8 text-xs rounded-xl"
-                            />
-                        </div>
-                        <Button type="submit" size="sm" variant="secondary" className="h-9 text-xs rounded-xl">
-                            {t('search', 'Qidirish')}
-                        </Button>
-                    </form>
+                    {/* Search box & Pagination limit & Reset */}
+                    <div className="flex items-center gap-2">
+                        <form onSubmit={handleSearch} className="flex items-center gap-2">
+                            <div className="relative w-48 sm:w-56">
+                                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder={t('search_devices_ph', 'Nomi, MAC yoki ID...')}
+                                    className="h-9 pl-8 text-xs rounded-xl"
+                                />
+                            </div>
+                        </form>
+
+                        {Boolean(
+                            filters?.school_id ||
+                            filters?.branch_id ||
+                            filters?.connection_type ||
+                            filters?.is_online ||
+                            filters?.search ||
+                            (filters?.per_page && String(filters?.per_page) !== '20')
+                        ) && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleResetFilters}
+                                className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                                <span>{t('cancel', 'Tozalash')}</span>
+                            </Button>
+                        )}
+
+                        <Select
+                            value={String(filters?.per_page || '20')}
+                            onValueChange={(val) => handleFilterChange('per_page', val)}
+                        >
+                            <SelectTrigger className="w-[100px] h-9 text-xs rounded-xl">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
+                                <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
+                                <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
+                                <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 {/* Devices Table Card */}

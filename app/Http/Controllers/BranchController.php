@@ -49,6 +49,15 @@ class BranchController extends Controller
             $query->where('school_id', $request->school_id);
         }
 
+        // Filter by search if passed
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         // Multi-tenant check: non-admins only see branches of their schools
         if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
@@ -83,6 +92,7 @@ class BranchController extends Controller
             'filters' => [
                 'per_page' => $perPage,
                 'school_id' => $request->school_id,
+                'search' => $request->search,
             ],
         ]);
     }

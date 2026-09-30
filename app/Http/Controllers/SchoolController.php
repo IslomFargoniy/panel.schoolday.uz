@@ -25,6 +25,10 @@ class SchoolController extends Controller
         ])
             ->withCount(['branches']);
 
+        if ($request->filled('status')) {
+            $query->where('status', (bool) $request->input('status'));
+        }
+
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -44,6 +48,11 @@ class SchoolController extends Controller
 
         return Inertia::render('school/index', [
             'school' => $schools,
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
+                'per_page' => $per_page,
+            ],
         ]);
     }
 

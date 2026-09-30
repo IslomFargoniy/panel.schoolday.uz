@@ -17,6 +17,9 @@ import type {
 } from '@/types';
 
 interface StudentsPageFilters {
+    school_id?: string;
+    branch_id?: string;
+    shift_id?: string;
     class_id?: string;
     status?: string;
     search?: string;
@@ -25,7 +28,10 @@ interface StudentsPageFilters {
 
 interface StudentsPageProps {
     students: PaginatedResponse<Student>;
-    classes: SchoolClass[];
+    schools?: { id: number; name: string }[];
+    branches?: { id: number; name: string; school_id?: number }[];
+    shifts?: { id: number; name: string; branch_id?: number }[];
+    classes: (SchoolClass & { shift_id?: number })[];
     filters: StudentsPageFilters;
     flash?: {
         success?: string;
@@ -35,6 +41,9 @@ interface StudentsPageProps {
 
 export default function StudentsPage({
     students,
+    schools = [],
+    branches = [],
+    shifts = [],
     classes,
     filters,
 }: StudentsPageProps) {
@@ -45,23 +54,37 @@ export default function StudentsPage({
     ];
 
     // ─── Filters ────────────────────────────────────────────────────────────────
-    const { data: filterData, setData: setFilterData } = useForm({
+    const [filterData, setFilterData] = useState({
+        school_id: filters?.school_id || '',
+        branch_id: filters?.branch_id || '',
+        shift_id: filters?.shift_id || '',
         class_id: filters?.class_id || '',
         status: filters?.status || '',
         search: filters?.search || '',
         per_page: filters?.per_page || '20',
     });
 
-    const handleFilter = () => {
-        router.get('/students', filterData, {
+    const handleFilterChange = (key: string, value: string) => {
+        const next = { ...filterData, [key]: value };
+        setFilterData(next);
+        router.get('/students', next, {
             preserveState: true,
             replace: true,
         });
     };
 
     const clearFilters = () => {
-        setFilterData({ class_id: '', status: '', search: '', per_page: '20' });
-        router.get('/students', {}, { preserveState: true, replace: true });
+        const resetData = {
+            school_id: '',
+            branch_id: '',
+            shift_id: '',
+            class_id: '',
+            status: '',
+            search: '',
+            per_page: '20',
+        };
+        setFilterData(resetData);
+        router.get('/students', resetData, { preserveState: true, replace: true });
     };
 
     // ─── Form ────────────────────────────────────────────────────────────────────
@@ -235,9 +258,11 @@ export default function StudentsPage({
                 <div className="flex flex-col gap-4 xl:col-span-3">
                     <StudentFilters
                         filterData={filterData}
+                        schools={schools}
+                        branches={branches}
+                        shifts={shifts}
                         classes={classes}
-                        setFilterData={setFilterData}
-                        onFilter={handleFilter}
+                        onFilterChange={handleFilterChange}
                         onClear={clearFilters}
                     />
 

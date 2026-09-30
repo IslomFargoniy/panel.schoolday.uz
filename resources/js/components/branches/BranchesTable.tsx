@@ -1,8 +1,9 @@
 import { Link } from '@inertiajs/react';
-import { ScanFace } from 'lucide-react';
+import { ScanFace, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -13,8 +14,10 @@ import {
 
 interface BranchesTableProps {
     branches: any;
-    perPage: string;
-    onPerPageChange: (val: string) => void;
+    schools?: { id: number; name: string }[];
+    filterData: { school_id?: string; search?: string; per_page: string };
+    onFilterChange: (key: string, value: string) => void;
+    onResetFilters: () => void;
     onEdit: (branch: any) => void;
     onDelete: (id: number) => void;
     onManageDevices: (branch: any) => void;
@@ -22,36 +25,86 @@ interface BranchesTableProps {
 
 export function BranchesTable({
     branches,
-    perPage,
-    onPerPageChange,
+    schools = [],
+    filterData,
+    onFilterChange,
+    onResetFilters,
     onEdit,
     onDelete,
     onManageDevices,
 }: BranchesTableProps) {
     const { t } = useTranslation();
 
+    const hasFilters = Boolean(filterData.school_id || filterData.search || filterData.per_page !== '20');
+
     return (
-        <div className="xl:col-span-3">
-            <div className="mb-4 flex justify-end">
-                <Select value={perPage} onValueChange={onPerPageChange}>
-                    <SelectTrigger className="w-[120px]">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="20">
-                            20 {t('common.items', 'ta')}
-                        </SelectItem>
-                        <SelectItem value="50">
-                            50 {t('common.items', 'ta')}
-                        </SelectItem>
-                        <SelectItem value="100">
-                            100 {t('common.items', 'ta')}
-                        </SelectItem>
-                        <SelectItem value="all">
-                            {t('common.all', 'Barchasi')}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+        <div className="xl:col-span-3 space-y-4">
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
+                <div className="flex flex-wrap items-center gap-2 flex-1">
+                    {/* School filter (Foreign key: school_id) */}
+                    {schools.length > 0 && (
+                        <div className="w-full sm:w-52">
+                            <Select
+                                value={filterData.school_id || 'all'}
+                                onValueChange={(val) => onFilterChange('school_id', val === 'all' ? '' : val)}
+                            >
+                                <SelectTrigger className="h-9 text-xs rounded-xl">
+                                    <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                    {schools.map((s) => (
+                                        <SelectItem key={s.id} value={String(s.id)}>
+                                            {s.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    {/* Search */}
+                    <div className="relative flex-1 min-w-[200px]">
+                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            value={filterData.search || ''}
+                            onChange={(e) => onFilterChange('search', e.target.value)}
+                            placeholder={t('search_branch', 'Filialni qidirish...')}
+                            className="h-9 pl-8 text-xs rounded-xl"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    {hasFilters && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={onResetFilters}
+                            className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                            <span>{t('cancel', 'Tozalash')}</span>
+                        </Button>
+                    )}
+
+                    <Select
+                        value={filterData.per_page || '20'}
+                        onValueChange={(val) => onFilterChange('per_page', val)}
+                    >
+                        <SelectTrigger className="w-[110px] h-9 text-xs rounded-xl">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
+                            <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
+                            <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
+                            <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             <div className="relative overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border/70">

@@ -22,6 +22,7 @@ interface BranchesPageProps {
     filters?: {
         per_page?: string;
         school_id?: string;
+        search?: string;
     };
 }
 
@@ -32,18 +33,22 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
         { title: t('branches.title', 'Branches'), href: '/branches' },
     ];
 
-    const { data: filterData, setData: setFilterData } = useForm({
+    const [filterData, setFilterData] = useState({
         per_page: filters?.per_page || '20',
         school_id: filters?.school_id || '',
+        search: filters?.search || '',
     });
 
-    const handleFilter = (val: string) => {
-        setFilterData('per_page', val);
-        router.get(
-            '/branches',
-            { per_page: val, school_id: filterData.school_id },
-            { preserveState: true, replace: true },
-        );
+    const handleFilterChange = (key: string, value: string) => {
+        const next = { ...filterData, [key]: value };
+        setFilterData(next);
+        router.get('/branches', next, { preserveState: true, replace: true });
+    };
+
+    const handleResetFilters = () => {
+        const resetData = { per_page: '20', school_id: '', search: '' };
+        setFilterData(resetData);
+        router.get('/branches', resetData, { preserveState: true, replace: true });
     };
 
     const [editing, setEditing] = useState<Branch | null>(null);
@@ -128,8 +133,10 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
                 />
                 <BranchesTable
                     branches={branches}
-                    perPage={filterData.per_page}
-                    onPerPageChange={handleFilter}
+                    schools={schools}
+                    filterData={filterData}
+                    onFilterChange={handleFilterChange}
+                    onResetFilters={handleResetFilters}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onManageDevices={(branch) => setDevicesBranch(branch)}

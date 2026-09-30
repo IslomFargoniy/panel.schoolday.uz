@@ -12,7 +12,13 @@ class MonitoringController extends Controller
 {
     public function index()
     {
-        return Inertia::render('monitoring');
+        $schools = \App\Models\School::select('id', 'name')->get();
+        $branches = Branch::select('id', 'name', 'school_id')->get();
+
+        return Inertia::render('monitoring', [
+            'schools' => $schools,
+            'branches' => $branches,
+        ]);
     }
 
     public function data(): JsonResponse
@@ -24,7 +30,17 @@ class MonitoringController extends Controller
             ->pluck('student_id')
             ->toArray();
 
-        $branches = Branch::with([
+        $branchesQuery = Branch::query();
+
+        if (request()->filled('school_id')) {
+            $branchesQuery->where('school_id', request('school_id'));
+        }
+
+        if (request()->filled('branch_id')) {
+            $branchesQuery->where('id', request('branch_id'));
+        }
+
+        $branches = $branchesQuery->with([
             'shifts.classes.students' => function ($q) {
                 $q->where('status', 'active')->orderBy('name');
             },

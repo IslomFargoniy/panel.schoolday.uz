@@ -1,5 +1,5 @@
-import { Head, useForm } from '@inertiajs/react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Head, useForm, router } from '@inertiajs/react';
+import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -35,19 +35,48 @@ interface UserItem {
     email: string;
     phone?: string | null;
     roles?: RoleItem[];
+    user_schools?: { id: number; school_id: number; school?: { id: number; name: string } }[];
     created_at?: string;
+}
+
+interface UsersIndexProps {
+    users: UserItem[];
+    roles: RoleItem[];
+    schools?: { id: number; name: string }[];
+    filters?: {
+        role?: string;
+        school_id?: string;
+        search?: string;
+    };
 }
 
 export default function UsersIndex({
     users,
     roles,
-}: {
-    users: UserItem[];
-    roles: RoleItem[];
-}) {
+    schools = [],
+    filters,
+}: UsersIndexProps) {
     const { t } = useTranslation();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editUser, setEditUser] = useState<UserItem | null>(null);
+
+    const [filterData, setFilterData] = useState({
+        role: filters?.role || '',
+        school_id: filters?.school_id || '',
+        search: filters?.search || '',
+    });
+
+    const handleFilterChange = (key: string, value: string) => {
+        const next = { ...filterData, [key]: value };
+        setFilterData(next);
+        router.get('/users', next, { preserveState: true, replace: true });
+    };
+
+    const handleResetFilters = () => {
+        const reset = { role: '', school_id: '', search: '' };
+        setFilterData(reset);
+        router.get('/users', reset, { preserveState: true, replace: true });
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.users', 'Users'), href: '/users' },
@@ -144,6 +173,77 @@ export default function UsersIndex({
                     </Button>
                 </div>
 
+                {/* Filter Bar */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs">
+                    <div className="flex flex-wrap items-center gap-2 flex-1">
+                        {/* Role filter */}
+                        <div className="w-full sm:w-44">
+                            <Select
+                                value={filterData.role || 'all'}
+                                onValueChange={(val) => handleFilterChange('role', val === 'all' ? '' : val)}
+                            >
+                                <SelectTrigger className="h-9 text-xs rounded-xl">
+                                    <SelectValue placeholder={t('users.role', 'Barcha rollar')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">{t('common.all', 'Barcha rollar')}</SelectItem>
+                                    {roles.map((r) => (
+                                        <SelectItem key={r.id} value={r.name}>
+                                            {r.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* School filter (Foreign key) */}
+                        {schools.length > 0 && (
+                            <div className="w-full sm:w-48">
+                                <Select
+                                    value={filterData.school_id || 'all'}
+                                    onValueChange={(val) => handleFilterChange('school_id', val === 'all' ? '' : val)}
+                                >
+                                    <SelectTrigger className="h-9 text-xs rounded-xl">
+                                        <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                        {schools.map((s) => (
+                                            <SelectItem key={s.id} value={String(s.id)}>
+                                                {s.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {/* Search input */}
+                        <div className="relative flex-1 min-w-[180px]">
+                            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                value={filterData.search}
+                                onChange={(e) => handleFilterChange('search', e.target.value)}
+                                placeholder={t('users.search_placeholder', 'Ism, email yoki telefon...')}
+                                className="h-9 pl-8 text-xs rounded-xl"
+                            />
+                        </div>
+                    </div>
+
+                    {Boolean(filterData.role || filterData.school_id || filterData.search) && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleResetFilters}
+                            className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                            <span>{t('cancel', 'Tozalash')}</span>
+                        </Button>
+                    )}
+                </div>
+
                 <div className="min-h-[400px] overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
@@ -161,6 +261,9 @@ export default function UsersIndex({
                                     <th className="px-6 py-4">
                                         {t('users.role', 'Role')}
                                     </th>
+                                    <th className="px-6 py-4">
+                                        {t('school', 'Maktab')}
+                                    </th>
                                     <th className="px-6 py-4 text-right">
                                         {t('common.actions', 'Actions')}
                                     </th>
@@ -170,7 +273,7 @@ export default function UsersIndex({
                                 {users.length === 0 ? (
                                     <tr>
                                         <td
-                                            colSpan={5}
+                                            colSpan={6}
                                             className="px-6 py-8 text-center text-muted-foreground"
                                         >
                                             {t(
@@ -199,6 +302,22 @@ export default function UsersIndex({
                                                     {user.roles?.[0]?.name ||
                                                         '-'}
                                                 </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-xs">
+                                                {user.user_schools && user.user_schools.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {user.user_schools.map((us) => (
+                                                            <span
+                                                                key={us.id}
+                                                                className="rounded bg-muted px-2 py-0.5 font-medium"
+                                                            >
+                                                                {us.school?.name || `ID: ${us.school_id}`}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2 text-muted-foreground">

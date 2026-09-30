@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\DailyAttendance;
+use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Shift;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -18,12 +20,41 @@ class ReportController extends Controller
         $filters = $this->getFilters($request);
         $paginated = $this->getAttendanceData($filters, true);
 
+        // Multi-tenant accessible options
+        $schoolsQuery = School::query();
+        $branchesQuery = Branch::query();
+        $shiftsQuery = Shift::with('branch');
+        $classesQuery = SchoolClass::with('shift.branch');
+        $studentsQuery = Student::where('status', 'active');
+
+        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
+            $schoolsQuery->whereIn('id', $userSchoolIds);
+            $branchesQuery->whereIn('school_id', $userSchoolIds);
+            $shiftsQuery->whereHas('branch', function ($b) use ($userSchoolIds) {
+                $b->whereIn('school_id', $userSchoolIds);
+            });
+            $classesQuery->whereHas('shift.branch', function ($b) use ($userSchoolIds) {
+                $b->whereIn('school_id', $userSchoolIds);
+            });
+            $studentsQuery->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                $b->whereIn('school_id', $userSchoolIds);
+            });
+        }
+
+        $schools = $schoolsQuery->select('id', 'name')->get();
+        $branches = $branchesQuery->select('id', 'name', 'school_id')->get();
+        $shifts = $shiftsQuery->select('id', 'name', 'branch_id', 'start_time', 'end_time')->get();
+        $classes = $classesQuery->select('id', 'name', 'shift_id')->orderBy('name')->get();
+        $students = $studentsQuery->select('id', 'name', 'class_id')->orderBy('name')->get();
+
         return Inertia::render('reports/index', [
             'attendances' => $paginated,
-            'branches' => Branch::all(),
-            'shifts' => Shift::with('branch')->get(),
-            'classes' => SchoolClass::with(['shift.branch'])->get(),
-            'students' => Student::where('status', 'active')->orderBy('name')->get(),
+            'schools' => $schools,
+            'branches' => $branches,
+            'shifts' => $shifts,
+            'classes' => $classes,
+            'students' => $students,
             'filters' => $filters,
         ]);
     }
@@ -44,6 +75,7 @@ class ReportController extends Controller
         return [
             'start_date' => $request->input('start_date', Carbon::today()->toDateString()),
             'end_date' => $request->input('end_date', Carbon::today()->toDateString()),
+            'school_id' => $request->input('school_id'),
             'branch_id' => $request->input('branch_id'),
             'shift_id' => $request->input('shift_id'),
             'class_id' => $request->input('class_id'),
@@ -59,6 +91,7 @@ class ReportController extends Controller
         $limit = $perPage === 'all' ? 100000 : (int) $perPage;
         $startDate = $filters['start_date'];
         $endDate = $filters['end_date'];
+        $schoolId = $filters['school_id'];
         $branchId = $filters['branch_id'];
         $shiftId = $filters['shift_id'];
         $classId = $filters['class_id'];
@@ -67,10 +100,19 @@ class ReportController extends Controller
 
         if ($status === 'absent') {
             $query = Student::where('status', 'active')
-                ->with(['schoolClass.shift.branch'])
+                ->with(['schoolClass.shift.branch.school'])
                 ->whereDoesntHave('attendances', function ($q) use ($startDate, $endDate) {
                     $q->whereBetween('date', [$startDate, $endDate]);
                 });
+
+            // Multi-tenant check
+            if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+                $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
+                $query->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                    $b->whereIn('school_id', $userSchoolIds);
+                });
+            }
+
             if ($studentId) {
                 $query->where('id', $studentId);
             } else {
@@ -83,6 +125,10 @@ class ReportController extends Controller
                 } elseif ($branchId) {
                     $query->whereHas('schoolClass.shift', function ($q) use ($branchId) {
                         $q->where('branch_id', $branchId);
+                    });
+                } elseif ($schoolId) {
+                    $query->whereHas('schoolClass.shift.branch', function ($q) use ($schoolId) {
+                        $q->where('school_id', $schoolId);
                     });
                 }
             }
@@ -108,10 +154,18 @@ class ReportController extends Controller
 
             return $results;
         } else {
-            $query = DailyAttendance::with(['student.schoolClass.shift.branch'])
+            $query = DailyAttendance::with(['student.schoolClass.shift.branch.school'])
                 ->whereBetween('date', [$startDate, $endDate])
                 ->orderBy('date', 'desc')
                 ->orderBy('first_check_in', 'desc');
+
+            // Multi-tenant check
+            if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+                $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
+                $query->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                    $b->whereIn('school_id', $userSchoolIds);
+                });
+            }
 
             if ($status === 'late') {
                 $query->where('is_late', true);
@@ -135,6 +189,10 @@ class ReportController extends Controller
                 } elseif ($branchId) {
                     $query->whereHas('student.schoolClass.shift', function ($q) use ($branchId) {
                         $q->where('branch_id', $branchId);
+                    });
+                } elseif ($schoolId) {
+                    $query->whereHas('student.schoolClass.shift.branch', function ($q) use ($schoolId) {
+                        $q->where('school_id', $schoolId);
                     });
                 }
             }
