@@ -43,13 +43,13 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-    {{-- Runtime Reverb WebSocket Configuration --}}
+    {{-- Runtime Reverb WebSocket Configuration for Browser Clients --}}
     <script>
         window.__REVERB__ = {
             key: "{{ config('broadcasting.connections.reverb.key') }}",
-            host: "{{ config('broadcasting.connections.reverb.options.host') ?: request()->getHost() }}",
-            port: {{ (int) (config('broadcasting.connections.reverb.options.port') ?: (request()->isSecure() ? 443 : 8080)) }},
-            scheme: "{{ config('broadcasting.connections.reverb.options.scheme') ?: (request()->isSecure() ? 'https' : 'http') }}"
+            host: "{{ request()->getHost() }}",
+            port: {{ request()->isSecure() ? 443 : 8080 }},
+            scheme: "{{ request()->isSecure() ? 'https' : 'http' }}"
         };
     </script>
 

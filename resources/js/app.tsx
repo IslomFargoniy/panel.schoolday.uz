@@ -15,22 +15,23 @@ const isHttps =
     (typeof window !== 'undefined' && window.location.protocol === 'https:') ||
     import.meta.env.VITE_REVERB_SCHEME === 'https';
 
+const isProductionDomain =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1';
+
 const reverbKey =
     reverbCfg.key ||
     import.meta.env.VITE_REVERB_APP_KEY ||
     'schoolday-key';
 
-const wsHost =
-    reverbCfg.host ||
-    import.meta.env.VITE_REVERB_HOST ||
-    (typeof window !== 'undefined' ? window.location.hostname : 'localhost');
+const wsHost = isProductionDomain
+    ? window.location.hostname
+    : (reverbCfg.host || import.meta.env.VITE_REVERB_HOST || 'localhost');
 
-const resolvedPort = Number(
-    reverbCfg.port ||
-    (typeof window !== 'undefined' && window.location.protocol === 'https:'
-        ? 443
-        : (import.meta.env.VITE_REVERB_PORT || (isHttps ? 443 : 8080)))
-);
+const resolvedPort = (isProductionDomain || isHttps)
+    ? 443
+    : Number(reverbCfg.port || import.meta.env.VITE_REVERB_PORT || 8080);
 
 configureEcho({
     broadcaster: 'reverb',
