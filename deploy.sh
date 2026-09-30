@@ -98,10 +98,13 @@ deploy() {
         log_success "Composer dependencies o'rnatildi"
     fi
 
-    # 4. NPM build
-    log_info "Frontend yig'ilmoqda (npm run build)..."
-    run_remote "PATH=\"/opt/php83/bin:\$PATH\" npm run build"
-    log_success "Frontend yig'ildi"
+    # 4. NPM build (Lokalda yig'ish va serverga rsync orqali yuklash - server xotirasini tejaydi va tez ishlaydi)
+    log_info "Frontend lokal yig'ilmoqda (npm run build)..."
+    npm run build
+    log_info "Frontend serverga sinxronlanmoqda..."
+    rsync -avz --delete public/build/ "$SERVER:$REMOTE_PATH/public/build/"
+    run_remote "chown -R panel_school_usr:panel_school_usr public/build"
+    log_success "Frontend muvaffaqiyatli yuklandi"
 
     # 5. Migratsiya (faqat --full rejimda)
     if [[ "$MODE" == "full" ]]; then
