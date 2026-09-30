@@ -16,7 +16,10 @@
     "telegram": "Telegram",
     "school": "Schools",
     "devices": "Devices",
-    "monitoring": "Monitoring"
+    "monitoring": "Monitoring",
+    "group_overview": "Overview",
+    "group_education": "Academic Structure",
+    "group_system": "System"
   },
   "common": {
     "per_page": "Show",

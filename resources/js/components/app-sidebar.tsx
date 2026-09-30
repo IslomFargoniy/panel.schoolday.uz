@@ -1,16 +1,13 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
-    Folder,
     LayoutDashboard,
-    Clock,
-    GraduationCap,
-    PieChart,
-    Users,
-    Building2,
-    Building,
     Activity,
     BarChart3,
+    Building2,
+    Building,
+    Clock,
+    GraduationCap,
+    Users,
     UserCog,
     Github,
     Send,
@@ -29,88 +26,113 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
+import type { NavGroup, NavItem } from '@/types';
 import AppLogo from './app-logo';
 
-const getMainNavItems = (t: any, user: any): NavItem[] => {
+const getNavGroups = (t: any, user: any): NavGroup[] => {
     const hasRole = (roleName: string) => {
         if (!user?.roles) return false;
         if (Array.isArray(user.roles)) {
             return user.roles.some((r: any) =>
-                typeof r === 'string' ? r.toLowerCase() === roleName.toLowerCase() : r.name?.toLowerCase() === roleName.toLowerCase()
+                typeof r === 'string'
+                    ? r.toLowerCase() === roleName.toLowerCase()
+                    : r.name?.toLowerCase() === roleName.toLowerCase()
             );
         }
         return false;
     };
 
     const isAdmin = hasRole('Admin') || hasRole('Superadmin');
+    const isSuperadmin = hasRole('Superadmin');
 
-    const items: NavItem[] = [
-        {
-            title: t('sidebar.dashboard', 'Dashboard'),
-            href: dashboard().url,
-            icon: LayoutDashboard,
-        },
-    ];
+    const groups: NavGroup[] = [];
+
+    // 1. Asosiy bo'lim (Umumiy ko'rinish, jonli monitoring va davomat tahlillari)
+    groups.push({
+        title: t('sidebar.group_overview', 'Asosiy'),
+        items: [
+            {
+                title: t('sidebar.dashboard', 'Bosh sahifa'),
+                href: dashboard().url,
+                icon: LayoutDashboard,
+            },
+            {
+                title: t('sidebar.monitoring', 'Monitoring'),
+                href: '/monitoring',
+                icon: Activity,
+            },
+            {
+                title: t('sidebar.reports', 'Hisobotlar'),
+                href: '/reports',
+                icon: BarChart3,
+            },
+        ],
+    });
+
+    // 2. Ta'lim tuzilmasi (Iyerarxiya: Maktab -> Filial -> Smena -> Sinf -> O'quvchi)
+    const educationItems: NavItem[] = [];
 
     if (isAdmin) {
-        items.push({
+        educationItems.push({
             title: t('sidebar.school', 'Maktablar'),
             href: '/school',
             icon: Building2,
         });
     }
 
-    items.push(
+    educationItems.push(
         {
-            title: t('sidebar.branches', 'Branches'),
+            title: t('sidebar.branches', 'Filiallar'),
             href: '/branches',
             icon: Building,
         },
         {
-            title: t('sidebar.shifts', 'Shifts'),
+            title: t('sidebar.shifts', 'Smenalar'),
             href: '/shifts',
             icon: Clock,
         },
         {
-            title: t('sidebar.classes', 'Classes'),
+            title: t('sidebar.classes', 'Sinflar'),
             href: '/classes',
             icon: GraduationCap,
         },
         {
-            title: t('sidebar.students', 'Students'),
+            title: t('sidebar.students', 'O‘quvchilar'),
             href: '/students',
             icon: Users,
         },
-        {
-            title: t('sidebar.reports', 'Reports'),
-            href: '/reports',
-            icon: BarChart3,
-        },
-        {
-            title: t('sidebar.monitoring', 'Monitoring'),
-            href: '/monitoring',
-            icon: Activity,
-        },
     );
 
-    if (hasRole('Superadmin')) {
-        items.push({
-            title: t('sidebar.users', 'Users'),
+    groups.push({
+        title: t('sidebar.group_education', 'Ta’lim tuzilmasi'),
+        items: educationItems,
+    });
+
+    // 3. Tizim va boshqaruv (Foydalanuvchilar va ruxsatlar)
+    const systemItems: NavItem[] = [];
+
+    if (isSuperadmin) {
+        systemItems.push({
+            title: t('sidebar.users', 'Foydalanuvchilar'),
             href: '/users',
             icon: UserCog,
         });
     }
 
-    return items;
-};
+    if (systemItems.length > 0) {
+        groups.push({
+            title: t('sidebar.group_system', 'Tizim'),
+            items: systemItems,
+        });
+    }
 
-import { usePage } from '@inertiajs/react';
+    return groups;
+};
 
 export function AppSidebar() {
     const { t } = useTranslation();
     const { auth } = usePage().props as unknown as { auth: { user: any } };
-    const mainNavItems = getMainNavItems(t, auth?.user);
+    const navGroups = getNavGroups(t, auth?.user);
 
     const footerNavItems: NavItem[] = [
         {
@@ -140,7 +162,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain groups={navGroups} />
             </SidebarContent>
 
             <SidebarFooter>

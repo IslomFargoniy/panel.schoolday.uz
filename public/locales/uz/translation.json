@@ -16,7 +16,10 @@
     "telegram": "Telegram",
     "school": "Maktablar",
     "devices": "Qurilmalar",
-    "monitoring": "Monitoring"
+    "monitoring": "Monitoring",
+    "group_overview": "Asosiy",
+    "group_education": "Ta'lim tuzilmasi",
+    "group_system": "Tizim"
   },
   "common": {
     "per_page": "Ko'rsatish",

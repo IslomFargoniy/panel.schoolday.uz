@@ -16,7 +16,10 @@
     "telegram": "Телеграм",
     "school": "Школы",
     "devices": "Устройства",
-    "monitoring": "Мониторинг"
+    "monitoring": "Мониторинг",
+    "group_overview": "Главная",
+    "group_education": "Учебная структура",
+    "group_system": "Система"
   },
   "common": {
     "per_page": "Показывать",
