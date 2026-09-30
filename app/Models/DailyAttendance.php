@@ -29,7 +29,10 @@ class DailyAttendance extends Model
 
     public function getDateAttribute($value): ?string
     {
-        if (!$value) return null;
+        if (! $value) {
+            return null;
+        }
+
         return substr($value, 0, 10);
     }
 

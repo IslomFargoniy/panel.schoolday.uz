@@ -24,7 +24,10 @@ interface BranchDeviceTableProps {
     layout?: 'grid' | 'stack';
 }
 
-export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDeviceTableProps) {
+export default function BranchDeviceTable({
+    branch,
+    layout = 'grid',
+}: BranchDeviceTableProps) {
     const { t } = useTranslation();
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [syncingId, setSyncingId] = useState<number | null>(null);
@@ -72,10 +75,12 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
             const response = await fetch(`/branch_device/${device.id}/sync`, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
+                    'X-XSRF-TOKEN': xsrfToken
+                        ? decodeURIComponent(xsrfToken)
+                        : '',
                 },
             });
 
@@ -91,12 +96,14 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                 router.reload({ only: ['branch'] });
             } else {
                 toast.error(
-                    data.message || t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
+                    data.message ||
+                        t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
                 );
             }
         } catch (err: any) {
             toast.error(
-                err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
+                err?.message ||
+                    t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
             );
         } finally {
             setSyncingId(null);
@@ -118,8 +125,10 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
     return (
         <div className="space-y-4">
             {/* Header bar */}
-            <div className={`flex flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-xs min-w-0 max-w-full overflow-hidden ${layout === 'stack' ? '' : 'sm:flex-row sm:items-center'}`}>
-                <div className="min-w-0 max-w-full">
+            <div
+                className={`flex max-w-full min-w-0 flex-col justify-between gap-3 overflow-hidden rounded-xl border border-border bg-card p-4 shadow-xs ${layout === 'stack' ? '' : 'sm:flex-row sm:items-center'}`}
+            >
+                <div className="max-w-full min-w-0">
                     <h3 className="flex items-center gap-2 text-sm font-bold text-foreground sm:text-base">
                         <ScanFace className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
                         <span className="truncate">
@@ -129,7 +138,7 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                             ({devices.length} {t('devices_count', 'ta')})
                         </span>
                     </h3>
-                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
                         {t(
                             'device_table_desc',
                             'Filialga biriktirilgan ISUP 5.0 va HTTP Listening terminallari',
@@ -165,7 +174,13 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                 </div>
             ) : (
                 /* Devices Container */
-                <div className={layout === 'stack' ? 'flex flex-col gap-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'}>
+                <div
+                    className={
+                        layout === 'stack'
+                            ? 'flex flex-col gap-3'
+                            : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
+                    }
+                >
                     {devices.map((item, index) => {
                         const isIsup = item.connection_type === 'isup';
                         const isOnline = item.is_online;
@@ -173,34 +188,40 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                         return (
                             <div
                                 key={item.id}
-                                className="relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:shadow-md min-w-0 max-w-full"
+                                className="relative max-w-full min-w-0 overflow-hidden rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:shadow-md"
                             >
-                                <div className="space-y-3 min-w-0">
+                                <div className="min-w-0 space-y-3">
                                     {/* Top Row: Device Name & Connection Pill */}
-                                    <div className="flex items-start justify-between gap-2 min-w-0">
-                                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <div className="flex min-w-0 items-start justify-between gap-2">
+                                        <div className="flex min-w-0 flex-1 items-center gap-2.5">
                                             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                                                 <ScanFace className="h-5 w-5" />
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <h4 className="text-xs leading-tight font-bold text-foreground sm:text-sm truncate" title={item.name || `Hikvision Terminal #${index + 1}`}>
+                                                <h4
+                                                    className="truncate text-xs leading-tight font-bold text-foreground sm:text-sm"
+                                                    title={
+                                                        item.name ||
+                                                        `Hikvision Terminal #${index + 1}`
+                                                    }
+                                                >
                                                     {item.name ||
                                                         `Hikvision Terminal #${index + 1}`}
                                                 </h4>
-                                                <p className="font-mono text-[10px] text-muted-foreground truncate">
+                                                <p className="truncate font-mono text-[10px] text-muted-foreground">
                                                     MinMoe Face Terminal
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-1 shrink-0">
+                                        <div className="flex shrink-0 items-center gap-1">
                                             {isIsup ? (
-                                                <span className="inline-flex items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400 shrink-0">
+                                                <span className="inline-flex shrink-0 items-center gap-1 rounded border border-purple-500/20 bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400">
                                                     <Network className="h-3 w-3 shrink-0" />
                                                     <span>ISUP 5.0</span>
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 rounded border border-blue-500/20 bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 shrink-0">
+                                                <span className="inline-flex shrink-0 items-center gap-1 rounded border border-blue-500/20 bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
                                                     <Radio className="h-3 w-3 shrink-0" />
                                                     <span>HTTP</span>
                                                 </span>
@@ -213,7 +234,7 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                                                     setDeviceToEdit(item);
                                                     setIsDeviceModalOpen(true);
                                                 }}
-                                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                className="h-7 w-7 text-muted-foreground hover:bg-muted hover:text-foreground"
                                                 title={t('edit', 'Tahrirlash')}
                                             >
                                                 <Pencil className="h-3.5 w-3.5" />
@@ -293,7 +314,7 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                                     </div>
 
                                     {/* Terminal Bottom Status Bar */}
-                                    <div className="flex flex-col gap-2 pt-1 border-t border-border/60">
+                                    <div className="flex flex-col gap-2 border-t border-border/60 pt-1">
                                         <div className="flex items-center justify-between text-[11px]">
                                             <div className="flex items-center gap-1.5">
                                                 {isOnline ? (
@@ -354,8 +375,12 @@ export default function BranchDeviceTable({ branch, layout = 'grid' }: BranchDev
                                         </div>
 
                                         {item.last_seen_at && (
-                                            <div className="text-[10px] text-muted-foreground font-mono">
-                                                {t('last_seen', 'Oxirgi aloqa')}: {formatLastSeen(item.last_seen_at)}
+                                            <div className="font-mono text-[10px] text-muted-foreground">
+                                                {t('last_seen', 'Oxirgi aloqa')}
+                                                :{' '}
+                                                {formatLastSeen(
+                                                    item.last_seen_at,
+                                                )}
                                             </div>
                                         )}
                                     </div>

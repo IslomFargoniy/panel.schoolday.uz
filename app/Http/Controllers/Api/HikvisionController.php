@@ -258,6 +258,7 @@ class HikvisionController extends Controller
 
         if ($request->header('X-Inertia')) {
             $count = $res['synced_count'] ?? 0;
+
             return back()->with('success', "ISUP hodisalar muvaffaqiyatli sinxronlandi ({$count} ta)");
         }
 

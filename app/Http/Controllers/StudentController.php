@@ -32,7 +32,7 @@ class StudentController extends Controller
         $query = Student::with(['schoolClass.shift.branch.school'])->orderBy('name', 'asc');
 
         // Multi-tenant check: non-admins only see students from their schools
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
             $query->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
                 $b->whereIn('school_id', $userSchoolIds);
@@ -79,7 +79,7 @@ class StudentController extends Controller
         $shiftsQuery = Shift::with('branch');
         $classesQuery = SchoolClass::with('shift.branch');
 
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
             $branchesQuery->whereIn('school_id', $userSchoolIds);

@@ -27,7 +27,7 @@ class ReportController extends Controller
         $classesQuery = SchoolClass::with('shift.branch');
         $studentsQuery = Student::where('status', 'active');
 
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
             $branchesQuery->whereIn('school_id', $userSchoolIds);
@@ -106,7 +106,7 @@ class ReportController extends Controller
                 });
 
             // Multi-tenant check
-            if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
                 $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
                 $query->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
                     $b->whereIn('school_id', $userSchoolIds);
@@ -160,7 +160,7 @@ class ReportController extends Controller
                 ->orderBy('first_check_in', 'desc');
 
             // Multi-tenant check
-            if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+            if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
                 $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
                 $query->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
                     $b->whereIn('school_id', $userSchoolIds);

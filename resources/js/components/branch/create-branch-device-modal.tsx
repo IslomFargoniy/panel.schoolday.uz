@@ -63,7 +63,10 @@ export default function CreateBranchDeviceModal({
     const open = isControlled ? controlledOpen : internalOpen;
     const setOpen = isControlled ? setControlledOpen! : setInternalOpen;
 
-    const initialBranchId = deviceToEdit?.branch_id || branch?.id || (branches.length > 0 ? branches[0].id : 1);
+    const initialBranchId =
+        deviceToEdit?.branch_id ||
+        branch?.id ||
+        (branches.length > 0 ? branches[0].id : 1);
 
     const { data, setData, post, put, processing, reset, errors, clearErrors } =
         useForm<FormData>({
@@ -81,12 +84,19 @@ export default function CreateBranchDeviceModal({
                 branch_id: deviceToEdit.branch_id,
                 name: deviceToEdit.name || '',
                 mac_address: deviceToEdit.mac_address || '',
-                device_id: deviceToEdit.device_id || `branch${deviceToEdit.branch_id}`,
-                connection_type: (deviceToEdit.connection_type as 'isup' | 'http_listening') || 'isup',
-                encryption_key: (deviceToEdit as any).encryption_key || `SchoolDay${deviceToEdit.branch_id}2026`,
+                device_id:
+                    deviceToEdit.device_id || `branch${deviceToEdit.branch_id}`,
+                connection_type:
+                    (deviceToEdit.connection_type as
+                        | 'isup'
+                        | 'http_listening') || 'isup',
+                encryption_key:
+                    (deviceToEdit as any).encryption_key ||
+                    `SchoolDay${deviceToEdit.branch_id}2026`,
             });
         } else {
-            const bId = branch?.id || (branches.length > 0 ? branches[0].id : 1);
+            const bId =
+                branch?.id || (branches.length > 0 ? branches[0].id : 1);
             setData({
                 branch_id: bId,
                 name: '',
@@ -163,7 +173,7 @@ export default function CreateBranchDeviceModal({
                     {trigger ? (
                         trigger
                     ) : (
-                        <Button className="flex h-8 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 shrink-0">
+                        <Button className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700">
                             <Plus className="h-3.5 w-3.5 shrink-0" />
                             <span>Create</span>
                         </Button>
@@ -179,7 +189,10 @@ export default function CreateBranchDeviceModal({
                         </div>
                         <span>
                             {deviceToEdit
-                                ? t('edit_device_title', 'Qurilma Ma’lumotlarini Tahrirlash')
+                                ? t(
+                                      'edit_device_title',
+                                      'Qurilma Ma’lumotlarini Tahrirlash',
+                                  )
                                 : t(
                                       'modal.create_device_title',
                                       'Yangi Hikvision Qurilmasi Qo‘shish',
@@ -206,8 +219,12 @@ export default function CreateBranchDeviceModal({
                 <form onSubmit={submit} className="space-y-4 pt-1">
                     {!branch && branches.length > 0 && (
                         <div className="space-y-1.5">
-                            <Label htmlFor="branch_id" className="text-xs font-medium">
-                                {t('branch', 'Filial')} <span className="text-rose-500">*</span>
+                            <Label
+                                htmlFor="branch_id"
+                                className="text-xs font-medium"
+                            >
+                                {t('branch', 'Filial')}{' '}
+                                <span className="text-rose-500">*</span>
                             </Label>
                             <Select
                                 value={String(data.branch_id)}
@@ -222,12 +239,23 @@ export default function CreateBranchDeviceModal({
                                 }}
                             >
                                 <SelectTrigger className="h-9 rounded-lg border-input text-xs sm:text-sm">
-                                    <SelectValue placeholder={t('select_branch', 'Filialni tanlang')} />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'select_branch',
+                                            'Filialni tanlang',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {branches.map((b) => (
-                                        <SelectItem key={b.id} value={String(b.id)}>
-                                            {b.name} {(b as any).school ? `(${((b as any).school.name)})` : ''}
+                                        <SelectItem
+                                            key={b.id}
+                                            value={String(b.id)}
+                                        >
+                                            {b.name}{' '}
+                                            {(b as any).school
+                                                ? `(${(b as any).school.name})`
+                                                : ''}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

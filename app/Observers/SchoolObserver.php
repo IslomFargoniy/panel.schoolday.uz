@@ -13,7 +13,7 @@ class SchoolObserver
     public function creating(School $school): void
     {
         // Only Admin or Superadmin can create schools
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             abort(403, 'Unauthorized to create school.');
         }
     }
@@ -23,7 +23,7 @@ class SchoolObserver
      */
     public function updating(School $school): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             Auth::user()->user_schools()
                 ->where('school_id', $school->id)
                 ->firstOrFail();
@@ -35,7 +35,7 @@ class SchoolObserver
      */
     public function deleting(School $school): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             abort(403, 'Only administrators can delete a school.');
         }
 

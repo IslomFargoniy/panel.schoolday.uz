@@ -27,6 +27,13 @@ interface LanguageBarProps {
     className?: string;
 }
 
+function setLanguageCookies(lang: string) {
+    if (typeof document !== 'undefined') {
+        document.cookie = `locale=${lang};path=/;max-age=31536000;SameSite=Lax`;
+        document.cookie = `lang=${lang};path=/;max-age=31536000;SameSite=Lax`;
+    }
+}
+
 export function LanguageBar({ className }: LanguageBarProps) {
     const { i18n } = useTranslation();
 
@@ -42,8 +49,7 @@ export function LanguageBar({ className }: LanguageBarProps) {
     const changeLanguage = (lang: string) => {
         i18n.changeLanguage(lang);
         localStorage.setItem('lang', lang);
-        document.cookie = `locale=${lang};path=/;max-age=31536000;SameSite=Lax`;
-        document.cookie = `lang=${lang};path=/;max-age=31536000;SameSite=Lax`;
+        setLanguageCookies(lang);
     };
 
     return (

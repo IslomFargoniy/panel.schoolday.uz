@@ -18,7 +18,11 @@ import type { BreadcrumbItem, SchoolPaginate } from '@/types';
 export default function SchoolIndex() {
     const { school, filters } = usePage<{
         school: SchoolPaginate;
-        filters?: { search?: string; status?: string; per_page?: string | number };
+        filters?: {
+            search?: string;
+            status?: string;
+            per_page?: string | number;
+        };
     }>().props;
     const { t } = useTranslation();
 
@@ -71,16 +75,21 @@ export default function SchoolIndex() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('sidebar.school', 'Maktablar')} />
 
-            <div className="flex h-full flex-1 flex-col gap-5 p-4 sm:p-6 min-w-0 max-w-full">
+            <div className="flex h-full max-w-full min-w-0 flex-1 flex-col gap-5 p-4 sm:p-6">
                 {/* Header & Filter Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                            <Building2 className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                            <span>{t('schools_title', 'Maktablar Tarmog‘i')}</span>
+                            <Building2 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                            <span>
+                                {t('schools_title', 'Maktablar Tarmog‘i')}
+                            </span>
                         </h1>
-                        <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground">
-                            {t('schools_desc', 'Barcha ta‘lim muassasalari, ularning filiallar limitlari va sozlamalari')}
+                        <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+                            {t(
+                                'schools_desc',
+                                'Barcha ta‘lim muassasalari, ularning filiallar limitlari va sozlamalari',
+                            )}
                         </p>
                     </div>
 
@@ -94,30 +103,49 @@ export default function SchoolIndex() {
                                     handleFilterChange(val, perPage);
                                 }}
                             >
-                                <SelectTrigger className="h-9.5 text-xs rounded-xl">
-                                    <SelectValue placeholder={t('status', 'Holat')} />
+                                <SelectTrigger className="h-9.5 rounded-xl text-xs">
+                                    <SelectValue
+                                        placeholder={t('status', 'Holat')}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t('common.all', 'Barcha holatlar')}</SelectItem>
-                                    <SelectItem value="1">{t('active', 'Faol')}</SelectItem>
-                                    <SelectItem value="0">{t('inactive', 'Nofaol')}</SelectItem>
+                                    <SelectItem value="all">
+                                        {t('common.all', 'Barcha holatlar')}
+                                    </SelectItem>
+                                    <SelectItem value="1">
+                                        {t('active', 'Faol')}
+                                    </SelectItem>
+                                    <SelectItem value="0">
+                                        {t('inactive', 'Nofaol')}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
 
                         {/* Search input */}
-                        <form onSubmit={handleSearch} className="flex items-center gap-2">
+                        <form
+                            onSubmit={handleSearch}
+                            className="flex items-center gap-2"
+                        >
                             <div className="relative min-w-[180px] sm:min-w-[220px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder={t('search_school', 'Maktabni qidirish...')}
-                                    className="pl-9 h-9.5 rounded-xl text-xs sm:text-sm"
+                                    placeholder={t(
+                                        'search_school',
+                                        'Maktabni qidirish...',
+                                    )}
+                                    className="h-9.5 rounded-xl pl-9 text-xs sm:text-sm"
                                 />
                             </div>
 
-                            <Button type="submit" variant="secondary" size="sm" className="h-9.5 rounded-xl px-3 text-xs">
+                            <Button
+                                type="submit"
+                                variant="secondary"
+                                size="sm"
+                                className="h-9.5 rounded-xl px-3 text-xs"
+                            >
                                 {t('search', 'Qidirish')}
                             </Button>
                         </form>
@@ -129,9 +157,9 @@ export default function SchoolIndex() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleReset}
-                                className="h-9.5 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                                className="h-9.5 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                             >
-                                <X className="w-3.5 h-3.5" />
+                                <X className="h-3.5 w-3.5" />
                                 <span>{t('cancel', 'Tozalash')}</span>
                             </Button>
                         )}
@@ -145,7 +173,7 @@ export default function SchoolIndex() {
                                     handleFilterChange(status, val);
                                 }}
                             >
-                                <SelectTrigger className="h-9.5 text-xs rounded-xl">
+                                <SelectTrigger className="h-9.5 rounded-xl text-xs">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -160,8 +188,11 @@ export default function SchoolIndex() {
                 </div>
 
                 {/* Schools Table */}
-                <div className="w-full min-w-0 max-w-full">
-                    <SchoolTable {...school} searchData={{ search, per_page: perPage }} />
+                <div className="w-full max-w-full min-w-0">
+                    <SchoolTable
+                        {...school}
+                        searchData={{ search, per_page: perPage }}
+                    />
                 </div>
             </div>
         </AppLayout>

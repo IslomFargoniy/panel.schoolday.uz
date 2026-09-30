@@ -12,10 +12,12 @@ class BranchObserver
      */
     public function creating(Branch $branch): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
-            Auth::user()->user_schools()
-                ->where('school_id', $branch->school_id)
-                ->firstOrFail();
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
+            if ($branch->school_id && Auth::user()->user_schools()->exists()) {
+                Auth::user()->user_schools()
+                    ->where('school_id', $branch->school_id)
+                    ->firstOrFail();
+            }
         }
     }
 
@@ -24,10 +26,12 @@ class BranchObserver
      */
     public function updating(Branch $branch): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
-            Auth::user()->user_schools()
-                ->where('school_id', $branch->school_id)
-                ->firstOrFail();
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
+            if ($branch->school_id && Auth::user()->user_schools()->exists()) {
+                Auth::user()->user_schools()
+                    ->where('school_id', $branch->school_id)
+                    ->firstOrFail();
+            }
         }
     }
 
@@ -36,10 +40,12 @@ class BranchObserver
      */
     public function deleting(Branch $branch): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
-            Auth::user()->user_schools()
-                ->where('school_id', $branch->school_id)
-                ->firstOrFail();
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
+            if ($branch->school_id && Auth::user()->user_schools()->exists()) {
+                Auth::user()->user_schools()
+                    ->where('school_id', $branch->school_id)
+                    ->firstOrFail();
+            }
         }
     }
 }

@@ -81,7 +81,7 @@ export function ShiftForm({
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="start_time">
                             {t('shifts.start', 'Start Time')}
@@ -139,12 +139,8 @@ export function ShiftForm({
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-border/50">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                    >
+                <div className="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-border/50 pt-4 sm:flex-row sm:items-center">
+                    <Button type="button" variant="outline" onClick={onCancel}>
                         {t('common.cancel', 'Bekor qilish')}
                     </Button>
                     <Button type="submit">

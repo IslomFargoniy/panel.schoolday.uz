@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserSchoolRequest;
 use App\Models\UserSchool;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -14,7 +15,7 @@ class UserSchoolController extends Controller
      */
     public function store(StoreUserSchoolRequest $request)
     {
-        if (!Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             abort(403, 'Unauthorized');
         }
 
@@ -22,7 +23,7 @@ class UserSchoolController extends Controller
             UserSchool::firstOrCreate($request->validated());
 
             return back()->with('success', __('Foydalanuvchi maktabga biriktirildi.'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => [$e->getMessage()],
             ]);
@@ -34,14 +35,15 @@ class UserSchoolController extends Controller
      */
     public function destroy(UserSchool $userSchool)
     {
-        if (!Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             abort(403, 'Unauthorized');
         }
 
         try {
             $userSchool->delete();
+
             return back()->with('success', __('Foydalanuvchi maktabdan ajratildi.'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => [$e->getMessage()],
             ]);

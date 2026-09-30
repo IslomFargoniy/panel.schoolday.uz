@@ -35,22 +35,26 @@ export function NavMain({ items, groups }: NavMainProps) {
                 if (!group.items || group.items.length === 0) return null;
 
                 return (
-                    <SidebarGroup key={group.title || groupIdx} className="px-2 py-0">
+                    <SidebarGroup
+                        key={group.title || groupIdx}
+                        className="px-2 py-0"
+                    >
                         {group.title && (
-                            <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/60 px-2 h-7">
+                            <SidebarGroupLabel className="h-7 px-2 text-[11px] font-semibold tracking-wider text-sidebar-foreground/60 uppercase">
                                 {group.title}
                             </SidebarGroupLabel>
                         )}
                         <SidebarMenu>
                             {group.items.map((item) => {
-                                const active = item.isActive ?? isCurrentUrl(item.href);
+                                const active =
+                                    item.isActive ?? isCurrentUrl(item.href);
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
                                             asChild
                                             isActive={active}
                                             tooltip={{ children: item.title }}
-                                            className="transition-colors font-medium text-[13px] rounded-lg h-9"
+                                            className="h-9 rounded-lg text-[13px] font-medium transition-colors"
                                         >
                                             <Link
                                                 href={item.href}
@@ -60,7 +64,9 @@ export function NavMain({ items, groups }: NavMainProps) {
                                                     }
                                                 }}
                                             >
-                                                {item.icon && <item.icon className="size-4 shrink-0" />}
+                                                {item.icon && (
+                                                    <item.icon className="size-4 shrink-0" />
+                                                )}
                                                 <span>{item.title}</span>
                                             </Link>
                                         </SidebarMenuButton>

@@ -7,7 +7,12 @@ import { Label } from '@/components/ui/label';
 
 interface BranchFormProps {
     editing: any;
-    formData: { school_id?: string | number; name: string; description: string; mac_addresses: string[] };
+    formData: {
+        school_id?: string | number;
+        name: string;
+        description: string;
+        mac_addresses: string[];
+    };
     errors: Record<string, string>;
     setData: (key: string, value: any) => void;
     onSubmit: (e: FormEvent) => void;
@@ -50,24 +55,32 @@ export function BranchForm({
                 {schools.length > 0 && (
                     <div className="space-y-2">
                         <Label htmlFor="school_id">
-                            {t('branches.school', 'Maktab')} <span className="text-rose-500">*</span>
+                            {t('branches.school', 'Maktab')}{' '}
+                            <span className="text-rose-500">*</span>
                         </Label>
                         <select
                             id="school_id"
                             value={formData.school_id || ''}
-                            onChange={(e) => setData('school_id', e.target.value)}
-                            className="h-9.5 w-full rounded-xl border border-input bg-background px-3 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                            onChange={(e) =>
+                                setData('school_id', e.target.value)
+                            }
+                            className="h-9.5 w-full rounded-xl border border-input bg-background px-3 text-xs text-foreground focus:ring-2 focus:ring-indigo-500/20 focus:outline-none sm:text-sm"
                             required
                         >
-                            <option value="">{t('select_school', 'Maktabni tanlang...')}</option>
+                            <option value="">
+                                {t('select_school', 'Maktabni tanlang...')}
+                            </option>
                             {schools.map((s) => (
                                 <option key={s.id} value={s.id}>
-                                    {s.name} ({t('limit', 'limit')}: {s.branch_limit})
+                                    {s.name} ({t('limit', 'limit')}:{' '}
+                                    {s.branch_limit})
                                 </option>
                             ))}
                         </select>
                         {errors.school_id && (
-                            <p className="text-xs text-destructive">{errors.school_id}</p>
+                            <p className="text-xs text-destructive">
+                                {errors.school_id}
+                            </p>
                         )}
                     </div>
                 )}
@@ -168,7 +181,7 @@ export function BranchForm({
                     </div>
                 </div>
 
-                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-3 border-t border-border">
+                <div className="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-border pt-3 sm:flex-row sm:items-center">
                     <Button
                         type="button"
                         variant="outline"
@@ -177,7 +190,10 @@ export function BranchForm({
                     >
                         {t('branches.cancel', 'Cancel')}
                     </Button>
-                    <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
+                    <Button
+                        type="submit"
+                        className="rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
                         {editing
                             ? t('branches.edit', 'Update Branch')
                             : t('branches.save', 'Save Branch')}

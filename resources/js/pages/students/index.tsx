@@ -92,14 +92,19 @@ export default function StudentsPage({
             per_page: '20',
         };
         setFilterData(resetData);
-        router.get('/students', resetData, { preserveState: true, replace: true });
+        router.get('/students', resetData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     // ─── Form & Modals ──────────────────────────────────────────────────────────
     const [editing, setEditing] = useState<Student | null>(null);
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
-    const [formImagePreview, setFormImagePreview] = useState<string | null>(null);
+    const [formImagePreview, setFormImagePreview] = useState<string | null>(
+        null,
+    );
     const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -143,7 +148,9 @@ export default function StudentsPage({
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!formData.class_id) {
-            toast.error(t('students.class_required', 'Sinfni tanlash majburiy!'));
+            toast.error(
+                t('students.class_required', 'Sinfni tanlash majburiy!'),
+            );
             return;
         }
 
@@ -254,7 +261,7 @@ export default function StudentsPage({
                 classes={classes}
             />
 
-            <div className="flex flex-col gap-4 p-4 sm:p-6 w-full min-w-0 max-w-full">
+            <div className="flex w-full max-w-full min-w-0 flex-col gap-4 p-4 sm:p-6">
                 <StudentFilters
                     filterData={filterData}
                     schools={schools}
@@ -283,12 +290,15 @@ export default function StudentsPage({
                     if (!open) handleCancel();
                 }}
             >
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
                             {editing
                                 ? t('students.edit', 'O‘quvchini tahrirlash')
-                                : t('students.add_new', 'Yangi o‘quvchi qo‘shish')}
+                                : t(
+                                      'students.add_new',
+                                      'Yangi o‘quvchi qo‘shish',
+                                  )}
                         </DialogTitle>
                     </DialogHeader>
                     <StudentForm
@@ -311,7 +321,10 @@ export default function StudentsPage({
                 open={deleteStudent !== null}
                 onOpenChange={(open) => !open && setDeleteStudent(null)}
                 onConfirm={handleConfirmDelete}
-                title={t('students.delete_confirm_title', 'O‘quvchini o‘chirish')}
+                title={t(
+                    'students.delete_confirm_title',
+                    'O‘quvchini o‘chirish',
+                )}
                 description={t(
                     'students.delete_confirm',
                     'Ushbu o‘quvchini o‘chirishni tasdiqlaysizmi? Unga tegishli barcha davomat va ruxsat yozuvlari o‘chirilishi mumkin.',

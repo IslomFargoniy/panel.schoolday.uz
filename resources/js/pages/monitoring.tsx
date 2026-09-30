@@ -61,7 +61,10 @@ interface MonitoringProps {
     branches?: { id: number; name: string; school_id?: number }[];
 }
 
-export default function Monitoring({ schools = [], branches = [] }: MonitoringProps) {
+export default function Monitoring({
+    schools = [],
+    branches = [],
+}: MonitoringProps) {
     const { t } = useTranslation();
     const { appearance, updateAppearance } = useAppearance();
     const [data, setData] = useState<MonitoringData | null>(null);
@@ -141,10 +144,15 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
 
     return (
         <>
-            <Head title={`${t('sidebar.monitoring', 'Monitoring')} — SchoolDay`}>
+            <Head
+                title={`${t('sidebar.monitoring', 'Monitoring')} — SchoolDay`}
+            >
                 <meta
                     name="description"
-                    content={t('monitoring.subtitle', 'Real-vaqt davomat monitoring')}
+                    content={t(
+                        'monitoring.subtitle',
+                        'Real-vaqt davomat monitoring',
+                    )}
                 />
             </Head>
 
@@ -202,10 +210,19 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                 </span>
                                 <span>
                                     {isWsConnected
-                                        ? t('monitoring.reverb_live', 'Reverb: Jonli')
+                                        ? t(
+                                              'monitoring.reverb_live',
+                                              'Reverb: Jonli',
+                                          )
                                         : isWsConnecting
-                                          ? t('monitoring.reverb_connecting', 'Reverb: Ulanmoqda...')
-                                          : t('monitoring.offline_polling', 'Oflayn (polling)')}
+                                          ? t(
+                                                'monitoring.reverb_connecting',
+                                                'Reverb: Ulanmoqda...',
+                                            )
+                                          : t(
+                                                'monitoring.offline_polling',
+                                                'Oflayn (polling)',
+                                            )}
                                 </span>
                             </div>
 
@@ -246,23 +263,42 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                     <Select
                                         value={selectedSchool || 'all'}
                                         onValueChange={(val) => {
-                                            const newSchool = val === 'all' ? '' : val;
+                                            const newSchool =
+                                                val === 'all' ? '' : val;
                                             setSelectedSchool(newSchool);
                                             if (newSchool && selectedBranch) {
                                                 const valid = branches.some(
-                                                    (b) => String(b.id) === selectedBranch && String(b.school_id) === newSchool
+                                                    (b) =>
+                                                        String(b.id) ===
+                                                            selectedBranch &&
+                                                        String(b.school_id) ===
+                                                            newSchool,
                                                 );
-                                                if (!valid) setSelectedBranch('');
+                                                if (!valid)
+                                                    setSelectedBranch('');
                                             }
                                         }}
                                     >
-                                        <SelectTrigger className="h-8 rounded-xl text-xs bg-transparent">
-                                            <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                        <SelectTrigger className="h-8 rounded-xl bg-transparent text-xs">
+                                            <SelectValue
+                                                placeholder={t(
+                                                    'select_school',
+                                                    'Barcha maktablar',
+                                                )}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                            <SelectItem value="all">
+                                                {t(
+                                                    'select_school',
+                                                    'Barcha maktablar',
+                                                )}
+                                            </SelectItem>
                                             {schools.map((s) => (
-                                                <SelectItem key={s.id} value={String(s.id)}>
+                                                <SelectItem
+                                                    key={s.id}
+                                                    value={String(s.id)}
+                                                >
                                                     {s.name}
                                                 </SelectItem>
                                             ))}
@@ -275,18 +311,40 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                 <div className="w-full sm:w-48">
                                     <Select
                                         value={selectedBranch || 'all'}
-                                        onValueChange={(val) => setSelectedBranch(val === 'all' ? '' : val)}
+                                        onValueChange={(val) =>
+                                            setSelectedBranch(
+                                                val === 'all' ? '' : val,
+                                            )
+                                        }
                                     >
-                                        <SelectTrigger className="h-8 rounded-xl text-xs bg-transparent">
-                                            <SelectValue placeholder={t('branches.select_branch', 'Barcha filiallar')} />
+                                        <SelectTrigger className="h-8 rounded-xl bg-transparent text-xs">
+                                            <SelectValue
+                                                placeholder={t(
+                                                    'branches.select_branch',
+                                                    'Barcha filiallar',
+                                                )}
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">{t('branches.select_branch', 'Barcha filiallar')}</SelectItem>
+                                            <SelectItem value="all">
+                                                {t(
+                                                    'branches.select_branch',
+                                                    'Barcha filiallar',
+                                                )}
+                                            </SelectItem>
                                             {(selectedSchool
-                                                ? branches.filter((b) => String(b.school_id) === selectedSchool)
+                                                ? branches.filter(
+                                                      (b) =>
+                                                          String(
+                                                              b.school_id,
+                                                          ) === selectedSchool,
+                                                  )
                                                 : branches
                                             ).map((b) => (
-                                                <SelectItem key={b.id} value={String(b.id)}>
+                                                <SelectItem
+                                                    key={b.id}
+                                                    value={String(b.id)}
+                                                >
                                                     {b.name}
                                                 </SelectItem>
                                             ))}
@@ -325,7 +383,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                 {totalStudents}
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                {t('monitoring.total_students', 'Jami o‘quvchilar')}
+                                {t(
+                                    'monitoring.total_students',
+                                    'Jami o‘quvchilar',
+                                )}
                             </p>
                         </div>
 
@@ -369,7 +430,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                 {attendanceRate}%
                             </p>
                             <p className="mt-1 text-xs text-slate-500 sm:text-sm dark:text-slate-400">
-                                {t('monitoring.attendance_rate', 'Davomat foizi')}
+                                {t(
+                                    'monitoring.attendance_rate',
+                                    'Davomat foizi',
+                                )}
                             </p>
                         </div>
                     </div>
@@ -379,7 +443,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                         <div className="flex flex-col items-center justify-center gap-4 py-24">
                             <RefreshCw className="h-8 w-8 animate-spin text-emerald-500" />
                             <p className="text-slate-400">
-                                {t('monitoring.loading', 'Ma‘lumotlar yuklanmoqda...')}
+                                {t(
+                                    'monitoring.loading',
+                                    'Ma‘lumotlar yuklanmoqda...',
+                                )}
                             </p>
                         </div>
                     ) : (
@@ -408,10 +475,17 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                             <div className="ml-auto flex items-center gap-2 text-xs">
                                                 <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-600 dark:text-emerald-400">
                                                     {branch.present_students}{' '}
-                                                    {t('monitoring.present_short', 'kelgan')}
+                                                    {t(
+                                                        'monitoring.present_short',
+                                                        'kelgan',
+                                                    )}
                                                 </span>
                                                 <span className="rounded-full bg-red-500/10 px-2.5 py-1 font-medium text-red-500 dark:text-red-400">
-                                                    {branchAbsent} {t('monitoring.absent_short', 'kelmagan')}
+                                                    {branchAbsent}{' '}
+                                                    {t(
+                                                        'monitoring.absent_short',
+                                                        'kelmagan',
+                                                    )}
                                                 </span>
                                                 <span className="hidden rounded-full bg-blue-500/10 px-2.5 py-1 font-medium text-blue-600 sm:inline dark:text-blue-400">
                                                     {branchRate}%
@@ -422,7 +496,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                         {/* Class Cards Grid */}
                                         {branch.classes.length === 0 ? (
                                             <p className="px-1 text-sm text-slate-400 italic">
-                                                {t('monitoring.no_classes', 'Sinflar topilmadi')}
+                                                {t(
+                                                    'monitoring.no_classes',
+                                                    'Sinflar topilmadi',
+                                                )}
                                             </p>
                                         ) : (
                                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -514,8 +591,14 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                                                                 }`}
                                                                             >
                                                                                 {student.is_present
-                                                                                    ? t('monitoring.status_present', 'Kelgan')
-                                                                                    : t('monitoring.status_absent', 'Kelmagan')}
+                                                                                    ? t(
+                                                                                          'monitoring.status_present',
+                                                                                          'Kelgan',
+                                                                                      )
+                                                                                    : t(
+                                                                                          'monitoring.status_absent',
+                                                                                          'Kelmagan',
+                                                                                      )}
                                                                             </span>
                                                                         </div>
                                                                     ),
@@ -524,7 +607,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
                                                                     .length ===
                                                                     0 && (
                                                                     <p className="px-4 py-3 text-xs text-slate-400 italic">
-                                                                        {t('monitoring.no_students', 'O‘quvchilar topilmadi')}
+                                                                        {t(
+                                                                            'monitoring.no_students',
+                                                                            'O‘quvchilar topilmadi',
+                                                                        )}
                                                                     </p>
                                                                 )}
                                                             </div>
@@ -542,7 +628,10 @@ export default function Monitoring({ schools = [], branches = [] }: MonitoringPr
 
                 {/* Footer */}
                 <footer className="relative z-10 px-4 py-6 text-center text-xs text-slate-400">
-                    {t('monitoring.footer', 'Real-vaqt (WebSocket) rejimida yangilanadi • SchoolDay Monitoring')}
+                    {t(
+                        'monitoring.footer',
+                        'Real-vaqt (WebSocket) rejimida yangilanadi • SchoolDay Monitoring',
+                    )}
                 </footer>
             </div>
         </>

@@ -27,7 +27,11 @@ interface BranchesPageProps {
     };
 }
 
-export default function BranchesPage({ branches, schools = [], filters }: BranchesPageProps) {
+export default function BranchesPage({
+    branches,
+    schools = [],
+    filters,
+}: BranchesPageProps) {
     const { t } = useTranslation();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -49,7 +53,10 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
     const handleResetFilters = () => {
         const resetData = { per_page: '20', school_id: '', search: '' };
         setFilterData(resetData);
-        router.get('/branches', resetData, { preserveState: true, replace: true });
+        router.get('/branches', resetData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     const [editing, setEditing] = useState<Branch | null>(null);
@@ -67,7 +74,9 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
         errors,
         clearErrors,
     } = useForm({
-        school_id: filters?.school_id || (schools.length > 0 ? String(schools[0].id) : ''),
+        school_id:
+            filters?.school_id ||
+            (schools.length > 0 ? String(schools[0].id) : ''),
         name: '',
         description: '',
         mac_addresses: [] as string[],
@@ -104,7 +113,9 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
         setEditing(branch);
         clearErrors();
         setData({
-            school_id: (branch as any).school_id ? String((branch as any).school_id) : '',
+            school_id: (branch as any).school_id
+                ? String((branch as any).school_id)
+                : '',
             name: branch.name,
             description: branch.description || '',
             mac_addresses: branch.mac_address_list || [],
@@ -128,7 +139,7 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('branches.title', 'Branches')} />
-            <div className="p-4 sm:p-6 w-full min-w-0 max-w-full">
+            <div className="w-full max-w-full min-w-0 p-4 sm:p-6">
                 <BranchesTable
                     branches={branches}
                     schools={schools}
@@ -159,7 +170,10 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
                         <DialogTitle className="text-lg font-bold">
                             {editing
                                 ? t('branches.edit', 'Filialni tahrirlash')
-                                : t('branches.add_new', 'Yangi filial qo‘shish')}
+                                : t(
+                                      'branches.add_new',
+                                      'Yangi filial qo‘shish',
+                                  )}
                         </DialogTitle>
                     </DialogHeader>
                     <BranchForm

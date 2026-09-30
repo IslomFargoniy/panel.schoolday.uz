@@ -39,7 +39,14 @@ import { Button } from '@/components/ui/button';
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
-import type { Branch, BreadcrumbItem, PaginatedResponse, SchoolClass, Shift, Student } from '@/types';
+import type {
+    Branch,
+    BreadcrumbItem,
+    PaginatedResponse,
+    SchoolClass,
+    Shift,
+    Student,
+} from '@/types';
 
 interface BranchShowProps {
     branch: Branch;
@@ -62,12 +69,12 @@ export default function BranchShowPage({
     const { t } = useTranslation();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
-    const [selectedShiftId, setSelectedShiftId] = useState<string | number | undefined>(
-        filters?.shift_id || undefined,
-    );
-    const [selectedClassId, setSelectedClassId] = useState<string | number | undefined>(
-        filters?.class_id || undefined,
-    );
+    const [selectedShiftId, setSelectedShiftId] = useState<
+        string | number | undefined
+    >(filters?.shift_id || undefined);
+    const [selectedClassId, setSelectedClassId] = useState<
+        string | number | undefined
+    >(filters?.class_id || undefined);
 
     // Modals state
     const [eventStudent, setEventStudent] = useState<Student | null>(null);
@@ -87,22 +94,35 @@ export default function BranchShowPage({
 
     // Delete dialogs state
     const [deleteShiftItem, setDeleteShiftItem] = useState<Shift | null>(null);
-    const [deleteClassItem, setDeleteClassItem] = useState<SchoolClass | null>(null);
-    const [deleteStudentItem, setDeleteStudentItem] = useState<Student | null>(null);
+    const [deleteClassItem, setDeleteClassItem] = useState<SchoolClass | null>(
+        null,
+    );
+    const [deleteStudentItem, setDeleteStudentItem] = useState<Student | null>(
+        null,
+    );
 
-    const shifts: (Shift & { classes?: (SchoolClass & { students_count?: number })[] })[] =
-        (branch as any).shifts || [];
-    const isupDevicesCount = branch.devices?.filter((d) => d.connection_type === 'isup').length || 0;
-    const onlineDevicesCount = branch.devices?.filter((d) => d.is_online).length || 0;
+    const shifts: (Shift & {
+        classes?: (SchoolClass & { students_count?: number })[];
+    })[] = (branch as any).shifts || [];
+    const isupDevicesCount =
+        branch.devices?.filter((d) => d.connection_type === 'isup').length || 0;
+    const onlineDevicesCount =
+        branch.devices?.filter((d) => d.is_online).length || 0;
 
     // Filter classes by active shift
     const visibleClasses = selectedShiftId
-        ? branchClasses.filter((c) => String(c.shift_id) === String(selectedShiftId))
+        ? branchClasses.filter(
+              (c) => String(c.shift_id) === String(selectedShiftId),
+          )
         : branchClasses;
 
     // Calculate active shift & class objects
-    const activeShift = shifts.find((s) => String(s.id) === String(selectedShiftId));
-    const activeClass = branchClasses.find((c) => String(c.id) === String(selectedClassId));
+    const activeShift = shifts.find(
+        (s) => String(s.id) === String(selectedShiftId),
+    );
+    const activeClass = branchClasses.find(
+        (c) => String(c.id) === String(selectedClassId),
+    );
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.branches', 'Filiallar'), href: '/branches' },
@@ -121,7 +141,11 @@ export default function BranchShowPage({
         });
     }
 
-    const applyFilters = (shiftId?: string | number, classId?: string | number, search?: string) => {
+    const applyFilters = (
+        shiftId?: string | number,
+        classId?: string | number,
+        search?: string,
+    ) => {
         router.get(
             `/branches/${branch.id}`,
             {
@@ -171,7 +195,11 @@ export default function BranchShowPage({
                 }
             },
             onError: (err: any) => {
-                toast.error(err?.error || err?.message || t('delete_failed', 'O‘chirishda xatolik'));
+                toast.error(
+                    err?.error ||
+                        err?.message ||
+                        t('delete_failed', 'O‘chirishda xatolik'),
+                );
             },
         });
     };
@@ -188,7 +216,11 @@ export default function BranchShowPage({
                 }
             },
             onError: (err: any) => {
-                toast.error(err?.error || err?.message || t('delete_failed', 'O‘chirishda xatolik'));
+                toast.error(
+                    err?.error ||
+                        err?.message ||
+                        t('delete_failed', 'O‘chirishda xatolik'),
+                );
             },
         });
     };
@@ -202,64 +234,87 @@ export default function BranchShowPage({
                 setDeleteStudentItem(null);
             },
             onError: (err: any) => {
-                toast.error(err?.error || err?.message || t('delete_failed', 'O‘chirishda xatolik'));
+                toast.error(
+                    err?.error ||
+                        err?.message ||
+                        t('delete_failed', 'O‘chirishda xatolik'),
+                );
             },
         });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${branch.name} — ${t('sidebar.branches', 'Filial')}`} />
+            <Head
+                title={`${branch.name} — ${t('sidebar.branches', 'Filial')}`}
+            />
 
-            <div className="flex flex-1 flex-col gap-5 p-4 sm:p-6 min-w-0 max-w-full">
+            <div className="flex max-w-full min-w-0 flex-1 flex-col gap-5 p-4 sm:p-6">
                 {/* 1. Header Banner */}
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs">
-                    <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex min-w-0 items-start gap-3.5 sm:items-center">
                         <Link
                             href="/branches"
-                            className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"
-                            title={t('back_to_branches', 'Filiallar ro‘yxatiga qaytish')}
+                            className="shrink-0 rounded-xl bg-muted/60 p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            title={t(
+                                'back_to_branches',
+                                'Filiallar ro‘yxatiga qaytish',
+                            )}
                         >
-                            <ArrowLeft className="w-5 h-5" />
+                            <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
+                                <h1 className="truncate text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                                     {branch.name}
                                 </h1>
                                 {(branch as any).school && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
-                                        <Building2 className="w-3.5 h-3.5" />
-                                        <span>{(branch as any).school.name}</span>
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300">
+                                        <Building2 className="h-3.5 w-3.5" />
+                                        <span>
+                                            {(branch as any).school.name}
+                                        </span>
                                     </span>
                                 )}
                             </div>
                             {branch.description && (
-                                <p className="mt-1 text-xs text-muted-foreground truncate max-w-xl">
+                                <p className="mt-1 max-w-xl truncate text-xs text-muted-foreground">
                                     {branch.description}
                                 </p>
                             )}
 
                             {/* Summary Badges */}
-                            <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground">
+                            <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-border/50 pt-2 text-xs text-muted-foreground">
                                 <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                                    <Clock className="w-3.5 h-3.5 text-amber-500" />
-                                    <span>{shifts.length} {t('sidebar.shifts', 'smena')}</span>
+                                    <Clock className="h-3.5 w-3.5 text-amber-500" />
+                                    <span>
+                                        {shifts.length}{' '}
+                                        {t('sidebar.shifts', 'smena')}
+                                    </span>
                                 </span>
                                 <span>•</span>
                                 <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                                    <GraduationCap className="w-3.5 h-3.5 text-sky-500" />
-                                    <span>{branchClasses.length} {t('sidebar.classes', 'sinf')}</span>
+                                    <GraduationCap className="h-3.5 w-3.5 text-sky-500" />
+                                    <span>
+                                        {branchClasses.length}{' '}
+                                        {t('sidebar.classes', 'sinf')}
+                                    </span>
                                 </span>
                                 <span>•</span>
                                 <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                                    <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                    <span>{students.total || 0} {t('sidebar.students', 'o‘quvchi')}</span>
+                                    <Users className="h-3.5 w-3.5 text-emerald-500" />
+                                    <span>
+                                        {students.total || 0}{' '}
+                                        {t('sidebar.students', 'o‘quvchi')}
+                                    </span>
                                 </span>
                                 <span>•</span>
                                 <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                                    <ScanFace className="w-3.5 h-3.5 text-indigo-500" />
-                                    <span>{branch.devices?.length || 0} {t('connected_devices', 'qurilma')}</span>
+                                    <ScanFace className="h-3.5 w-3.5 text-indigo-500" />
+                                    <span>
+                                        {branch.devices?.length || 0}{' '}
+                                        {t('connected_devices', 'qurilma')}
+                                    </span>
                                     <span className="text-[11px] font-normal text-muted-foreground">
                                         ({onlineDevicesCount} online)
                                     </span>
@@ -278,23 +333,25 @@ export default function BranchShowPage({
 
                 {/* 2. Hierarchical Drill-down Breadcrumb Navigation Strip */}
                 {(selectedShiftId || selectedClassId) && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl border border-indigo-200/80 bg-indigo-50/50 dark:border-indigo-900/60 dark:bg-indigo-950/20 text-xs">
-                        <div className="flex items-center gap-2 text-foreground font-medium flex-wrap">
-                            <span className="text-muted-foreground">{t('hierarchy', 'Ierarxiya')}:</span>
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200/80 bg-indigo-50/50 px-4 py-3 text-xs dark:border-indigo-900/60 dark:bg-indigo-950/20">
+                        <div className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                            <span className="text-muted-foreground">
+                                {t('hierarchy', 'Ierarxiya')}:
+                            </span>
                             <button
                                 type="button"
                                 onClick={() => {
                                     handleShiftSelect(undefined);
                                 }}
-                                className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                                className="flex items-center gap-1 font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
                             >
-                                <Building className="w-3.5 h-3.5" />
+                                <Building className="h-3.5 w-3.5" />
                                 <span>{branch.name}</span>
                             </button>
 
                             {activeShift && (
                                 <>
-                                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
+                                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -302,11 +359,11 @@ export default function BranchShowPage({
                                         }}
                                         className={
                                             selectedClassId
-                                                ? 'font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1'
-                                                : 'font-bold text-foreground flex items-center gap-1'
+                                                ? 'flex items-center gap-1 font-semibold text-indigo-600 hover:underline dark:text-indigo-400'
+                                                : 'flex items-center gap-1 font-bold text-foreground'
                                         }
                                     >
-                                        <Clock className="w-3.5 h-3.5 text-amber-500" />
+                                        <Clock className="h-3.5 w-3.5 text-amber-500" />
                                         <span>{activeShift.name}</span>
                                     </button>
                                 </>
@@ -314,9 +371,9 @@ export default function BranchShowPage({
 
                             {activeClass && (
                                 <>
-                                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
-                                    <span className="font-bold text-foreground flex items-center gap-1">
-                                        <GraduationCap className="w-3.5 h-3.5 text-sky-500" />
+                                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
+                                    <span className="flex items-center gap-1 font-bold text-foreground">
+                                        <GraduationCap className="h-3.5 w-3.5 text-sky-500" />
                                         <span>{activeClass.name} sinfi</span>
                                     </span>
                                 </>
@@ -329,44 +386,56 @@ export default function BranchShowPage({
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleClassSelect(undefined)}
-                                className="h-7 text-xs gap-1.5 rounded-lg border-indigo-200 dark:border-indigo-800"
+                                className="h-7 gap-1.5 rounded-lg border-indigo-200 text-xs dark:border-indigo-800"
                             >
-                                <ArrowLeft className="w-3.5 h-3.5" />
-                                <span>{t('back_to_classes', 'Sinflarga qaytish')}</span>
+                                <ArrowLeft className="h-3.5 w-3.5" />
+                                <span>
+                                    {t('back_to_classes', 'Sinflarga qaytish')}
+                                </span>
                             </Button>
                         ) : selectedShiftId ? (
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleShiftSelect(undefined)}
-                                className="h-7 text-xs gap-1.5 rounded-lg border-indigo-200 dark:border-indigo-800"
+                                className="h-7 gap-1.5 rounded-lg border-indigo-200 text-xs dark:border-indigo-800"
                             >
-                                <ArrowLeft className="w-3.5 h-3.5" />
-                                <span>{t('back_to_shifts', 'Barcha smenalarga qaytish')}</span>
+                                <ArrowLeft className="h-3.5 w-3.5" />
+                                <span>
+                                    {t(
+                                        'back_to_shifts',
+                                        'Barcha smenalarga qaytish',
+                                    )}
+                                </span>
                             </Button>
                         ) : null}
                     </div>
                 )}
 
                 {/* 3. Main Split Layout: Left 70% (Shifts / Classes / Students) | Right 30% (Devices) */}
-                <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 items-start">
+                <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-10">
                     {/* LEFT COLUMN: 70% */}
-                    <div className="lg:col-span-7 space-y-4">
+                    <div className="space-y-4 lg:col-span-7">
                         {/* ========================================================= */}
                         {/* LEVEL 1: SMENALAR RO'YXATI (Default when !selectedShiftId) */}
                         {/* ========================================================= */}
                         {!selectedShiftId && (
-                            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-border">
+                            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-5">
+                                <div className="mb-4 flex flex-col justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-center">
                                     <div>
-                                        <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-amber-500" />
-                                            <span>{t('branch_shifts_title', 'Filial Smenalari')}</span>
+                                        <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
+                                            <Clock className="h-4 w-4 text-amber-500" />
+                                            <span>
+                                                {t(
+                                                    'branch_shifts_title',
+                                                    'Filial Smenalari',
+                                                )}
+                                            </span>
                                             <span className="text-xs font-normal text-muted-foreground">
                                                 ({shifts.length} ta)
                                             </span>
                                         </h3>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
                                             {t(
                                                 'shifts_desc',
                                                 'Smena tanlang va unga biriktirilgan sinflar hamda o‘quvchilar ro‘yxatiga kiring.',
@@ -380,9 +449,9 @@ export default function BranchShowPage({
                                             setShiftToEdit(null);
                                             setIsShiftModalOpen(true);
                                         }}
-                                        className="h-8 gap-1.5 rounded-xl text-xs font-medium shrink-0"
+                                        className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                     >
-                                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                                        <Plus className="h-3.5 w-3.5 shrink-0" />
                                         <span>Create</span>
                                     </Button>
                                 </div>
@@ -393,7 +462,10 @@ export default function BranchShowPage({
                                             <Clock className="h-6 w-6" />
                                         </div>
                                         <h4 className="mb-1 text-sm font-semibold text-foreground">
-                                            {t('no_shifts_title', 'Hozircha smenalar mavjud emas')}
+                                            {t(
+                                                'no_shifts_title',
+                                                'Hozircha smenalar mavjud emas',
+                                            )}
                                         </h4>
                                         <p className="mx-auto mb-4 max-w-sm text-xs text-muted-foreground">
                                             {t(
@@ -409,16 +481,18 @@ export default function BranchShowPage({
                                             }}
                                             className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                                         >
-                                            <Plus className="w-3.5 h-3.5" />
+                                            <Plus className="h-3.5 w-3.5" />
                                             <span>Create</span>
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         {shifts.map((shift) => {
                                             const totalStudentsInShift =
                                                 shift.classes?.reduce(
-                                                    (acc, c) => acc + (c.students_count || 0),
+                                                    (acc, c) =>
+                                                        acc +
+                                                        (c.students_count || 0),
                                                     0,
                                                 ) || 0;
 
@@ -429,16 +503,23 @@ export default function BranchShowPage({
                                                 >
                                                     <div>
                                                         {/* Header: Name, Time, Actions */}
-                                                        <div className="flex items-start justify-between gap-2 mb-3">
+                                                        <div className="mb-3 flex items-start justify-between gap-2">
                                                             <div>
-                                                                <h4 className="text-sm font-bold text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                                <h4 className="text-sm font-bold text-foreground transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                                                                     {shift.name}
                                                                 </h4>
-                                                                <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 font-mono text-[11px] font-semibold">
-                                                                    <Clock className="w-3 h-3" />
+                                                                <div className="mt-1 inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-300">
+                                                                    <Clock className="h-3 w-3" />
                                                                     <span>
-                                                                        {shift.start_time?.substring(0, 5)} -{' '}
-                                                                        {shift.end_time?.substring(0, 5)}
+                                                                        {shift.start_time?.substring(
+                                                                            0,
+                                                                            5,
+                                                                        )}{' '}
+                                                                        -{' '}
+                                                                        {shift.end_time?.substring(
+                                                                            0,
+                                                                            5,
+                                                                        )}
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -447,57 +528,89 @@ export default function BranchShowPage({
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    onClick={(e) => {
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
                                                                         e.stopPropagation();
-                                                                        setShiftToEdit(shift);
-                                                                        setIsShiftModalOpen(true);
+                                                                        setShiftToEdit(
+                                                                            shift,
+                                                                        );
+                                                                        setIsShiftModalOpen(
+                                                                            true,
+                                                                        );
                                                                     }}
                                                                     className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                                                                    title={t('edit', 'Tahrirlash')}
+                                                                    title={t(
+                                                                        'edit',
+                                                                        'Tahrirlash',
+                                                                    )}
                                                                 >
-                                                                    <Pencil className="w-3.5 h-3.5" />
+                                                                    <Pencil className="h-3.5 w-3.5" />
                                                                 </Button>
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    onClick={(e) => {
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
                                                                         e.stopPropagation();
-                                                                        setDeleteShiftItem(shift);
+                                                                        setDeleteShiftItem(
+                                                                            shift,
+                                                                        );
                                                                     }}
                                                                     className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                                                                    title={t('delete', 'O‘chirish')}
+                                                                    title={t(
+                                                                        'delete',
+                                                                        'O‘chirish',
+                                                                    )}
                                                                 >
-                                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                                    <Trash2 className="h-3.5 w-3.5" />
                                                                 </Button>
                                                             </div>
                                                         </div>
 
                                                         {/* Stats: Classes & Students */}
-                                                        <div className="grid grid-cols-2 gap-2 my-3 p-2.5 rounded-lg bg-muted/40 text-xs">
+                                                        <div className="my-3 grid grid-cols-2 gap-2 rounded-lg bg-muted/40 p-2.5 text-xs">
                                                             <div className="flex items-center gap-1.5 text-muted-foreground">
-                                                                <GraduationCap className="w-3.5 h-3.5 text-sky-500" />
+                                                                <GraduationCap className="h-3.5 w-3.5 text-sky-500" />
                                                                 <span className="font-semibold text-foreground">
-                                                                    {shift.classes_count || 0}
+                                                                    {shift.classes_count ||
+                                                                        0}
                                                                 </span>
-                                                                <span>sinf</span>
+                                                                <span>
+                                                                    sinf
+                                                                </span>
                                                             </div>
                                                             <div className="flex items-center gap-1.5 text-muted-foreground">
-                                                                <Users className="w-3.5 h-3.5 text-emerald-500" />
+                                                                <Users className="h-3.5 w-3.5 text-emerald-500" />
                                                                 <span className="font-semibold text-foreground">
-                                                                    {totalStudentsInShift}
+                                                                    {
+                                                                        totalStudentsInShift
+                                                                    }
                                                                 </span>
-                                                                <span>o‘quvchi</span>
+                                                                <span>
+                                                                    o‘quvchi
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Drill-in Button */}
                                                     <Button
-                                                        onClick={() => handleShiftSelect(shift.id)}
-                                                        className="w-full mt-2 h-8 text-xs font-medium gap-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300"
+                                                        onClick={() =>
+                                                            handleShiftSelect(
+                                                                shift.id,
+                                                            )
+                                                        }
+                                                        className="mt-2 h-8 w-full gap-1.5 rounded-lg bg-indigo-50 text-xs font-medium text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-900/60"
                                                     >
-                                                        <span>{t('view_classes_in_shift', 'Sinflarni ko‘rish')}</span>
-                                                        <ChevronRight className="w-3.5 h-3.5" />
+                                                        <span>
+                                                            {t(
+                                                                'view_classes_in_shift',
+                                                                'Sinflarni ko‘rish',
+                                                            )}
+                                                        </span>
+                                                        <ChevronRight className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </div>
                                             );
@@ -511,17 +624,24 @@ export default function BranchShowPage({
                         {/* LEVEL 2: SINFLAR RO'YXATI (When selectedShiftId && !selectedClassId)      */}
                         {/* ========================================================================= */}
                         {selectedShiftId && !selectedClassId && (
-                            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-border">
+                            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-5">
+                                <div className="mb-4 flex flex-col justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-center">
                                     <div>
-                                        <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                                            <GraduationCap className="w-4 h-4 text-sky-500" />
-                                            <span>{activeShift?.name} — {t('classes_list', 'Sinflar ro‘yxati')}</span>
+                                        <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
+                                            <GraduationCap className="h-4 w-4 text-sky-500" />
+                                            <span>
+                                                {activeShift?.name} —{' '}
+                                                {t(
+                                                    'classes_list',
+                                                    'Sinflar ro‘yxati',
+                                                )}
+                                            </span>
                                             <span className="text-xs font-normal text-muted-foreground">
-                                                ({visibleClasses.length} ta sinf)
+                                                ({visibleClasses.length} ta
+                                                sinf)
                                             </span>
                                         </h3>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
                                             {t(
                                                 'select_class_to_view_students',
                                                 'O‘quvchilarni ko‘rish va Hikvision amallarini bajarish uchun sinf ustiga bosing.',
@@ -535,9 +655,9 @@ export default function BranchShowPage({
                                             setClassToEdit(null);
                                             setIsClassModalOpen(true);
                                         }}
-                                        className="h-8 gap-1.5 rounded-xl text-xs font-medium shrink-0"
+                                        className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                     >
-                                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                                        <Plus className="h-3.5 w-3.5 shrink-0" />
                                         <span>Create</span>
                                     </Button>
                                 </div>
@@ -548,7 +668,10 @@ export default function BranchShowPage({
                                             <GraduationCap className="h-6 w-6" />
                                         </div>
                                         <h4 className="mb-1 text-sm font-semibold text-foreground">
-                                            {t('no_classes_in_shift', 'Ushbu smenada hali sinflar mavjud emas')}
+                                            {t(
+                                                'no_classes_in_shift',
+                                                'Ushbu smenada hali sinflar mavjud emas',
+                                            )}
                                         </h4>
                                         <p className="mx-auto mb-4 max-w-sm text-xs text-muted-foreground">
                                             {t(
@@ -564,29 +687,35 @@ export default function BranchShowPage({
                                             }}
                                             className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                                         >
-                                            <Plus className="w-3.5 h-3.5" />
+                                            <Plus className="h-3.5 w-3.5" />
                                             <span>Create</span>
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
+                                    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
                                         {visibleClasses.map((item) => (
                                             <div
                                                 key={item.id}
                                                 className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-3.5 transition-all duration-200 hover:border-sky-400 hover:shadow-md dark:hover:border-sky-600"
                                             >
                                                 <div>
-                                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                                    <div className="mb-2 flex items-start justify-between gap-2">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400 font-bold text-xs">
-                                                                {item.name.substring(0, 3)}
+                                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-xs font-bold text-sky-600 dark:bg-sky-950/60 dark:text-sky-400">
+                                                                {item.name.substring(
+                                                                    0,
+                                                                    3,
+                                                                )}
                                                             </div>
                                                             <div>
-                                                                <h4 className="text-sm font-bold text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                                                                    {item.name} sinfi
+                                                                <h4 className="text-sm font-bold text-foreground transition-colors group-hover:text-sky-600 dark:group-hover:text-sky-400">
+                                                                    {item.name}{' '}
+                                                                    sinfi
                                                                 </h4>
                                                                 <span className="text-[11px] text-muted-foreground">
-                                                                    {activeShift?.name}
+                                                                    {
+                                                                        activeShift?.name
+                                                                    }
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -595,46 +724,72 @@ export default function BranchShowPage({
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={(e) => {
+                                                                onClick={(
+                                                                    e,
+                                                                ) => {
                                                                     e.stopPropagation();
-                                                                    setClassToEdit(item);
-                                                                    setIsClassModalOpen(true);
+                                                                    setClassToEdit(
+                                                                        item,
+                                                                    );
+                                                                    setIsClassModalOpen(
+                                                                        true,
+                                                                    );
                                                                 }}
                                                                 className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                                                                title={t('edit', 'Tahrirlash')}
+                                                                title={t(
+                                                                    'edit',
+                                                                    'Tahrirlash',
+                                                                )}
                                                             >
-                                                                <Pencil className="w-3.5 h-3.5" />
+                                                                <Pencil className="h-3.5 w-3.5" />
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={(e) => {
+                                                                onClick={(
+                                                                    e,
+                                                                ) => {
                                                                     e.stopPropagation();
-                                                                    setDeleteClassItem(item);
+                                                                    setDeleteClassItem(
+                                                                        item,
+                                                                    );
                                                                 }}
                                                                 className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                                                                title={t('delete', 'O‘chirish')}
+                                                                title={t(
+                                                                    'delete',
+                                                                    'O‘chirish',
+                                                                )}
                                                             >
-                                                                <Trash2 className="w-3.5 h-3.5" />
+                                                                <Trash2 className="h-3.5 w-3.5" />
                                                             </Button>
                                                         </div>
                                                     </div>
 
-                                                    <div className="space-y-1.5 my-2.5 p-2 rounded-lg bg-muted/40 text-xs">
+                                                    <div className="my-2.5 space-y-1.5 rounded-lg bg-muted/40 p-2 text-xs">
                                                         <div className="flex items-center justify-between text-muted-foreground">
-                                                            <span>O‘quvchilar:</span>
+                                                            <span>
+                                                                O‘quvchilar:
+                                                            </span>
                                                             <span className="font-semibold text-foreground">
-                                                                {(item as any).students_count || 0} ta
+                                                                {(item as any)
+                                                                    .students_count ||
+                                                                    0}{' '}
+                                                                ta
                                                             </span>
                                                         </div>
                                                         {item.telegram_group_id && (
                                                             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                                                                 <span className="flex items-center gap-1">
-                                                                    <Send className="w-3 h-3 text-sky-500" />
-                                                                    <span>TG guruh:</span>
+                                                                    <Send className="h-3 w-3 text-sky-500" />
+                                                                    <span>
+                                                                        TG
+                                                                        guruh:
+                                                                    </span>
                                                                 </span>
-                                                                <span className="font-mono text-foreground truncate max-w-[100px]">
-                                                                    {item.telegram_group_id}
+                                                                <span className="max-w-[100px] truncate font-mono text-foreground">
+                                                                    {
+                                                                        item.telegram_group_id
+                                                                    }
                                                                 </span>
                                                             </div>
                                                         )}
@@ -642,11 +797,20 @@ export default function BranchShowPage({
                                                 </div>
 
                                                 <Button
-                                                    onClick={() => handleClassSelect(item.id)}
-                                                    className="w-full mt-1 h-7.5 text-xs font-medium gap-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 dark:text-sky-300"
+                                                    onClick={() =>
+                                                        handleClassSelect(
+                                                            item.id,
+                                                        )
+                                                    }
+                                                    className="mt-1 h-7.5 w-full gap-1 rounded-lg bg-sky-50 text-xs font-medium text-sky-700 hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 dark:hover:bg-sky-900/60"
                                                 >
-                                                    <span>{t('view_students', 'O‘quvchilarni ko‘rish')}</span>
-                                                    <ChevronRight className="w-3.5 h-3.5" />
+                                                    <span>
+                                                        {t(
+                                                            'view_students',
+                                                            'O‘quvchilarni ko‘rish',
+                                                        )}
+                                                    </span>
+                                                    <ChevronRight className="h-3.5 w-3.5" />
                                                 </Button>
                                             </div>
                                         ))}
@@ -659,20 +823,24 @@ export default function BranchShowPage({
                         {/* LEVEL 3: O'QUVCHILAR RO'YXATI (When selectedClassId is set)               */}
                         {/* ========================================================================= */}
                         {selectedClassId && (
-                            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs">
+                            <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-5">
                                 {/* Header */}
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-border">
+                                <div className="mb-4 flex flex-col justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-center">
                                     <div>
-                                        <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                                            <Users className="w-4 h-4 text-emerald-500" />
+                                        <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
+                                            <Users className="h-4 w-4 text-emerald-500" />
                                             <span>
-                                                {activeClass?.name} sinfi — {t('students_list', 'O‘quvchilar')}
+                                                {activeClass?.name} sinfi —{' '}
+                                                {t(
+                                                    'students_list',
+                                                    'O‘quvchilar',
+                                                )}
                                             </span>
                                             <span className="text-xs font-normal text-muted-foreground">
                                                 ({students.total || 0} ta)
                                             </span>
                                         </h3>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
                                             {t(
                                                 'class_students_desc',
                                                 'O‘quvchilarni boshqarish, yuz rasmlarini yuklash va Hikvision qurilmalariga sinxronlash.',
@@ -681,13 +849,23 @@ export default function BranchShowPage({
                                     </div>
 
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <form onSubmit={handleSearch} className="relative w-full sm:w-56">
-                                            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                        <form
+                                            onSubmit={handleSearch}
+                                            className="relative w-full sm:w-56"
+                                        >
+                                            <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                                             <Input
                                                 value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                                placeholder={t('search_student', 'Qidirish...')}
-                                                className="h-8 pl-8 text-xs rounded-xl"
+                                                onChange={(e) =>
+                                                    setSearchTerm(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder={t(
+                                                    'search_student',
+                                                    'Qidirish...',
+                                                )}
+                                                className="h-8 rounded-xl pl-8 text-xs"
                                             />
                                         </form>
 
@@ -697,167 +875,227 @@ export default function BranchShowPage({
                                                 setStudentToEdit(null);
                                                 setIsStudentModalOpen(true);
                                             }}
-                                            className="h-8 gap-1.5 rounded-xl text-xs font-medium shrink-0"
+                                            className="h-8 shrink-0 gap-1.5 rounded-xl text-xs font-medium"
                                         >
-                                            <Plus className="w-3.5 h-3.5 shrink-0" />
+                                            <Plus className="h-3.5 w-3.5 shrink-0" />
                                             <span>Create</span>
                                         </Button>
                                     </div>
                                 </div>
 
                                 {/* Table */}
-                                <div className="overflow-x-auto min-w-0 max-w-full rounded-xl border border-border">
+                                <div className="max-w-full min-w-0 overflow-x-auto rounded-xl border border-border">
                                     <table className="w-full min-w-[560px] text-left text-xs">
-                                        <thead className="border-b bg-muted/50 text-[11px] text-muted-foreground uppercase font-semibold">
+                                        <thead className="border-b bg-muted/50 text-[11px] font-semibold text-muted-foreground uppercase">
                                             <tr>
                                                 <th className="px-3 py-3">#</th>
-                                                <th className="px-3 py-3">{t('student', 'O‘quvchi')}</th>
-                                                <th className="px-3 py-3">{t('hikvision_id', 'Hikvision ID')}</th>
-                                                <th className="px-3 py-3">{t('status', 'Status')}</th>
-                                                <th className="px-3 py-3 text-right">{t('actions', 'Amallar')}</th>
+                                                <th className="px-3 py-3">
+                                                    {t('student', 'O‘quvchi')}
+                                                </th>
+                                                <th className="px-3 py-3">
+                                                    {t(
+                                                        'hikvision_id',
+                                                        'Hikvision ID',
+                                                    )}
+                                                </th>
+                                                <th className="px-3 py-3">
+                                                    {t('status', 'Status')}
+                                                </th>
+                                                <th className="px-3 py-3 text-right">
+                                                    {t('actions', 'Amallar')}
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-border">
                                             {students.data.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={5} className="py-8 text-center text-muted-foreground">
-                                                        {t('no_students_found', 'Bu sinfda o‘quvchilar topilmadi')}
+                                                    <td
+                                                        colSpan={5}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        {t(
+                                                            'no_students_found',
+                                                            'Bu sinfda o‘quvchilar topilmadi',
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                students.data.map((student, idx) => (
-                                                    <tr
-                                                        key={student.id}
-                                                        className="hover:bg-muted/30 transition-colors"
-                                                    >
-                                                        <td className="px-3 py-2.5 text-muted-foreground font-mono">
-                                                            {idx + 1}
-                                                        </td>
-                                                        <td className="px-3 py-2.5">
-                                                            <div className="flex items-center gap-2.5">
-                                                                {student.face_image ? (
-                                                                    <img
-                                                                        src={`/storage/${student.face_image}`}
-                                                                        alt={student.name}
-                                                                        onClick={() =>
-                                                                            setPreviewImage(
-                                                                                `/storage/${student.face_image}`,
-                                                                            )
-                                                                        }
-                                                                        className="w-8 h-8 rounded-full object-cover border border-border cursor-pointer hover:opacity-80 shrink-0"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-[11px] shrink-0">
-                                                                        {student.name.charAt(0)}
-                                                                    </div>
-                                                                )}
-                                                                <div>
-                                                                    <div className="font-semibold text-foreground">
-                                                                        {student.name}
-                                                                    </div>
-                                                                    {student.phone && (
-                                                                        <div className="text-[11px] text-muted-foreground font-mono">
-                                                                            {student.phone}
+                                                students.data.map(
+                                                    (student, idx) => (
+                                                        <tr
+                                                            key={student.id}
+                                                            className="transition-colors hover:bg-muted/30"
+                                                        >
+                                                            <td className="px-3 py-2.5 font-mono text-muted-foreground">
+                                                                {idx + 1}
+                                                            </td>
+                                                            <td className="px-3 py-2.5">
+                                                                <div className="flex items-center gap-2.5">
+                                                                    {student.face_image ? (
+                                                                        <img
+                                                                            src={`/storage/${student.face_image}`}
+                                                                            alt={
+                                                                                student.name
+                                                                            }
+                                                                            onClick={() =>
+                                                                                setPreviewImage(
+                                                                                    `/storage/${student.face_image}`,
+                                                                                )
+                                                                            }
+                                                                            className="h-8 w-8 shrink-0 cursor-pointer rounded-full border border-border object-cover hover:opacity-80"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-bold text-muted-foreground">
+                                                                            {student.name.charAt(
+                                                                                0,
+                                                                            )}
                                                                         </div>
                                                                     )}
+                                                                    <div>
+                                                                        <div className="font-semibold text-foreground">
+                                                                            {
+                                                                                student.name
+                                                                            }
+                                                                        </div>
+                                                                        {student.phone && (
+                                                                            <div className="font-mono text-[11px] text-muted-foreground">
+                                                                                {
+                                                                                    student.phone
+                                                                                }
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-3 py-2.5 font-mono">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="font-medium text-foreground">
-                                                                    {student.employeeNoString || student.id}
+                                                            </td>
+                                                            <td className="px-3 py-2.5 font-mono">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="font-medium text-foreground">
+                                                                        {student.employeeNoString ||
+                                                                            student.id}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            copyToClipboard(
+                                                                                student.employeeNoString ||
+                                                                                    String(
+                                                                                        student.id,
+                                                                                    ),
+                                                                                String(
+                                                                                    student.id,
+                                                                                ),
+                                                                            )
+                                                                        }
+                                                                        className="rounded p-1 text-muted-foreground hover:text-foreground"
+                                                                        title="Nusxalash"
+                                                                    >
+                                                                        {copiedId ===
+                                                                        String(
+                                                                            student.id,
+                                                                        ) ? (
+                                                                            <Check className="h-3 w-3 text-emerald-500" />
+                                                                        ) : (
+                                                                            <Copy className="h-3 w-3" />
+                                                                        )}
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-3 py-2.5">
+                                                                <span
+                                                                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                                                        student.status ===
+                                                                        'active'
+                                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                                                            : 'bg-muted text-muted-foreground'
+                                                                    }`}
+                                                                >
+                                                                    {student.status ===
+                                                                    'active'
+                                                                        ? 'Faol'
+                                                                        : 'Nofaol'}
                                                                 </span>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        copyToClipboard(
-                                                                            student.employeeNoString ||
-                                                                                String(student.id),
-                                                                            String(student.id),
-                                                                        )
-                                                                    }
-                                                                    className="p-1 text-muted-foreground hover:text-foreground rounded"
-                                                                    title="Nusxalash"
-                                                                >
-                                                                    {copiedId === String(student.id) ? (
-                                                                        <Check className="w-3 h-3 text-emerald-500" />
-                                                                    ) : (
-                                                                        <Copy className="w-3 h-3" />
-                                                                    )}
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-3 py-2.5">
-                                                            <span
-                                                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                                                    student.status === 'active'
-                                                                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
-                                                                        : 'bg-muted text-muted-foreground'
-                                                                }`}
-                                                            >
-                                                                {student.status === 'active' ? 'Faol' : 'Nofaol'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-3 py-2.5 text-right">
-                                                            <div className="flex items-center justify-end gap-1">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => {
-                                                                        setEventStudent(student);
-                                                                        setIsEventModalOpen(true);
-                                                                    }}
-                                                                    className="h-7 w-7 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
-                                                                    title={t(
-                                                                        'hikvision_events',
-                                                                        'Hikvision hodisalari va sinxronlash',
-                                                                    )}
-                                                                >
-                                                                    <CalendarCheck className="w-3.5 h-3.5" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => {
-                                                                        setStudentToEdit(student);
-                                                                        setIsStudentModalOpen(true);
-                                                                    }}
-                                                                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                                                                    title={t('edit', 'Tahrirlash')}
-                                                                >
-                                                                    <Pencil className="w-3.5 h-3.5" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => setDeleteStudentItem(student)}
-                                                                    className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                                                                    title={t('delete', 'O‘chirish')}
-                                                                >
-                                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                                </Button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                            </td>
+                                                            <td className="px-3 py-2.5 text-right">
+                                                                <div className="flex items-center justify-end gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => {
+                                                                            setEventStudent(
+                                                                                student,
+                                                                            );
+                                                                            setIsEventModalOpen(
+                                                                                true,
+                                                                            );
+                                                                        }}
+                                                                        className="h-7 w-7 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-indigo-950/50"
+                                                                        title={t(
+                                                                            'hikvision_events',
+                                                                            'Hikvision hodisalari va sinxronlash',
+                                                                        )}
+                                                                    >
+                                                                        <CalendarCheck className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => {
+                                                                            setStudentToEdit(
+                                                                                student,
+                                                                            );
+                                                                            setIsStudentModalOpen(
+                                                                                true,
+                                                                            );
+                                                                        }}
+                                                                        className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                                                        title={t(
+                                                                            'edit',
+                                                                            'Tahrirlash',
+                                                                        )}
+                                                                    >
+                                                                        <Pencil className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() =>
+                                                                            setDeleteStudentItem(
+                                                                                student,
+                                                                            )
+                                                                        }
+                                                                        className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                                                        title={t(
+                                                                            'delete',
+                                                                            'O‘chirish',
+                                                                        )}
+                                                                    >
+                                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
 
                                 {/* Pagination */}
-                                {students.links && students.links.length > 3 && (
-                                    <div className="p-3 border-t border-border mt-3">
-                                        <Pagination links={students.links} />
-                                    </div>
-                                )}
+                                {students.links &&
+                                    students.links.length > 3 && (
+                                        <div className="mt-3 border-t border-border p-3">
+                                            <Pagination
+                                                links={students.links}
+                                            />
+                                        </div>
+                                    )}
                             </div>
                         )}
                     </div>
 
                     {/* RIGHT COLUMN: 30% — QURILMALAR */}
-                    <div className="lg:col-span-3 space-y-4">
+                    <div className="space-y-4 lg:col-span-3">
                         <BranchDeviceTable branch={branch} layout="stack" />
                     </div>
                 </div>
@@ -938,7 +1176,10 @@ export default function BranchShowPage({
                 open={deleteStudentItem !== null}
                 onOpenChange={(open) => !open && setDeleteStudentItem(null)}
                 onConfirm={handleConfirmDeleteStudent}
-                title={t('confirm_delete_student_title', 'O‘quvchini o‘chirish')}
+                title={t(
+                    'confirm_delete_student_title',
+                    'O‘quvchini o‘chirish',
+                )}
                 description={t(
                     'confirm_delete_student',
                     'Haqiqatan ham bu o‘quvchini o‘chirmoqchimisiz?',

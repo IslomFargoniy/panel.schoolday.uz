@@ -95,12 +95,8 @@ export function ClassForm({
                         </p>
                     )}
                 </div>
-                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-4 border-t border-border/50">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                    >
+                <div className="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-border/50 pt-4 sm:flex-row sm:items-center">
+                    <Button type="button" variant="outline" onClick={onCancel}>
                         {t('common.cancel', 'Bekor qilish')}
                     </Button>
                     <Button type="submit">

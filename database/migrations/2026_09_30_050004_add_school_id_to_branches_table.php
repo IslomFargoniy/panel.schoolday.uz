@@ -18,7 +18,7 @@ return new class extends Migration
 
         // Ensure default School exists if any branches exist
         $defaultSchoolId = DB::table('schools')->value('id');
-        if (!$defaultSchoolId && DB::table('branches')->count() > 0) {
+        if (! $defaultSchoolId && DB::table('branches')->count() > 0) {
             $defaultSchoolId = DB::table('schools')->insertGetId([
                 'name' => 'Bosh Maktab',
                 'branch_limit' => 5,
@@ -32,7 +32,7 @@ return new class extends Migration
             // Link existing users to this school
             $userIds = DB::table('users')->pluck('id');
             foreach ($userIds as $uid) {
-                if (!DB::table('user_schools')->where('user_id', $uid)->where('school_id', $defaultSchoolId)->exists()) {
+                if (! DB::table('user_schools')->where('user_id', $uid)->where('school_id', $defaultSchoolId)->exists()) {
                     DB::table('user_schools')->insert([
                         'user_id' => $uid,
                         'school_id' => $defaultSchoolId,

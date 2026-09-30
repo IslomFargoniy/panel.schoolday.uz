@@ -1,7 +1,7 @@
 import { type Auth, type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import type { FormEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HeadingSmall from '@/components/heading-small';

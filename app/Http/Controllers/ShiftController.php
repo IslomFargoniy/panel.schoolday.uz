@@ -38,7 +38,7 @@ class ShiftController extends Controller
             }]);
 
         // Multi-tenant check
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $query->whereHas('branch', function ($b) use ($userSchoolIds) {
                 $b->whereIn('school_id', $userSchoolIds);
@@ -70,7 +70,7 @@ class ShiftController extends Controller
         $schoolsQuery = \App\Models\School::query();
         $branchesQuery = Branch::query();
 
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
             $branchesQuery->whereIn('school_id', $userSchoolIds);

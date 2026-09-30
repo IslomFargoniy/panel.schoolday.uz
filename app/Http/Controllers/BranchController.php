@@ -59,7 +59,7 @@ class BranchController extends Controller
         }
 
         // Multi-tenant check: non-admins only see branches of their schools
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
             $query->whereIn('school_id', $userSchoolIds);
         }
@@ -80,7 +80,7 @@ class BranchController extends Controller
 
         // List schools accessible to user
         $schoolsQuery = School::query();
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
         }
@@ -100,9 +100,9 @@ class BranchController extends Controller
     public function show(Request $request, Branch $branch)
     {
         // Multi-tenant check: non-admins must belong to the branch's school
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id')->toArray();
-            if (!in_array($branch->school_id, $userSchoolIds)) {
+            if (! in_array($branch->school_id, $userSchoolIds)) {
                 abort(403, 'Ushbu filialga kirish huquqi yo‘q.');
             }
         }
@@ -112,7 +112,7 @@ class BranchController extends Controller
             'devices' => fn ($q) => $q->latest(),
             'shifts' => function ($q) {
                 $q->withCount('classes')
-                  ->with(['classes' => fn ($c) => $c->withCount('students')]);
+                    ->with(['classes' => fn ($c) => $c->withCount('students')]);
             },
         ]);
 
@@ -138,8 +138,8 @@ class BranchController extends Controller
             $search = $request->search;
             $studentsQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('employeeNoString', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('employeeNoString', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -172,10 +172,10 @@ class BranchController extends Controller
 
         // Determine school_id
         $schoolId = $validated['school_id'] ?? null;
-        if (!$schoolId && Auth::check()) {
+        if (! $schoolId && Auth::check()) {
             $schoolId = Auth::user()->user_schools()->value('school_id');
         }
-        if (!$schoolId) {
+        if (! $schoolId) {
             $schoolId = School::first()?->id;
         }
 

@@ -36,7 +36,11 @@ interface UserItem {
     email: string;
     phone?: string | null;
     roles?: RoleItem[];
-    user_schools?: { id: number; school_id: number; school?: { id: number; name: string } }[];
+    user_schools?: {
+        id: number;
+        school_id: number;
+        school?: { id: number; name: string };
+    }[];
     created_at?: string;
 }
 
@@ -160,31 +164,46 @@ export default function UsersIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('sidebar.users', 'Users')} />
 
-            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 min-w-0 max-w-full">
+            <div className="flex max-w-full min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                    <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                         {t('sidebar.users', 'Users')}
                     </h2>
-                    <Button onClick={openCreateModal} className="gap-2 shrink-0">
+                    <Button
+                        onClick={openCreateModal}
+                        className="shrink-0 gap-2"
+                    >
                         <Plus className="h-4 w-4 shrink-0" />
                         <span>Create</span>
                     </Button>
                 </div>
 
                 {/* Filter Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs">
-                    <div className="flex flex-wrap items-center gap-2 flex-1">
+                <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs sm:flex-row sm:items-center">
+                    <div className="flex flex-1 flex-wrap items-center gap-2">
                         {/* Role filter */}
                         <div className="w-full sm:w-44">
                             <Select
                                 value={filterData.role || 'all'}
-                                onValueChange={(val) => handleFilterChange('role', val === 'all' ? '' : val)}
+                                onValueChange={(val) =>
+                                    handleFilterChange(
+                                        'role',
+                                        val === 'all' ? '' : val,
+                                    )
+                                }
                             >
-                                <SelectTrigger className="h-9 text-xs rounded-xl">
-                                    <SelectValue placeholder={t('users.role', 'Barcha rollar')} />
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
+                                    <SelectValue
+                                        placeholder={t(
+                                            'users.role',
+                                            'Barcha rollar',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t('common.all', 'Barcha rollar')}</SelectItem>
+                                    <SelectItem value="all">
+                                        {t('common.all', 'Barcha rollar')}
+                                    </SelectItem>
                                     {roles.map((r) => (
                                         <SelectItem key={r.id} value={r.name}>
                                             {r.name}
@@ -199,15 +218,33 @@ export default function UsersIndex({
                             <div className="w-full sm:w-48">
                                 <Select
                                     value={filterData.school_id || 'all'}
-                                    onValueChange={(val) => handleFilterChange('school_id', val === 'all' ? '' : val)}
+                                    onValueChange={(val) =>
+                                        handleFilterChange(
+                                            'school_id',
+                                            val === 'all' ? '' : val,
+                                        )
+                                    }
                                 >
-                                    <SelectTrigger className="h-9 text-xs rounded-xl">
-                                        <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                                        <SelectValue
+                                            placeholder={t(
+                                                'select_school',
+                                                'Barcha maktablar',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                        <SelectItem value="all">
+                                            {t(
+                                                'select_school',
+                                                'Barcha maktablar',
+                                            )}
+                                        </SelectItem>
                                         {schools.map((s) => (
-                                            <SelectItem key={s.id} value={String(s.id)}>
+                                            <SelectItem
+                                                key={s.id}
+                                                value={String(s.id)}
+                                            >
                                                 {s.name}
                                             </SelectItem>
                                         ))}
@@ -217,52 +254,61 @@ export default function UsersIndex({
                         )}
 
                         {/* Search input */}
-                        <div className="relative flex-1 min-w-[180px]">
-                            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <div className="relative min-w-[180px] flex-1">
+                            <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 value={filterData.search}
-                                onChange={(e) => handleFilterChange('search', e.target.value)}
-                                placeholder={t('users.search_placeholder', 'Ism, email yoki telefon...')}
-                                className="h-9 pl-8 text-xs rounded-xl"
+                                onChange={(e) =>
+                                    handleFilterChange('search', e.target.value)
+                                }
+                                placeholder={t(
+                                    'users.search_placeholder',
+                                    'Ism, email yoki telefon...',
+                                )}
+                                className="h-9 rounded-xl pl-8 text-xs"
                             />
                         </div>
                     </div>
 
-                    {Boolean(filterData.role || filterData.school_id || filterData.search) && (
+                    {Boolean(
+                        filterData.role ||
+                        filterData.school_id ||
+                        filterData.search,
+                    ) && (
                         <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={handleResetFilters}
-                            className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                            className="h-9 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                         >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="h-3.5 w-3.5" />
                             <span>{t('cancel', 'Tozalash')}</span>
                         </Button>
                     )}
                 </div>
 
                 <div className="min-h-[400px] overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm">
-                    <div className="overflow-x-auto min-w-0 max-w-full">
+                    <div className="max-w-full min-w-0 overflow-x-auto">
                         <table className="w-full min-w-[700px] text-left text-sm">
                             <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
+                                    <th className="px-4 py-3.5 sm:px-6 sm:py-4">
                                         {t('users.name', 'Name')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
+                                    <th className="px-4 py-3.5 sm:px-6 sm:py-4">
                                         {t('users.email', 'Email')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
+                                    <th className="px-4 py-3.5 sm:px-6 sm:py-4">
                                         {t('users.phone', 'Phone')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
+                                    <th className="px-4 py-3.5 sm:px-6 sm:py-4">
                                         {t('users.role', 'Role')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4">
+                                    <th className="px-4 py-3.5 sm:px-6 sm:py-4">
                                         {t('school', 'Maktab')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right">
+                                    <th className="px-4 py-3.5 text-right sm:px-6 sm:py-4">
                                         {t('common.actions', 'Actions')}
                                     </th>
                                 </tr>
@@ -302,19 +348,26 @@ export default function UsersIndex({
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-xs">
-                                                {user.user_schools && user.user_schools.length > 0 ? (
+                                                {user.user_schools &&
+                                                user.user_schools.length > 0 ? (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {user.user_schools.map((us) => (
-                                                            <span
-                                                                key={us.id}
-                                                                className="rounded bg-muted px-2 py-0.5 font-medium"
-                                                            >
-                                                                {us.school?.name || `ID: ${us.school_id}`}
-                                                            </span>
-                                                        ))}
+                                                        {user.user_schools.map(
+                                                            (us) => (
+                                                                <span
+                                                                    key={us.id}
+                                                                    className="rounded bg-muted px-2 py-0.5 font-medium"
+                                                                >
+                                                                    {us.school
+                                                                        ?.name ||
+                                                                        `ID: ${us.school_id}`}
+                                                                </span>
+                                                            ),
+                                                        )}
                                                     </div>
                                                 ) : (
-                                                    <span className="text-muted-foreground">-</span>
+                                                    <span className="text-muted-foreground">
+                                                        -
+                                                    </span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
@@ -511,7 +564,10 @@ export default function UsersIndex({
                     open={deleteUserId !== null}
                     onOpenChange={(open) => !open && setDeleteUserId(null)}
                     onConfirm={handleConfirmDelete}
-                    title={t('users.delete_confirm_title', 'Foydalanuvchini o‘chirish')}
+                    title={t(
+                        'users.delete_confirm_title',
+                        'Foydalanuvchini o‘chirish',
+                    )}
                     description={t(
                         'common.confirm_delete',
                         'Ushbu foydalanuvchini o‘chirishni tasdiqlaysizmi?',

@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
+use App\Observers\SchoolObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Observers\SchoolObserver;
 
 #[ObservedBy([SchoolObserver::class])]
 class School extends Model
 {
-    use HasFactory, \App\Traits\FormatsDates;
+    use \App\Traits\FormatsDates, HasFactory;
 
     protected $fillable = [
         'name',
@@ -36,7 +36,10 @@ class School extends Model
 
     public function getValidDateAttribute($value): ?string
     {
-        if (!$value) return null;
+        if (! $value) {
+            return null;
+        }
+
         return substr($value, 0, 10);
     }
 

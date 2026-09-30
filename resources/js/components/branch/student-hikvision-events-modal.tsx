@@ -59,12 +59,15 @@ export default function StudentHikvisionEventsModal({
         if (!student) return;
         setLoading(true);
         try {
-            const res = await fetch(`/students/${student.id}/hikvision-events`, {
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
+            const res = await fetch(
+                `/students/${student.id}/hikvision-events`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
                 },
-            });
+            );
             const data = await res.json();
             if (data.success && Array.isArray(data.events)) {
                 setEvents(data.events);
@@ -90,25 +93,35 @@ export default function StudentHikvisionEventsModal({
 
     const getStatusBadge = (status?: string) => {
         const s = (status || '').toLowerCase();
-        if (s.includes('keld') || s.includes('enter') || s.includes('checkin') || s === '1') {
+        if (
+            s.includes('keld') ||
+            s.includes('enter') ||
+            s.includes('checkin') ||
+            s === '1'
+        ) {
             return (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800">
-                    <LogIn className="w-3 h-3 text-emerald-500" />
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400">
+                    <LogIn className="h-3 w-3 text-emerald-500" />
                     <span>{t('attendance_entered', 'Kirish')}</span>
                 </span>
             );
         }
-        if (s.includes('ketd') || s.includes('exit') || s.includes('checkout') || s === '2') {
+        if (
+            s.includes('ketd') ||
+            s.includes('exit') ||
+            s.includes('checkout') ||
+            s === '2'
+        ) {
             return (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-800">
-                    <LogOut className="w-3 h-3 text-amber-500" />
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-400">
+                    <LogOut className="h-3 w-3 text-amber-500" />
                     <span>{t('attendance_exited', 'Chiqish')}</span>
                 </span>
             );
         }
         return (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-muted text-muted-foreground">
-                <Activity className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                <Activity className="h-3 w-3" />
                 <span>{status || t('attendance_event', 'Hodisa')}</span>
             </span>
         );
@@ -116,30 +129,33 @@ export default function StudentHikvisionEventsModal({
 
     return (
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-            <DialogContent className="sm:max-w-[650px] max-h-[85vh] flex flex-col p-0 overflow-hidden">
-                <DialogHeader className="p-4 sm:p-5 border-b border-border bg-muted/30">
+            <DialogContent className="flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-[650px]">
+                <DialogHeader className="border-b border-border bg-muted/30 p-4 sm:p-5">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                             {student.face_image ? (
                                 <img
                                     src={student.face_image}
                                     alt=""
-                                    className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500/40"
+                                    className="h-12 w-12 rounded-full border-2 border-indigo-500/40 object-cover"
                                 />
                             ) : (
-                                <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-base">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-base font-bold text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                                     {student.name.charAt(0)}
                                 </div>
                             )}
                             <div>
-                                <DialogTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
+                                <DialogTitle className="flex items-center gap-2 text-base font-bold sm:text-lg">
                                     <span>{student.name}</span>
-                                    <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800">
+                                    <span className="rounded-md border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono text-xs font-medium text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300">
                                         ID: {student.employeeNoString || '—'}
                                     </span>
                                 </DialogTitle>
-                                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                                    {t('hikvision_events_desc', 'Hikvision turniketidan o‘tish va yuzni tanish hodisalari jurnali')}
+                                <DialogDescription className="mt-0.5 text-xs text-muted-foreground">
+                                    {t(
+                                        'hikvision_events_desc',
+                                        'Hikvision turniketidan o‘tish va yuzni tanish hodisalari jurnali',
+                                    )}
                                 </DialogDescription>
                             </div>
                         </div>
@@ -152,33 +168,45 @@ export default function StudentHikvisionEventsModal({
                             className="h-8 w-8 text-muted-foreground hover:text-foreground"
                             title={t('refresh', 'Yangilash')}
                         >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw
+                                className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                            />
                         </Button>
                     </div>
                 </DialogHeader>
 
                 {/* Content List */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+                <div className="flex-1 space-y-3 overflow-y-auto p-4 sm:p-5">
                     {loading ? (
-                        <div className="py-12 flex flex-col items-center justify-center text-muted-foreground gap-2">
-                            <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-                            <span className="text-xs">{t('events_loading', 'Hikvision hodisalari yuklanmoqda...')}</span>
+                        <div className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
+                            <RefreshCw className="h-6 w-6 animate-spin text-indigo-500" />
+                            <span className="text-xs">
+                                {t(
+                                    'events_loading',
+                                    'Hikvision hodisalari yuklanmoqda...',
+                                )}
+                            </span>
                         </div>
                     ) : events.length === 0 ? (
-                        <div className="py-12 text-center rounded-xl border border-dashed border-border bg-card/40 p-6">
-                            <ScanFace className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                            <h4 className="text-sm font-semibold text-foreground mb-1">
+                        <div className="rounded-xl border border-dashed border-border bg-card/40 p-6 py-12 text-center">
+                            <ScanFace className="mx-auto mb-2 h-8 w-8 text-muted-foreground opacity-50" />
+                            <h4 className="mb-1 text-sm font-semibold text-foreground">
                                 {t('events_not_found', 'Hodisalar topilmadi')}
                             </h4>
-                            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                                {t('events_not_found_desc', 'Ushbu o‘quvchining ID raqami bo‘yicha terminaldan o‘tish yozuvlari hali mavjud emas.')}
+                            <p className="mx-auto max-w-sm text-xs text-muted-foreground">
+                                {t(
+                                    'events_not_found_desc',
+                                    'Ushbu o‘quvchining ID raqami bo‘yicha terminaldan o‘tish yozuvlari hali mavjud emas.',
+                                )}
                             </p>
                         </div>
                     ) : (
                         <div className="space-y-2.5">
                             {events.map((evt) => {
                                 const rawTime = evt.dateTime || evt.created_at;
-                                const formattedTime = rawTime ? formatDateTime(rawTime) : '—';
+                                const formattedTime = rawTime
+                                    ? formatDateTime(rawTime)
+                                    : '—';
                                 const serial = evt.access?.shortSerialNumber;
                                 const photoUrl = evt.picture
                                     ? serial
@@ -189,49 +217,57 @@ export default function StudentHikvisionEventsModal({
                                 return (
                                     <div
                                         key={evt.id}
-                                        className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors text-xs"
+                                        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3 text-xs transition-colors hover:bg-muted/40"
                                     >
-                                        <div className="flex items-center gap-3 min-w-0">
+                                        <div className="flex min-w-0 items-center gap-3">
                                             {/* Photo from terminal */}
                                             {photoUrl ? (
                                                 <button
                                                     type="button"
-                                                    onClick={() => setSelectedPhoto(photoUrl)}
-                                                    className="relative w-10 h-10 rounded-lg overflow-hidden border border-border group shrink-0"
+                                                    onClick={() =>
+                                                        setSelectedPhoto(
+                                                            photoUrl,
+                                                        )
+                                                    }
+                                                    className="group relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border"
                                                     title="Terminal suratini kattalashtirish"
                                                 >
                                                     <img
                                                         src={photoUrl}
                                                         alt="Capture"
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                                     />
-                                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                                        <Camera className="w-3.5 h-3.5 text-white" />
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                                                        <Camera className="h-3.5 w-3.5 text-white" />
                                                     </div>
                                                 </button>
                                             ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border">
-                                                    <ScanFace className="w-5 h-5 opacity-60" />
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground">
+                                                    <ScanFace className="h-5 w-5 opacity-60" />
                                                 </div>
                                             )}
 
                                             <div className="min-w-0">
                                                 <div className="flex items-center gap-2">
-                                                    {getStatusBadge(evt.attendanceStatus)}
-                                                    <span className="font-semibold text-foreground truncate">
-                                                        {evt.deviceName || 'MinMoe Terminal'}
+                                                    {getStatusBadge(
+                                                        evt.attendanceStatus,
+                                                    )}
+                                                    <span className="truncate font-semibold text-foreground">
+                                                        {evt.deviceName ||
+                                                            'MinMoe Terminal'}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-muted-foreground mt-1 text-[11px] font-mono">
-                                                    <Clock className="w-3 h-3 text-muted-foreground" />
+                                                <div className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
+                                                    <Clock className="h-3 w-3 text-muted-foreground" />
                                                     <span>{formattedTime}</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="text-right shrink-0">
-                                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
-                                                {evt.access?.ipAddress || 'ISUP 5.0'}
+                                        <div className="shrink-0 text-right">
+                                            <span className="rounded border border-border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+                                                {evt.access?.ipAddress ||
+                                                    'ISUP 5.0'}
                                             </span>
                                         </div>
                                     </div>
@@ -244,24 +280,27 @@ export default function StudentHikvisionEventsModal({
                 {/* Image zoom preview */}
                 {selectedPhoto && (
                     <div
-                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs"
                         onClick={() => setSelectedPhoto(null)}
                     >
-                        <div className="relative max-w-md w-full bg-card rounded-2xl overflow-hidden border border-border p-2">
+                        <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card p-2">
                             <button
                                 type="button"
                                 onClick={() => setSelectedPhoto(null)}
-                                className="absolute top-4 right-4 z-10 p-1.5 rounded-full bg-black/60 text-white hover:bg-black"
+                                className="absolute top-4 right-4 z-10 rounded-full bg-black/60 p-1.5 text-white hover:bg-black"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="h-4 w-4" />
                             </button>
                             <img
                                 src={selectedPhoto}
                                 alt="Hikvision Capture Zoom"
-                                className="w-full h-auto rounded-xl object-contain max-h-[70vh]"
+                                className="h-auto max-h-[70vh] w-full rounded-xl object-contain"
                             />
-                            <p className="text-center text-xs text-muted-foreground mt-2 py-1">
-                                {t('zoom_capture_hint', 'Turniket kamerasi orqali qayd etilgan surat')}
+                            <p className="mt-2 py-1 text-center text-xs text-muted-foreground">
+                                {t(
+                                    'zoom_capture_hint',
+                                    'Turniket kamerasi orqali qayd etilgan surat',
+                                )}
                             </p>
                         </div>
                     </div>

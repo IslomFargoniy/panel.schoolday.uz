@@ -25,17 +25,19 @@ class DashboardController extends Controller
         $eventQuery = HikvisionAccessEvent::with(['student.schoolClass', 'faceRects', 'access'])->orderBy('id', 'desc');
 
         // Multi-tenant check
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $studentQuery->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
-            });
-            $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
-            });
-            $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
-            });
+            if ($userSchoolIds->isNotEmpty()) {
+                $studentQuery->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                    $b->whereIn('school_id', $userSchoolIds);
+                });
+                $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                    $b->whereIn('school_id', $userSchoolIds);
+                });
+                $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
+                    $b->whereIn('school_id', $userSchoolIds);
+                });
+            }
         }
 
         if ($schoolId) {
@@ -107,10 +109,12 @@ class DashboardController extends Controller
         $schoolsQuery = School::query();
         $branchesQuery = Branch::query();
 
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
+            if ($userSchoolIds->isNotEmpty()) {
+                $schoolsQuery->whereIn('id', $userSchoolIds);
+                $branchesQuery->whereIn('school_id', $userSchoolIds);
+            }
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();

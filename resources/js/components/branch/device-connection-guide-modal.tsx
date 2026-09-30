@@ -52,12 +52,10 @@ export default function DeviceConnectionGuideModal({
             <DialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-1.5 border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 shrink-0"
+                    className="flex shrink-0 items-center gap-1.5 border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
                 >
-                    <BookOpen className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span>
-                        {t('guide', 'Yo‘riqnoma')}
-                    </span>
+                    <BookOpen className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <span>{t('guide', 'Yo‘riqnoma')}</span>
                 </Button>
             </DialogTrigger>
 

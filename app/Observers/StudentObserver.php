@@ -20,9 +20,9 @@ class StudentObserver
      */
     public function creating(Student $student): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $this->getSchoolId($student);
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();
@@ -35,9 +35,9 @@ class StudentObserver
      */
     public function updating(Student $student): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $this->getSchoolId($student);
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();
@@ -50,9 +50,9 @@ class StudentObserver
      */
     public function deleting(Student $student): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $this->getSchoolId($student);
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();

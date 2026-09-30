@@ -54,9 +54,17 @@ export default function ShiftsPage({
     };
 
     const handleResetFilters = () => {
-        const resetData = { per_page: '20', school_id: '', branch_id: '', search: '' };
+        const resetData = {
+            per_page: '20',
+            school_id: '',
+            branch_id: '',
+            search: '',
+        };
         setFilterData(resetData);
-        router.get('/shifts', resetData, { preserveState: true, replace: true });
+        router.get('/shifts', resetData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     const [editing, setEditing] = useState<Shift | null>(null);
@@ -122,7 +130,9 @@ export default function ShiftsPage({
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (!formData.branch_id) {
-            toast.error(t('shifts.branch_required', 'Filialni tanlash majburiy!'));
+            toast.error(
+                t('shifts.branch_required', 'Filialni tanlash majburiy!'),
+            );
             return;
         }
         if (editing) {
@@ -153,7 +163,7 @@ export default function ShiftsPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('shifts.title', 'Shifts Management')} />
-            <div className="p-4 sm:p-6 w-full min-w-0 max-w-full">
+            <div className="w-full max-w-full min-w-0 p-4 sm:p-6">
                 <ShiftsTable
                     shifts={shifts}
                     schools={schools}

@@ -38,7 +38,10 @@ export function StudentsTable({
                         >
                             <Upload className="h-4 w-4" />
                             <span className="hidden sm:inline">
-                                {t('students.import_excel', 'Excel orqali yuklash')}
+                                {t(
+                                    'students.import_excel',
+                                    'Excel orqali yuklash',
+                                )}
                             </span>
                         </Button>
                     )}
@@ -46,7 +49,7 @@ export function StudentsTable({
                         <Button
                             onClick={onCreate}
                             size="sm"
-                            className="gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
+                            className="shrink-0 gap-1.5 rounded-xl font-medium shadow-xs"
                         >
                             <Plus className="h-4 w-4 shrink-0" />
                             <span>Create</span>
@@ -55,24 +58,24 @@ export function StudentsTable({
                 </div>
             </div>
 
-            <div className="overflow-x-auto min-w-0 max-w-full">
+            <div className="max-w-full min-w-0 overflow-x-auto">
                 <table className="w-full min-w-[680px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('students.name', 'Name')} &amp;{' '}
                                 {t('students.status', 'Status')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('students.class', 'Class')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('students.hikvision_id', 'Hikvision ID')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('students.telegram_id', 'Telegram ID')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium">
+                            <th className="px-4 py-3.5 text-right font-medium sm:px-6 sm:py-4">
                                 {t('students.edit', 'Actions')}
                             </th>
                         </tr>
@@ -164,7 +167,10 @@ export function StudentsTable({
                                             variant="ghost"
                                             onClick={() => onDelete(student)}
                                             className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                            title={t('students.delete', 'Delete')}
+                                            title={t(
+                                                'students.delete',
+                                                'Delete',
+                                            )}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>

@@ -14,23 +14,23 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
 
     return (
         <div className="relative overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border/70">
-            <div className="overflow-x-auto min-w-0 max-w-full">
+            <div className="max-w-full min-w-0 overflow-x-auto">
                 <table className="w-full min-w-[600px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('classes.details', 'Class Details')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t('classes.students', 'Students')}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                 {t(
                                     'classes.today_attendance',
                                     "Today's Attendance",
                                 )}
                             </th>
-                            <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium">
+                            <th className="px-4 py-3.5 text-right font-medium sm:px-6 sm:py-4">
                                 {t('classes.actions', 'Actions')}
                             </th>
                         </tr>
@@ -111,7 +111,10 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
                                             variant="ghost"
                                             onClick={() => onDelete(cls.id)}
                                             className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                            title={t('classes.delete', 'Delete')}
+                                            title={t(
+                                                'classes.delete',
+                                                'Delete',
+                                            )}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>

@@ -66,9 +66,18 @@ export default function ClassesPage({
     };
 
     const clearFilters = () => {
-        const resetData = { school_id: '', branch_id: '', shift_id: '', search: '', per_page: '20' };
+        const resetData = {
+            school_id: '',
+            branch_id: '',
+            shift_id: '',
+            search: '',
+            per_page: '20',
+        };
         setFilterData(resetData);
-        router.get('/classes', resetData, { preserveState: true, replace: true });
+        router.get('/classes', resetData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     const [editing, setEditing] = useState<SchoolClass | null>(null);
@@ -111,7 +120,9 @@ export default function ClassesPage({
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (!formData.shift_id) {
-            toast.error(t('classes.shift_required', 'Smenani tanlash majburiy!'));
+            toast.error(
+                t('classes.shift_required', 'Smenani tanlash majburiy!'),
+            );
             return;
         }
         if (editing) {
@@ -142,7 +153,7 @@ export default function ClassesPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('classes.title', 'Classes')} />
-            <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 w-full min-w-0 max-w-full">
+            <div className="flex w-full max-w-full min-w-0 flex-1 flex-col gap-4 p-4 sm:p-6">
                 <ClassFilters
                     filterData={filterData}
                     schools={schools}

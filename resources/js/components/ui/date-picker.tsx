@@ -53,6 +53,7 @@ export function DatePicker({
     const { t, i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [inputValue, setInputValue] = useState(value || '');
+    const [prevValue, setPrevValue] = useState(value);
 
     // Current viewed month and year in the calendar
     const today = new Date();
@@ -63,7 +64,8 @@ export function DatePicker({
     const [viewYear, setViewYear] = useState<number>(initialDate.getFullYear());
     const [viewMonth, setViewMonth] = useState<number>(initialDate.getMonth()); // 0-indexed
 
-    useEffect(() => {
+    if (value !== prevValue) {
+        setPrevValue(value);
         setInputValue(value || '');
         if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
             const d = new Date(value + 'T00:00:00');
@@ -72,7 +74,7 @@ export function DatePicker({
                 setViewMonth(d.getMonth());
             }
         }
-    }, [value]);
+    }
 
     // Handle direct typing in the input
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

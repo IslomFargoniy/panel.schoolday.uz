@@ -21,7 +21,7 @@ class BranchDeviceController extends Controller
         $query = BranchDevice::with(['branch.school'])->latest();
 
         // Multi-tenant check
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $query->whereHas('branch', function ($b) use ($userSchoolIds) {
                 $b->whereIn('school_id', $userSchoolIds);
@@ -52,8 +52,8 @@ class BranchDeviceController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('mac_address', 'like', "%{$search}%")
-                  ->orWhere('device_id', 'like', "%{$search}%");
+                    ->orWhere('mac_address', 'like', "%{$search}%")
+                    ->orWhere('device_id', 'like', "%{$search}%");
             });
         }
 
@@ -62,7 +62,7 @@ class BranchDeviceController extends Controller
         $schoolsQuery = \App\Models\School::query();
         $branchesQuery = \App\Models\Branch::with('school');
 
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
             $branchesQuery->whereIn('school_id', $userSchoolIds);
@@ -139,6 +139,7 @@ class BranchDeviceController extends Controller
         if ($result['success'] ?? false) {
             return back()->with('success', $result['message'] ?? 'ISUP hodisalar muvaffaqiyatli sinxronlandi.');
         }
+
         return back()->with('error', $result['message'] ?? 'Sinxronizatsiyada xatolik yuz berdi.');
     }
 }

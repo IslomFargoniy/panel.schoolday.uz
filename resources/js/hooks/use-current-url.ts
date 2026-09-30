@@ -43,7 +43,10 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
             return urlToCompare === '/' || urlToCompare === '';
         }
 
-        return urlToCompare === targetPath || urlToCompare.startsWith(targetPath + '/');
+        return (
+            urlToCompare === targetPath ||
+            urlToCompare.startsWith(targetPath + '/')
+        );
     };
 
     const whenCurrentUrl: WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(

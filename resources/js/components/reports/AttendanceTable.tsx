@@ -31,31 +31,49 @@ export function AttendanceTable({
 
     return (
         <div className="relative flex min-h-[60vh] flex-1 flex-col rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border">
-            <div className="flex-1 overflow-x-auto min-w-0 max-w-full">
+            <div className="max-w-full min-w-0 flex-1 overflow-x-auto">
                 <table className="w-full min-w-[850px] text-left text-sm">
                     <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                         <tr>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.date', 'Date')}
                             </th>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.student_name', 'Student Info')}
                             </th>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.class', 'Class')}
                             </th>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.first_in', 'First Check-in')}
                             </th>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.last_out', 'Last Check-out')}
                             </th>
-                            <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                            <th
+                                scope="col"
+                                className="px-4 py-3.5 font-medium sm:px-6 sm:py-4"
+                            >
                                 {t('reports.details', 'Status')}
                             </th>
                             <th
                                 scope="col"
-                                className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium"
+                                className="px-4 py-3.5 text-right font-medium sm:px-6 sm:py-4"
                             >
                                 <div className="flex items-center justify-end gap-2">
                                     <span>
@@ -95,7 +113,7 @@ export function AttendanceTable({
                                         key={item.id}
                                         className="transition-colors hover:bg-muted/30"
                                     >
-                                        <td className="px-6 py-4 font-medium text-muted-foreground font-mono whitespace-nowrap">
+                                        <td className="px-6 py-4 font-mono font-medium whitespace-nowrap text-muted-foreground">
                                             {formatDate(item.date)}
                                         </td>
 
@@ -151,7 +169,9 @@ export function AttendanceTable({
                                             <div className="flex flex-col">
                                                 <span className="font-mono text-xs">
                                                     {item.first_check_in
-                                                        ? formatDateTime(item.first_check_in)
+                                                        ? formatDateTime(
+                                                              item.first_check_in,
+                                                          )
                                                         : '-'}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
@@ -170,7 +190,9 @@ export function AttendanceTable({
                                             <div className="flex flex-col">
                                                 <span className="font-mono text-xs">
                                                     {item.last_check_out
-                                                        ? formatDateTime(item.last_check_out)
+                                                        ? formatDateTime(
+                                                              item.last_check_out,
+                                                          )
                                                         : '-'}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">

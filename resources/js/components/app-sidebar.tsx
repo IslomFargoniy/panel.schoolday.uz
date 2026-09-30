@@ -37,7 +37,7 @@ const getNavGroups = (t: any, user: any): NavGroup[] => {
             return user.roles.some((r: any) =>
                 typeof r === 'string'
                     ? r.toLowerCase() === roleName.toLowerCase()
-                    : r.name?.toLowerCase() === roleName.toLowerCase()
+                    : r.name?.toLowerCase() === roleName.toLowerCase(),
             );
         }
         return false;

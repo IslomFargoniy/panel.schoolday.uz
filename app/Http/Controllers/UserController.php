@@ -19,7 +19,7 @@ class UserController extends Controller
         $query = User::with(['roles', 'user_schools.school']);
 
         // Multi-tenant check
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $query->whereHas('user_schools', function ($q) use ($userSchoolIds) {
                 $q->whereIn('school_id', $userSchoolIds);
@@ -39,8 +39,8 @@ class UserController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -48,7 +48,7 @@ class UserController extends Controller
         $roles = Role::all();
 
         $schoolsQuery = \App\Models\School::query();
-        if (\Illuminate\Support\Facades\Auth::check() && !\Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && !\Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
+        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
             $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
             $schoolsQuery->whereIn('id', $userSchoolIds);
         }

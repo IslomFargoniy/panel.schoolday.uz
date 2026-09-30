@@ -90,17 +90,17 @@ export default function ReportDetailsPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('reports.details', 'Attendance Details')} />
-            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 min-w-0 max-w-full">
+            <div className="flex max-w-full min-w-0 flex-1 flex-col gap-6 p-4 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                     <div className="flex items-center gap-3 sm:gap-4">
                         <Link
                             href="/reports"
-                            className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted shrink-0"
+                            className="inline-flex shrink-0 items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <div>
-                            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                                 {student?.name ||
                                     t(
                                         'reports.unknown_student',
@@ -146,9 +146,11 @@ export default function ReportDetailsPage({
                                 <span className="text-muted-foreground">
                                     {t('reports.first_in', 'First Check-in')}
                                 </span>
-                                <span className="text-base font-medium font-mono text-xs">
+                                <span className="font-mono text-base text-xs font-medium">
                                     {attendance.first_check_in
-                                        ? formatDateTime(attendance.first_check_in)
+                                        ? formatDateTime(
+                                              attendance.first_check_in,
+                                          )
                                         : '-'}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
@@ -163,9 +165,11 @@ export default function ReportDetailsPage({
                                 <span className="text-muted-foreground">
                                     {t('reports.last_out', 'Last Check-out')}
                                 </span>
-                                <span className="text-base font-medium font-mono text-xs">
+                                <span className="font-mono text-base text-xs font-medium">
                                     {attendance.last_check_out
-                                        ? formatDateTime(attendance.last_check_out)
+                                        ? formatDateTime(
+                                              attendance.last_check_out,
+                                          )
                                         : '-'}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
@@ -247,23 +251,23 @@ export default function ReportDetailsPage({
                             )}
                         </h3>
                     </div>
-                    <div className="overflow-x-auto min-w-0 max-w-full">
+                    <div className="max-w-full min-w-0 overflow-x-auto">
                         <table className="w-full min-w-[650px] text-left text-sm">
                             <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <th className="px-4 sm:px-6 py-3 sm:py-4">
+                                    <th className="px-4 py-3 sm:px-6 sm:py-4">
                                         {t('reports.time', 'Time')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3 sm:py-4">
+                                    <th className="px-4 py-3 sm:px-6 sm:py-4">
                                         {t('reports.device', 'Device')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3 sm:py-4">
+                                    <th className="px-4 py-3 sm:px-6 sm:py-4">
                                         {t('reports.verify_mode', 'Method')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3 sm:py-4">
+                                    <th className="px-4 py-3 sm:px-6 sm:py-4">
                                         {t('reports.photo', 'Photo')}
                                     </th>
-                                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-right">
+                                    <th className="px-4 py-3 text-right sm:px-6 sm:py-4">
                                         {t('common.actions', 'Harakatlar')}
                                     </th>
                                 </tr>
@@ -289,7 +293,7 @@ export default function ReportDetailsPage({
                                                 key={evt.id}
                                                 className="transition-colors hover:bg-muted/30"
                                             >
-                                                <td className="px-4 sm:px-6 py-3 sm:py-4 font-medium">
+                                                <td className="px-4 py-3 font-medium sm:px-6 sm:py-4">
                                                     <div className="flex flex-col">
                                                         <span className="font-mono text-xs">
                                                             {formatDateTime(
@@ -299,7 +303,7 @@ export default function ReportDetailsPage({
                                                                     evt.created_at,
                                                             )}
                                                         </span>
-                                                        <span className="text-xs font-normal whitespace-nowrap text-muted-foreground font-mono">
+                                                        <span className="font-mono text-xs font-normal whitespace-nowrap text-muted-foreground">
                                                             {t(
                                                                 'reports.recorded',
                                                                 'Rec:',
@@ -310,7 +314,7 @@ export default function ReportDetailsPage({
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                                <td className="px-4 py-3 sm:px-6 sm:py-4">
                                                     <div className="flex flex-col">
                                                         <span>
                                                             {evt.deviceName ||
@@ -326,11 +330,11 @@ export default function ReportDetailsPage({
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-3 sm:py-4 capitalize">
+                                                <td className="px-4 py-3 capitalize sm:px-6 sm:py-4">
                                                     {evt.currentVerifyMode ||
                                                         '-'}
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                                <td className="px-4 py-3 sm:px-6 sm:py-4">
                                                     {imgUrl ? (
                                                         <img
                                                             src={imgUrl}
@@ -351,7 +355,7 @@ export default function ReportDetailsPage({
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
+                                                <td className="px-4 py-3 text-right sm:px-6 sm:py-4">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
@@ -383,7 +387,10 @@ export default function ReportDetailsPage({
                     open={isDeleteAttendanceOpen}
                     onOpenChange={setIsDeleteAttendanceOpen}
                     onConfirm={handleConfirmDeleteAttendance}
-                    title={t('reports.delete_attendance_title', 'Davomat yozuvini o‘chirish')}
+                    title={t(
+                        'reports.delete_attendance_title',
+                        'Davomat yozuvini o‘chirish',
+                    )}
                     description={t(
                         'reports.confirm_delete_attendance',
                         'Ushbu kunlik davomat yozuvini o‘chirishni tasdiqlaysizmi?',
@@ -394,7 +401,10 @@ export default function ReportDetailsPage({
                     open={deleteEventId !== null}
                     onOpenChange={(open) => !open && setDeleteEventId(null)}
                     onConfirm={handleConfirmDeleteEvent}
-                    title={t('reports.delete_event_title', 'Kirish-chiqish hodisasini o‘chirish')}
+                    title={t(
+                        'reports.delete_event_title',
+                        'Kirish-chiqish hodisasini o‘chirish',
+                    )}
                     description={t(
                         'reports.confirm_delete_event',
                         'Ushbu hodisani o‘chirishni tasdiqlaysizmi?',

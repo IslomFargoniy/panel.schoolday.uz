@@ -12,9 +12,9 @@ class BranchDeviceObserver
      */
     public function creating(BranchDevice $branchDevice): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();
@@ -27,9 +27,9 @@ class BranchDeviceObserver
      */
     public function updating(BranchDevice $branchDevice): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();
@@ -42,9 +42,9 @@ class BranchDeviceObserver
      */
     public function deleting(BranchDevice $branchDevice): void
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId) {
+            if ($schoolId && Auth::user()->user_schools()->exists()) {
                 Auth::user()->user_schools()
                     ->where('school_id', $schoolId)
                     ->firstOrFail();

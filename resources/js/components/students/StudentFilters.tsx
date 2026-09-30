@@ -43,7 +43,9 @@ export function StudentFilters({
 
     // Cascading branches
     const filteredBranches = filterData.school_id
-        ? branches.filter((b) => String(b.school_id) === String(filterData.school_id))
+        ? branches.filter(
+              (b) => String(b.school_id) === String(filterData.school_id),
+          )
         : branches;
 
     const branchIds = filteredBranches.map((b) => b.id);
@@ -79,13 +81,13 @@ export function StudentFilters({
         filterData.class_id ||
         filterData.status ||
         filterData.search ||
-        filterData.per_page !== '20'
+        filterData.per_page !== '20',
     );
 
     return (
         <div className="flex flex-col gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
             {/* Top row: Cascading foreign key dropdowns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
                 {/* 1. School (Maktab) */}
                 {schools.length > 0 && (
                     <Select
@@ -95,7 +97,9 @@ export function StudentFilters({
                             onFilterChange('school_id', newSchool);
                             if (newSchool && filterData.branch_id) {
                                 const validBranch = branches.some(
-                                    (b) => String(b.id) === filterData.branch_id && String(b.school_id) === newSchool
+                                    (b) =>
+                                        String(b.id) === filterData.branch_id &&
+                                        String(b.school_id) === newSchool,
                                 );
                                 if (!validBranch) {
                                     onFilterChange('branch_id', '');
@@ -105,11 +109,18 @@ export function StudentFilters({
                             }
                         }}
                     >
-                        <SelectTrigger className="h-9 text-xs rounded-xl">
-                            <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                        <SelectTrigger className="h-9 rounded-xl text-xs">
+                            <SelectValue
+                                placeholder={t(
+                                    'select_school',
+                                    'Barcha maktablar',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                            <SelectItem value="all">
+                                {t('select_school', 'Barcha maktablar')}
+                            </SelectItem>
                             {schools.map((s) => (
                                 <SelectItem key={s.id} value={String(s.id)}>
                                     {s.name}
@@ -127,7 +138,9 @@ export function StudentFilters({
                         onFilterChange('branch_id', newBranch);
                         if (newBranch && filterData.shift_id) {
                             const validShift = shifts.some(
-                                (s) => String(s.id) === filterData.shift_id && String(s.branch_id) === newBranch
+                                (s) =>
+                                    String(s.id) === filterData.shift_id &&
+                                    String(s.branch_id) === newBranch,
                             );
                             if (!validShift) {
                                 onFilterChange('shift_id', '');
@@ -136,11 +149,18 @@ export function StudentFilters({
                         }
                     }}
                 >
-                    <SelectTrigger className="h-9 text-xs rounded-xl">
-                        <SelectValue placeholder={t('branches.select_branch', 'Barcha filiallar')} />
+                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                        <SelectValue
+                            placeholder={t(
+                                'branches.select_branch',
+                                'Barcha filiallar',
+                            )}
+                        />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('branches.select_branch', 'Barcha filiallar')}</SelectItem>
+                        <SelectItem value="all">
+                            {t('branches.select_branch', 'Barcha filiallar')}
+                        </SelectItem>
                         {filteredBranches.map((b) => (
                             <SelectItem key={b.id} value={String(b.id)}>
                                 {b.name}
@@ -157,7 +177,9 @@ export function StudentFilters({
                         onFilterChange('shift_id', newShift);
                         if (newShift && filterData.class_id) {
                             const validClass = classes.some(
-                                (c) => String(c.id) === filterData.class_id && String(c.shift_id) === newShift
+                                (c) =>
+                                    String(c.id) === filterData.class_id &&
+                                    String(c.shift_id) === newShift,
                             );
                             if (!validClass) {
                                 onFilterChange('class_id', '');
@@ -165,11 +187,18 @@ export function StudentFilters({
                         }
                     }}
                 >
-                    <SelectTrigger className="h-9 text-xs rounded-xl">
-                        <SelectValue placeholder={t('classes.all_shifts', 'Barcha smenalar')} />
+                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                        <SelectValue
+                            placeholder={t(
+                                'classes.all_shifts',
+                                'Barcha smenalar',
+                            )}
+                        />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('classes.all_shifts', 'Barcha smenalar')}</SelectItem>
+                        <SelectItem value="all">
+                            {t('classes.all_shifts', 'Barcha smenalar')}
+                        </SelectItem>
                         {filteredShifts.map((s) => (
                             <SelectItem key={s.id} value={String(s.id)}>
                                 {s.name}
@@ -181,13 +210,22 @@ export function StudentFilters({
                 {/* 4. Class (Sinf) */}
                 <Select
                     value={filterData.class_id || 'all'}
-                    onValueChange={(val) => onFilterChange('class_id', val === 'all' ? '' : val)}
+                    onValueChange={(val) =>
+                        onFilterChange('class_id', val === 'all' ? '' : val)
+                    }
                 >
-                    <SelectTrigger className="h-9 text-xs rounded-xl">
-                        <SelectValue placeholder={t('students.all_classes', 'Barcha sinflar')} />
+                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                        <SelectValue
+                            placeholder={t(
+                                'students.all_classes',
+                                'Barcha sinflar',
+                            )}
+                        />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('students.all_classes', 'Barcha sinflar')}</SelectItem>
+                        <SelectItem value="all">
+                            {t('students.all_classes', 'Barcha sinflar')}
+                        </SelectItem>
                         {filteredClasses.map((cls) => (
                             <SelectItem key={cls.id} value={String(cls.id)}>
                                 {cls.name}
@@ -199,28 +237,46 @@ export function StudentFilters({
                 {/* 5. Status */}
                 <Select
                     value={filterData.status || 'all'}
-                    onValueChange={(val) => onFilterChange('status', val === 'all' ? '' : val)}
+                    onValueChange={(val) =>
+                        onFilterChange('status', val === 'all' ? '' : val)
+                    }
                 >
-                    <SelectTrigger className="h-9 text-xs rounded-xl">
-                        <SelectValue placeholder={t('students.all_status', 'Barcha holatlar')} />
+                    <SelectTrigger className="h-9 rounded-xl text-xs">
+                        <SelectValue
+                            placeholder={t(
+                                'students.all_status',
+                                'Barcha holatlar',
+                            )}
+                        />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">{t('students.all_status', 'Barcha holatlar')}</SelectItem>
-                        <SelectItem value="active">{t('students.active', 'Faol')}</SelectItem>
-                        <SelectItem value="inactive">{t('students.inactive', 'Nofaol')}</SelectItem>
+                        <SelectItem value="all">
+                            {t('students.all_status', 'Barcha holatlar')}
+                        </SelectItem>
+                        <SelectItem value="active">
+                            {t('students.active', 'Faol')}
+                        </SelectItem>
+                        <SelectItem value="inactive">
+                            {t('students.inactive', 'Nofaol')}
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
 
             {/* Bottom row: Search, Clear, Per Page */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1 border-t border-border/50">
+            <div className="flex flex-col items-stretch justify-between gap-2 border-t border-border/50 pt-1 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
-                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         value={filterData.search || ''}
-                        onChange={(e) => onFilterChange('search', e.target.value)}
-                        placeholder={t('students.placeholder_search', 'F.I.O, telefon yoki ID bo‘yicha qidirish...')}
-                        className="h-9 pl-8 text-xs rounded-xl"
+                        onChange={(e) =>
+                            onFilterChange('search', e.target.value)
+                        }
+                        placeholder={t(
+                            'students.placeholder_search',
+                            'F.I.O, telefon yoki ID bo‘yicha qidirish...',
+                        )}
+                        className="h-9 rounded-xl pl-8 text-xs"
                     />
                 </div>
 
@@ -231,9 +287,9 @@ export function StudentFilters({
                             variant="ghost"
                             size="sm"
                             onClick={onClear}
-                            className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                            className="h-9 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                         >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="h-3.5 w-3.5" />
                             <span>{t('cancel', 'Tozalash')}</span>
                         </Button>
                     )}
@@ -242,14 +298,22 @@ export function StudentFilters({
                         value={filterData.per_page || '20'}
                         onValueChange={(val) => onFilterChange('per_page', val)}
                     >
-                        <SelectTrigger className="w-[110px] h-9 text-xs rounded-xl">
+                        <SelectTrigger className="h-9 w-[110px] rounded-xl text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                            <SelectItem value="20">
+                                20 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="50">
+                                50 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="100">
+                                100 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="all">
+                                {t('common.all', 'Barchasi')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

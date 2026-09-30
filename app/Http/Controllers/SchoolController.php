@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSchoolRequest;
 use App\Http\Requests\UpdateSchoolRequest;
 use App\Models\School;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -38,7 +39,7 @@ class SchoolController extends Controller
             });
         }
 
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             $query->whereHas('user_schools', function ($q) {
                 $q->where('user_id', Auth::id());
             });
@@ -72,7 +73,7 @@ class SchoolController extends Controller
             }
 
             return redirect()->back()->with('success', __('Maktab muvaffaqiyatli yaratildi.'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
             ]);
@@ -84,7 +85,7 @@ class SchoolController extends Controller
      */
     public function show(Request $request, School $school)
     {
-        if (Auth::check() && !Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('Superadmin')) {
+        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
             Auth::user()->user_schools()
                 ->where('school_id', $school->id)
                 ->firstOrFail();
@@ -106,8 +107,9 @@ class SchoolController extends Controller
     {
         try {
             $school->update($request->validated());
+
             return redirect()->back()->with('success', __('Maktab muvaffaqiyatli yangilandi.'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
             ]);
@@ -121,8 +123,9 @@ class SchoolController extends Controller
     {
         try {
             $school->delete();
+
             return redirect()->back()->with('success', __('Maktab muvaffaqiyatli o‘chirildi.'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
             ]);

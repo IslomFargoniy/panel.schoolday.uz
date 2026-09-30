@@ -20,7 +20,13 @@ interface ClassFiltersProps {
     };
     schools?: { id: number; name: string }[];
     branches?: { id: number; name: string; school_id?: number }[];
-    shifts?: { id: number; name: string; branch_id?: number; start_time?: string; end_time?: string }[];
+    shifts?: {
+        id: number;
+        name: string;
+        branch_id?: number;
+        start_time?: string;
+        end_time?: string;
+    }[];
     onFilterChange: (key: string, value: string) => void;
     onReset: () => void;
     onCreate?: () => void;
@@ -39,7 +45,9 @@ export function ClassFilters({
 
     // Cascading Branches by selected School
     const filteredBranches = filterData.school_id
-        ? branches.filter((b) => String(b.school_id) === String(filterData.school_id))
+        ? branches.filter(
+              (b) => String(b.school_id) === String(filterData.school_id),
+          )
         : branches;
 
     // Cascading Shifts by selected Branch or School
@@ -59,12 +67,12 @@ export function ClassFilters({
         filterData.branch_id ||
         filterData.shift_id ||
         filterData.search ||
-        filterData.per_page !== '20'
+        filterData.per_page !== '20',
     );
 
     return (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
-            <div className="flex flex-wrap items-center gap-2 flex-1">
+        <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs sm:flex-row sm:items-center dark:border-sidebar-border/70">
+            <div className="flex flex-1 flex-wrap items-center gap-2">
                 {/* School Filter */}
                 {schools.length > 0 && (
                     <div className="w-full sm:w-40">
@@ -75,7 +83,10 @@ export function ClassFilters({
                                 onFilterChange('school_id', newSchool);
                                 if (newSchool && filterData.branch_id) {
                                     const validBranch = branches.some(
-                                        (b) => String(b.id) === filterData.branch_id && String(b.school_id) === newSchool
+                                        (b) =>
+                                            String(b.id) ===
+                                                filterData.branch_id &&
+                                            String(b.school_id) === newSchool,
                                     );
                                     if (!validBranch) {
                                         onFilterChange('branch_id', '');
@@ -84,11 +95,18 @@ export function ClassFilters({
                                 }
                             }}
                         >
-                            <SelectTrigger className="h-9 text-xs rounded-xl">
-                                <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                            <SelectTrigger className="h-9 rounded-xl text-xs">
+                                <SelectValue
+                                    placeholder={t(
+                                        'select_school',
+                                        'Barcha maktablar',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                <SelectItem value="all">
+                                    {t('select_school', 'Barcha maktablar')}
+                                </SelectItem>
                                 {schools.map((s) => (
                                     <SelectItem key={s.id} value={String(s.id)}>
                                         {s.name}
@@ -108,7 +126,9 @@ export function ClassFilters({
                             onFilterChange('branch_id', newBranch);
                             if (newBranch && filterData.shift_id) {
                                 const validShift = shifts.some(
-                                    (s) => String(s.id) === filterData.shift_id && String(s.branch_id) === newBranch
+                                    (s) =>
+                                        String(s.id) === filterData.shift_id &&
+                                        String(s.branch_id) === newBranch,
                                 );
                                 if (!validShift) {
                                     onFilterChange('shift_id', '');
@@ -116,11 +136,21 @@ export function ClassFilters({
                             }
                         }}
                     >
-                        <SelectTrigger className="h-9 text-xs rounded-xl">
-                            <SelectValue placeholder={t('branches.select_branch', 'Barcha filiallar')} />
+                        <SelectTrigger className="h-9 rounded-xl text-xs">
+                            <SelectValue
+                                placeholder={t(
+                                    'branches.select_branch',
+                                    'Barcha filiallar',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{t('branches.select_branch', 'Barcha filiallar')}</SelectItem>
+                            <SelectItem value="all">
+                                {t(
+                                    'branches.select_branch',
+                                    'Barcha filiallar',
+                                )}
+                            </SelectItem>
                             {filteredBranches.map((b) => (
                                 <SelectItem key={b.id} value={String(b.id)}>
                                     {b.name}
@@ -134,16 +164,31 @@ export function ClassFilters({
                 <div className="w-full sm:w-40">
                     <Select
                         value={filterData.shift_id || 'all'}
-                        onValueChange={(val) => onFilterChange('shift_id', val === 'all' ? '' : val)}
+                        onValueChange={(val) =>
+                            onFilterChange('shift_id', val === 'all' ? '' : val)
+                        }
                     >
-                        <SelectTrigger className="h-9 text-xs rounded-xl">
-                            <SelectValue placeholder={t('classes.all_shifts', 'Barcha smenalar')} />
+                        <SelectTrigger className="h-9 rounded-xl text-xs">
+                            <SelectValue
+                                placeholder={t(
+                                    'classes.all_shifts',
+                                    'Barcha smenalar',
+                                )}
+                            />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{t('classes.all_shifts', 'Barcha smenalar')}</SelectItem>
+                            <SelectItem value="all">
+                                {t('classes.all_shifts', 'Barcha smenalar')}
+                            </SelectItem>
                             {filteredShifts.map((shift) => (
-                                <SelectItem key={shift.id} value={String(shift.id)}>
-                                    {shift.name} {shift.start_time ? `(${shift.start_time.substring(0, 5)})` : ''}
+                                <SelectItem
+                                    key={shift.id}
+                                    value={String(shift.id)}
+                                >
+                                    {shift.name}{' '}
+                                    {shift.start_time
+                                        ? `(${shift.start_time.substring(0, 5)})`
+                                        : ''}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -151,13 +196,15 @@ export function ClassFilters({
                 </div>
 
                 {/* Search */}
-                <div className="relative flex-1 min-w-[140px]">
-                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <div className="relative min-w-[140px] flex-1">
+                    <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         value={filterData.search || ''}
-                        onChange={(e) => onFilterChange('search', e.target.value)}
+                        onChange={(e) =>
+                            onFilterChange('search', e.target.value)
+                        }
                         placeholder={t('classes.search', 'Sinfni qidirish...')}
-                        className="h-9 pl-8 text-xs rounded-xl"
+                        className="h-9 rounded-xl pl-8 text-xs"
                     />
                 </div>
             </div>
@@ -169,9 +216,9 @@ export function ClassFilters({
                         variant="ghost"
                         size="sm"
                         onClick={onReset}
-                        className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                        className="h-9 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                     >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="h-3.5 w-3.5" />
                         <span>{t('cancel', 'Tozalash')}</span>
                     </Button>
                 )}
@@ -180,14 +227,22 @@ export function ClassFilters({
                     value={filterData.per_page || '20'}
                     onValueChange={(val) => onFilterChange('per_page', val)}
                 >
-                    <SelectTrigger className="w-[110px] h-9 text-xs rounded-xl">
+                    <SelectTrigger className="h-9 w-[110px] rounded-xl text-xs">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
-                        <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
-                        <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
-                        <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                        <SelectItem value="20">
+                            20 {t('common.items', 'ta')}
+                        </SelectItem>
+                        <SelectItem value="50">
+                            50 {t('common.items', 'ta')}
+                        </SelectItem>
+                        <SelectItem value="100">
+                            100 {t('common.items', 'ta')}
+                        </SelectItem>
+                        <SelectItem value="all">
+                            {t('common.all', 'Barchasi')}
+                        </SelectItem>
                     </SelectContent>
                 </Select>
 
@@ -195,7 +250,7 @@ export function ClassFilters({
                     <Button
                         onClick={onCreate}
                         size="sm"
-                        className="h-9 gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
+                        className="h-9 shrink-0 gap-1.5 rounded-xl font-medium shadow-xs"
                     >
                         <Plus className="h-4 w-4 shrink-0" />
                         <span>Create</span>

@@ -43,29 +43,40 @@ export function ShiftsTable({
 
     // Cascading: filter branches by selected school
     const filteredBranches = filterData.school_id
-        ? branches.filter((b) => String(b.school_id) === String(filterData.school_id))
+        ? branches.filter(
+              (b) => String(b.school_id) === String(filterData.school_id),
+          )
         : branches;
 
     const hasFilters = Boolean(
-        filterData.school_id || filterData.branch_id || filterData.search || filterData.per_page !== '20'
+        filterData.school_id ||
+        filterData.branch_id ||
+        filterData.search ||
+        filterData.per_page !== '20',
     );
 
     return (
         <div className="w-full space-y-4">
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
-                <div className="flex flex-wrap items-center gap-2 flex-1">
+            <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs sm:flex-row sm:items-center dark:border-sidebar-border/70">
+                <div className="flex flex-1 flex-wrap items-center gap-2">
                     {/* Foreign key: school_id */}
                     {schools.length > 0 && (
                         <div className="w-full sm:w-44">
                             <Select
                                 value={filterData.school_id || 'all'}
                                 onValueChange={(val) => {
-                                    onFilterChange('school_id', val === 'all' ? '' : val);
+                                    onFilterChange(
+                                        'school_id',
+                                        val === 'all' ? '' : val,
+                                    );
                                     // Reset branch if it doesn't belong to the newly selected school
                                     if (val !== 'all' && filterData.branch_id) {
                                         const stillValid = branches.some(
-                                            (b) => String(b.id) === filterData.branch_id && String(b.school_id) === val
+                                            (b) =>
+                                                String(b.id) ===
+                                                    filterData.branch_id &&
+                                                String(b.school_id) === val,
                                         );
                                         if (!stillValid) {
                                             onFilterChange('branch_id', '');
@@ -73,13 +84,23 @@ export function ShiftsTable({
                                     }
                                 }}
                             >
-                                <SelectTrigger className="h-9 text-xs rounded-xl">
-                                    <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
+                                    <SelectValue
+                                        placeholder={t(
+                                            'select_school',
+                                            'Barcha maktablar',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                    <SelectItem value="all">
+                                        {t('select_school', 'Barcha maktablar')}
+                                    </SelectItem>
                                     {schools.map((s) => (
-                                        <SelectItem key={s.id} value={String(s.id)}>
+                                        <SelectItem
+                                            key={s.id}
+                                            value={String(s.id)}
+                                        >
                                             {s.name}
                                         </SelectItem>
                                     ))}
@@ -92,13 +113,28 @@ export function ShiftsTable({
                     <div className="w-full sm:w-44">
                         <Select
                             value={filterData.branch_id || 'all'}
-                            onValueChange={(val) => onFilterChange('branch_id', val === 'all' ? '' : val)}
+                            onValueChange={(val) =>
+                                onFilterChange(
+                                    'branch_id',
+                                    val === 'all' ? '' : val,
+                                )
+                            }
                         >
-                            <SelectTrigger className="h-9 text-xs rounded-xl">
-                                <SelectValue placeholder={t('branches.select_branch', 'Barcha filiallar')} />
+                            <SelectTrigger className="h-9 rounded-xl text-xs">
+                                <SelectValue
+                                    placeholder={t(
+                                        'branches.select_branch',
+                                        'Barcha filiallar',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{t('branches.select_branch', 'Barcha filiallar')}</SelectItem>
+                                <SelectItem value="all">
+                                    {t(
+                                        'branches.select_branch',
+                                        'Barcha filiallar',
+                                    )}
+                                </SelectItem>
                                 {filteredBranches.map((b) => (
                                     <SelectItem key={b.id} value={String(b.id)}>
                                         {b.name}
@@ -109,13 +145,18 @@ export function ShiftsTable({
                     </div>
 
                     {/* Search by shift name */}
-                    <div className="relative flex-1 min-w-[160px]">
-                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <div className="relative min-w-[160px] flex-1">
+                        <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             value={filterData.search || ''}
-                            onChange={(e) => onFilterChange('search', e.target.value)}
-                            placeholder={t('search_shift', 'Smenani qidirish...')}
-                            className="h-9 pl-8 text-xs rounded-xl"
+                            onChange={(e) =>
+                                onFilterChange('search', e.target.value)
+                            }
+                            placeholder={t(
+                                'search_shift',
+                                'Smenani qidirish...',
+                            )}
+                            className="h-9 rounded-xl pl-8 text-xs"
                         />
                     </div>
                 </div>
@@ -127,9 +168,9 @@ export function ShiftsTable({
                             variant="ghost"
                             size="sm"
                             onClick={onResetFilters}
-                            className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                            className="h-9 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                         >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="h-3.5 w-3.5" />
                             <span>{t('cancel', 'Tozalash')}</span>
                         </Button>
                     )}
@@ -138,14 +179,22 @@ export function ShiftsTable({
                         value={filterData.per_page || '20'}
                         onValueChange={(val) => onFilterChange('per_page', val)}
                     >
-                        <SelectTrigger className="w-[110px] h-9 text-xs rounded-xl">
+                        <SelectTrigger className="h-9 w-[110px] rounded-xl text-xs">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
-                            <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                            <SelectItem value="20">
+                                20 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="50">
+                                50 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="100">
+                                100 {t('common.items', 'ta')}
+                            </SelectItem>
+                            <SelectItem value="all">
+                                {t('common.all', 'Barchasi')}
+                            </SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -153,7 +202,7 @@ export function ShiftsTable({
                         <Button
                             onClick={onCreate}
                             size="sm"
-                            className="h-9 gap-1.5 rounded-xl font-medium shadow-xs shrink-0"
+                            className="h-9 shrink-0 gap-1.5 rounded-xl font-medium shadow-xs"
                         >
                             <Plus className="h-4 w-4 shrink-0" />
                             <span>Create</span>
@@ -164,26 +213,26 @@ export function ShiftsTable({
 
             {/* Table */}
             <div className="relative overflow-hidden rounded-xl border border-sidebar-border bg-card shadow-sm dark:border-sidebar-border/70">
-                <div className="overflow-x-auto min-w-0 max-w-full">
+                <div className="max-w-full min-w-0 overflow-x-auto">
                     <table className="w-full min-w-[680px] text-left text-sm">
                         <thead className="border-b bg-muted/50 text-xs text-muted-foreground uppercase">
                             <tr>
-                                <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                                <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                     {t('shifts.details', 'Shift Details')}
                                 </th>
-                                <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                                <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                     {t('shifts.branch', 'Branch')}
                                 </th>
-                                <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                                <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                     {t('shifts.capacity', 'Capacity')}
                                 </th>
-                                <th className="px-4 sm:px-6 py-3.5 sm:py-4 font-medium">
+                                <th className="px-4 py-3.5 font-medium sm:px-6 sm:py-4">
                                     {t(
                                         'shifts.today_attendance',
                                         "Today's Attendance",
                                     )}
                                 </th>
-                                <th className="px-4 sm:px-6 py-3.5 sm:py-4 text-right font-medium">
+                                <th className="px-4 py-3.5 text-right font-medium sm:px-6 sm:py-4">
                                     {t('shifts.actions', 'Actions')}
                                 </th>
                             </tr>
@@ -216,8 +265,11 @@ export function ShiftsTable({
                                                     {shift.branch.name}
                                                 </span>
                                                 {shift.branch.school && (
-                                                    <span className="text-[11px] text-muted-foreground mt-0.5">
-                                                        {shift.branch.school.name}
+                                                    <span className="mt-0.5 text-[11px] text-muted-foreground">
+                                                        {
+                                                            shift.branch.school
+                                                                .name
+                                                        }
                                                     </span>
                                                 )}
                                             </div>
@@ -283,7 +335,10 @@ export function ShiftsTable({
                                                     onDelete(shift.id)
                                                 }
                                                 className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                                title={t('shifts.delete', 'Delete')}
+                                                title={t(
+                                                    'shifts.delete',
+                                                    'Delete',
+                                                )}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

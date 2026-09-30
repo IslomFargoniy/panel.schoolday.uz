@@ -88,15 +88,18 @@ export default function ReportsPage({
             status: 'all',
             per_page: '20',
         };
-        router.get('/reports', resetData, { preserveState: true, replace: true });
+        router.get('/reports', resetData, {
+            preserveState: true,
+            replace: true,
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('reports.title', 'Daily Attendance Report')} />
-            <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 min-w-0 max-w-full">
+            <div className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-4 sm:p-6">
                 <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                    <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                         {t('reports.title', 'Daily Attendance Report')}
                     </h2>
                 </div>

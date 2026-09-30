@@ -54,7 +54,9 @@ export function ReportFilters({
 
     // Cascading branches
     const filteredBranches = filterData.school_id
-        ? branches.filter((b) => String(b.school_id) === String(filterData.school_id))
+        ? branches.filter(
+              (b) => String(b.school_id) === String(filterData.school_id),
+          )
         : branches;
 
     const branchIds = filteredBranches.map((b) => b.id);
@@ -90,7 +92,11 @@ export function ReportFilters({
         if (filterData.class_id) {
             return String(st.class_id) === String(filterData.class_id);
         }
-        if (filterData.shift_id || filterData.branch_id || filterData.school_id) {
+        if (
+            filterData.shift_id ||
+            filterData.branch_id ||
+            filterData.school_id
+        ) {
             return st.class_id && classIds.includes(st.class_id);
         }
         return true;
@@ -103,17 +109,14 @@ export function ReportFilters({
         filterData.class_id ||
         filterData.student_id ||
         (filterData.status && filterData.status !== 'all') ||
-        filterData.per_page !== '20'
+        filterData.per_page !== '20',
     );
 
     return (
         <div className="mb-4 rounded-xl border border-sidebar-border bg-card p-4 shadow-sm dark:border-sidebar-border">
-            <form
-                onSubmit={onSubmit}
-                className="flex flex-col gap-3"
-            >
+            <form onSubmit={onSubmit} className="flex flex-col gap-3">
                 {/* Row 1: Cascading Foreign Keys (School -> Branch -> Shift -> Class -> Student) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {/* 1. School (Maktab) */}
                     {schools.length > 0 && (
                         <div>
@@ -124,7 +127,11 @@ export function ReportFilters({
                                     setData('school_id', newSchool);
                                     if (newSchool && filterData.branch_id) {
                                         const valid = branches.some(
-                                            (b) => String(b.id) === filterData.branch_id && String(b.school_id) === newSchool
+                                            (b) =>
+                                                String(b.id) ===
+                                                    filterData.branch_id &&
+                                                String(b.school_id) ===
+                                                    newSchool,
                                         );
                                         if (!valid) {
                                             setData('branch_id', '');
@@ -135,13 +142,23 @@ export function ReportFilters({
                                     }
                                 }}
                             >
-                                <SelectTrigger className="h-9 text-xs rounded-xl">
-                                    <SelectValue placeholder={t('select_school', 'Barcha maktablar')} />
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
+                                    <SelectValue
+                                        placeholder={t(
+                                            'select_school',
+                                            'Barcha maktablar',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t('select_school', 'Barcha maktablar')}</SelectItem>
+                                    <SelectItem value="all">
+                                        {t('select_school', 'Barcha maktablar')}
+                                    </SelectItem>
                                     {schools.map((s) => (
-                                        <SelectItem key={s.id} value={String(s.id)}>
+                                        <SelectItem
+                                            key={s.id}
+                                            value={String(s.id)}
+                                        >
                                             {s.name}
                                         </SelectItem>
                                     ))}
@@ -159,7 +176,10 @@ export function ReportFilters({
                                 setData('branch_id', newBranch);
                                 if (newBranch && filterData.shift_id) {
                                     const valid = shifts.some(
-                                        (s) => String(s.id) === filterData.shift_id && String(s.branch_id) === newBranch
+                                        (s) =>
+                                            String(s.id) ===
+                                                filterData.shift_id &&
+                                            String(s.branch_id) === newBranch,
                                     );
                                     if (!valid) {
                                         setData('shift_id', '');
@@ -169,11 +189,21 @@ export function ReportFilters({
                                 }
                             }}
                         >
-                            <SelectTrigger className="h-9 text-xs rounded-xl">
-                                <SelectValue placeholder={t('reports.all_branches', 'Barcha filiallar')} />
+                            <SelectTrigger className="h-9 rounded-xl text-xs">
+                                <SelectValue
+                                    placeholder={t(
+                                        'reports.all_branches',
+                                        'Barcha filiallar',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{t('reports.all_branches', 'Barcha filiallar')}</SelectItem>
+                                <SelectItem value="all">
+                                    {t(
+                                        'reports.all_branches',
+                                        'Barcha filiallar',
+                                    )}
+                                </SelectItem>
                                 {filteredBranches.map((b: any) => (
                                     <SelectItem key={b.id} value={String(b.id)}>
                                         {b.name}
@@ -192,7 +222,10 @@ export function ReportFilters({
                                 setData('shift_id', newShift);
                                 if (newShift && filterData.class_id) {
                                     const valid = classes.some(
-                                        (c) => String(c.id) === filterData.class_id && String(c.shift_id) === newShift
+                                        (c) =>
+                                            String(c.id) ===
+                                                filterData.class_id &&
+                                            String(c.shift_id) === newShift,
                                     );
                                     if (!valid) {
                                         setData('class_id', '');
@@ -201,11 +234,18 @@ export function ReportFilters({
                                 }
                             }}
                         >
-                            <SelectTrigger className="h-9 text-xs rounded-xl">
-                                <SelectValue placeholder={t('reports.all_shifts', 'Barcha smenalar')} />
+                            <SelectTrigger className="h-9 rounded-xl text-xs">
+                                <SelectValue
+                                    placeholder={t(
+                                        'reports.all_shifts',
+                                        'Barcha smenalar',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{t('reports.all_shifts', 'Barcha smenalar')}</SelectItem>
+                                <SelectItem value="all">
+                                    {t('reports.all_shifts', 'Barcha smenalar')}
+                                </SelectItem>
                                 {filteredShifts.map((s: any) => (
                                     <SelectItem key={s.id} value={String(s.id)}>
                                         {s.name}
@@ -224,7 +264,10 @@ export function ReportFilters({
                                 setData('class_id', newClass);
                                 if (newClass && filterData.student_id) {
                                     const valid = students.some(
-                                        (st) => String(st.id) === filterData.student_id && String(st.class_id) === newClass
+                                        (st) =>
+                                            String(st.id) ===
+                                                filterData.student_id &&
+                                            String(st.class_id) === newClass,
                                     );
                                     if (!valid) {
                                         setData('student_id', '');
@@ -232,11 +275,18 @@ export function ReportFilters({
                                 }
                             }}
                         >
-                            <SelectTrigger className="h-9 text-xs rounded-xl">
-                                <SelectValue placeholder={t('reports.all_classes', 'Barcha sinflar')} />
+                            <SelectTrigger className="h-9 rounded-xl text-xs">
+                                <SelectValue
+                                    placeholder={t(
+                                        'reports.all_classes',
+                                        'Barcha sinflar',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">{t('reports.all_classes', 'Barcha sinflar')}</SelectItem>
+                                <SelectItem value="all">
+                                    {t('reports.all_classes', 'Barcha sinflar')}
+                                </SelectItem>
                                 {filteredClasses.map((c: any) => (
                                     <SelectItem key={c.id} value={String(c.id)}>
                                         {c.name}
@@ -250,14 +300,25 @@ export function ReportFilters({
                     <div>
                         <Combobox
                             value={filterData.student_id}
-                            onChange={(val) => setData('student_id', val === 'all' ? '' : val)}
-                            placeholder={t('reports.all_students', "Barcha o'quvchilar")}
-                            searchPlaceholder={t('common.search', 'Qidirish...')}
+                            onChange={(val) =>
+                                setData('student_id', val === 'all' ? '' : val)
+                            }
+                            placeholder={t(
+                                'reports.all_students',
+                                "Barcha o'quvchilar",
+                            )}
+                            searchPlaceholder={t(
+                                'common.search',
+                                'Qidirish...',
+                            )}
                             emptyText={t('common.not_found', 'Topilmadi')}
                             options={[
                                 {
                                     value: '',
-                                    label: t('reports.all_students', "Barcha o'quvchilar"),
+                                    label: t(
+                                        'reports.all_students',
+                                        "Barcha o'quvchilar",
+                                    ),
                                 },
                                 ...filteredStudents.map((s: any) => ({
                                     value: String(s.id),
@@ -269,31 +330,42 @@ export function ReportFilters({
                 </div>
 
                 {/* Row 2: Date range, Status, Per page, Submit, Reset */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/50">
-                    <div className="flex flex-wrap items-center gap-2 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/50 pt-2">
+                    <div className="flex flex-1 flex-wrap items-center gap-2">
                         {/* Date Range Popover */}
                         <div className="w-full sm:w-60">
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={`w-full justify-start border-sidebar-border bg-card text-left font-normal text-xs h-9 rounded-xl hover:bg-muted ${
-                                            !filterData.start_date || !filterData.end_date
+                                        className={`h-9 w-full justify-start rounded-xl border-sidebar-border bg-card text-left text-xs font-normal hover:bg-muted ${
+                                            !filterData.start_date ||
+                                            !filterData.end_date
                                                 ? 'text-muted-foreground'
                                                 : ''
                                         }`}
                                     >
                                         <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                                        {filterData.start_date || filterData.end_date ? (
+                                        {filterData.start_date ||
+                                        filterData.end_date ? (
                                             <span>
-                                                {filterData.start_date || '...'} - {filterData.end_date || '...'}
+                                                {filterData.start_date || '...'}{' '}
+                                                - {filterData.end_date || '...'}
                                             </span>
                                         ) : (
-                                            <span>{t('reports.select_date', 'Sanani tanlang')}</span>
+                                            <span>
+                                                {t(
+                                                    'reports.select_date',
+                                                    'Sanani tanlang',
+                                                )}
+                                            </span>
                                         )}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-4" align="start">
+                                <PopoverContent
+                                    className="w-auto p-4"
+                                    align="start"
+                                >
                                     <div className="flex flex-col gap-3">
                                         <div className="space-y-1">
                                             <label className="text-xs font-medium text-muted-foreground">
@@ -302,7 +374,12 @@ export function ReportFilters({
                                             <Input
                                                 type="date"
                                                 value={filterData.start_date}
-                                                onChange={(e) => setData('start_date', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'start_date',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 required
                                                 className="h-9"
                                             />
@@ -314,7 +391,12 @@ export function ReportFilters({
                                             <Input
                                                 type="date"
                                                 value={filterData.end_date}
-                                                onChange={(e) => setData('end_date', e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'end_date',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 required
                                                 className="h-9"
                                             />
@@ -330,16 +412,48 @@ export function ReportFilters({
                                 value={filterData.status}
                                 onValueChange={(val) => setData('status', val)}
                             >
-                                <SelectTrigger className="h-9 text-xs rounded-xl">
-                                    <SelectValue placeholder={t('reports.status', 'Holat')} />
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
+                                    <SelectValue
+                                        placeholder={t(
+                                            'reports.status',
+                                            'Holat',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">{t('reports.status_all', 'Barchasi')}</SelectItem>
-                                    <SelectItem value="present">{t('reports.status_present', 'Kelganlar')}</SelectItem>
-                                    <SelectItem value="on_time">{t('reports.status_on_time', "O'z vaqtida")}</SelectItem>
-                                    <SelectItem value="late">{t('reports.status_late', 'Kechikkanlar')}</SelectItem>
-                                    <SelectItem value="left_early">{t('reports.status_left_early', 'Barvaqt ketganlar')}</SelectItem>
-                                    <SelectItem value="absent">{t('reports.status_absent', 'Kelmaganlar')}</SelectItem>
+                                    <SelectItem value="all">
+                                        {t('reports.status_all', 'Barchasi')}
+                                    </SelectItem>
+                                    <SelectItem value="present">
+                                        {t(
+                                            'reports.status_present',
+                                            'Kelganlar',
+                                        )}
+                                    </SelectItem>
+                                    <SelectItem value="on_time">
+                                        {t(
+                                            'reports.status_on_time',
+                                            "O'z vaqtida",
+                                        )}
+                                    </SelectItem>
+                                    <SelectItem value="late">
+                                        {t(
+                                            'reports.status_late',
+                                            'Kechikkanlar',
+                                        )}
+                                    </SelectItem>
+                                    <SelectItem value="left_early">
+                                        {t(
+                                            'reports.status_left_early',
+                                            'Barvaqt ketganlar',
+                                        )}
+                                    </SelectItem>
+                                    <SelectItem value="absent">
+                                        {t(
+                                            'reports.status_absent',
+                                            'Kelmaganlar',
+                                        )}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -348,37 +462,51 @@ export function ReportFilters({
                         <div className="w-28">
                             <Select
                                 value={filterData.per_page}
-                                onValueChange={(val) => setData('per_page', val)}
+                                onValueChange={(val) =>
+                                    setData('per_page', val)
+                                }
                             >
-                                <SelectTrigger className="h-9 text-xs rounded-xl">
+                                <SelectTrigger className="h-9 rounded-xl text-xs">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="20">20 {t('common.items', 'ta')}</SelectItem>
-                                    <SelectItem value="50">50 {t('common.items', 'ta')}</SelectItem>
-                                    <SelectItem value="100">100 {t('common.items', 'ta')}</SelectItem>
-                                    <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
+                                    <SelectItem value="20">
+                                        20 {t('common.items', 'ta')}
+                                    </SelectItem>
+                                    <SelectItem value="50">
+                                        50 {t('common.items', 'ta')}
+                                    </SelectItem>
+                                    <SelectItem value="100">
+                                        100 {t('common.items', 'ta')}
+                                    </SelectItem>
+                                    <SelectItem value="all">
+                                        {t('common.all', 'Barchasi')}
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
 
                     {/* Actions: Filter & Reset */}
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                         {hasActiveFilters && onReset && (
                             <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={onReset}
-                                className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                                className="h-9 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                             >
-                                <X className="w-3.5 h-3.5" />
+                                <X className="h-3.5 w-3.5" />
                                 <span>{t('cancel', 'Tozalash')}</span>
                             </Button>
                         )}
 
-                        <Button type="submit" size="sm" className="h-9 text-xs rounded-xl">
+                        <Button
+                            type="submit"
+                            size="sm"
+                            className="h-9 rounded-xl text-xs"
+                        >
                             {t('reports.filter', 'Hisobotni filtrlash')}
                         </Button>
                     </div>
