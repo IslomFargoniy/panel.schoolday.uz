@@ -65,7 +65,9 @@ export function AppearanceToggleDropdown({
                         ) : (
                             <Monitor className="h-4 w-4 text-slate-600 dark:text-slate-300" />
                         )}
-                        <span className="sr-only">Toggle theme</span>
+                        <span className="sr-only">
+                            {t('toggle_theme', 'Mavzuni almashtirish')}
+                        </span>
                     </Button>
                 </DropdownMenuTrigger>
 

@@ -112,14 +112,14 @@ export function StudentFilters({
                         <SelectTrigger className="h-9 rounded-xl text-xs">
                             <SelectValue
                                 placeholder={t(
-                                    'select_school',
+                                    'all_schools',
                                     'Barcha maktablar',
                                 )}
                             />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">
-                                {t('select_school', 'Barcha maktablar')}
+                                {t('all_schools', 'Barcha maktablar')}
                             </SelectItem>
                             {schools.map((s) => (
                                 <SelectItem key={s.id} value={String(s.id)}>
@@ -152,14 +152,14 @@ export function StudentFilters({
                     <SelectTrigger className="h-9 rounded-xl text-xs">
                         <SelectValue
                             placeholder={t(
-                                'branches.select_branch',
+                                'all_branches',
                                 'Barcha filiallar',
                             )}
                         />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">
-                            {t('branches.select_branch', 'Barcha filiallar')}
+                            {t('all_branches', 'Barcha filiallar')}
                         </SelectItem>
                         {filteredBranches.map((b) => (
                             <SelectItem key={b.id} value={String(b.id)}>
@@ -190,14 +190,14 @@ export function StudentFilters({
                     <SelectTrigger className="h-9 rounded-xl text-xs">
                         <SelectValue
                             placeholder={t(
-                                'classes.all_shifts',
+                                'all_shifts',
                                 'Barcha smenalar',
                             )}
                         />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">
-                            {t('classes.all_shifts', 'Barcha smenalar')}
+                            {t('all_shifts', 'Barcha smenalar')}
                         </SelectItem>
                         {filteredShifts.map((s) => (
                             <SelectItem key={s.id} value={String(s.id)}>
@@ -217,14 +217,14 @@ export function StudentFilters({
                     <SelectTrigger className="h-9 rounded-xl text-xs">
                         <SelectValue
                             placeholder={t(
-                                'students.all_classes',
+                                'all_classes',
                                 'Barcha sinflar',
                             )}
                         />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">
-                            {t('students.all_classes', 'Barcha sinflar')}
+                            {t('all_classes', 'Barcha sinflar')}
                         </SelectItem>
                         {filteredClasses.map((cls) => (
                             <SelectItem key={cls.id} value={String(cls.id)}>
@@ -244,14 +244,14 @@ export function StudentFilters({
                     <SelectTrigger className="h-9 rounded-xl text-xs">
                         <SelectValue
                             placeholder={t(
-                                'students.all_status',
+                                'all_status',
                                 'Barcha holatlar',
                             )}
                         />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">
-                            {t('students.all_status', 'Barcha holatlar')}
+                            {t('all_status', 'Barcha holatlar')}
                         </SelectItem>
                         <SelectItem value="active">
                             {t('students.active', 'Faol')}

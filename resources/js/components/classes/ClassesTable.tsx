@@ -57,7 +57,10 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
                                             {cls.telegram_group_id && (
                                                 <span
                                                     className="inline-flex items-center rounded-md bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-600 ring-1 ring-indigo-500/20 ring-inset dark:text-indigo-400"
-                                                    title="Telegram Group"
+                                                    title={t(
+                                                        'telegram_group_id',
+                                                        'Telegram Group ID',
+                                                    )}
                                                 >
                                                     {cls.telegram_group_id}
                                                 </span>
@@ -74,21 +77,30 @@ export function ClassesTable({ classes, onEdit, onDelete }: ClassesTableProps) {
                                     <div className="flex flex-wrap gap-2">
                                         <span
                                             className="inline-flex items-center rounded-md bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-600 ring-1 ring-emerald-500/20 ring-inset"
-                                            title="Present Today"
+                                            title={t(
+                                                'classes.present_today',
+                                                'Present Today',
+                                            )}
                                         >
                                             {t('classes.present_today', 'P')}:{' '}
                                             {cls.present_students || 0}
                                         </span>
                                         <span
                                             className="inline-flex items-center rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-blue-500/20 ring-inset"
-                                            title="On Time"
+                                            title={t(
+                                                'classes.on_time',
+                                                'On Time',
+                                            )}
                                         >
                                             {t('classes.on_time', 'T')}:{' '}
                                             {cls.on_time_students || 0}
                                         </span>
                                         <span
                                             className="inline-flex items-center rounded-md bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-600 ring-1 ring-amber-500/20 ring-inset"
-                                            title="Late"
+                                            title={t(
+                                                'classes.late',
+                                                'Late',
+                                            )}
                                         >
                                             {t('classes.late', 'L')}:{' '}
                                             {cls.late_students || 0}

@@ -177,10 +177,10 @@ export default function SchoolIndex() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="10">10 ta</SelectItem>
-                                    <SelectItem value="15">15 ta</SelectItem>
-                                    <SelectItem value="25">25 ta</SelectItem>
-                                    <SelectItem value="50">50 ta</SelectItem>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="15">15</SelectItem>
+                                    <SelectItem value="25">25</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

@@ -374,7 +374,10 @@ export default function BranchShowPage({
                                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
                                     <span className="flex items-center gap-1 font-bold text-foreground">
                                         <GraduationCap className="h-3.5 w-3.5 text-sky-500" />
-                                        <span>{activeClass.name} sinfi</span>
+                                        <span>
+                                            {activeClass.name}{' '}
+                                            {t('classes.class_word', 'sinfi')}
+                                        </span>
                                     </span>
                                 </>
                             )}
@@ -578,7 +581,10 @@ export default function BranchShowPage({
                                                                         0}
                                                                 </span>
                                                                 <span>
-                                                                    sinf
+                                                                    {t(
+                                                                        'classes.count_unit',
+                                                                        'sinf',
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -589,7 +595,10 @@ export default function BranchShowPage({
                                                                     }
                                                                 </span>
                                                                 <span>
-                                                                    o‘quvchi
+                                                                    {t(
+                                                                        'students.count_unit',
+                                                                        'o‘quvchi',
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -637,8 +646,11 @@ export default function BranchShowPage({
                                                 )}
                                             </span>
                                             <span className="text-xs font-normal text-muted-foreground">
-                                                ({visibleClasses.length} ta
-                                                sinf)
+                                                ({visibleClasses.length}{' '}
+                                                {t(
+                                                    'classes.count_unit',
+                                                    'sinf',
+                                                )})
                                             </span>
                                         </h3>
                                         <p className="mt-0.5 text-xs text-muted-foreground">
@@ -710,7 +722,10 @@ export default function BranchShowPage({
                                                             <div>
                                                                 <h4 className="text-sm font-bold text-foreground transition-colors group-hover:text-sky-600 dark:group-hover:text-sky-400">
                                                                     {item.name}{' '}
-                                                                    sinfi
+                                                                    {t(
+                                                                        'classes.class_word',
+                                                                        'sinfi',
+                                                                    )}
                                                                 </h4>
                                                                 <span className="text-[11px] text-muted-foreground">
                                                                     {
@@ -768,13 +783,20 @@ export default function BranchShowPage({
                                                     <div className="my-2.5 space-y-1.5 rounded-lg bg-muted/40 p-2 text-xs">
                                                         <div className="flex items-center justify-between text-muted-foreground">
                                                             <span>
-                                                                O‘quvchilar:
+                                                                {t(
+                                                                    'sidebar.students',
+                                                                    'O‘quvchilar',
+                                                                )}
+                                                                :
                                                             </span>
                                                             <span className="font-semibold text-foreground">
                                                                 {(item as any)
                                                                     .students_count ||
                                                                     0}{' '}
-                                                                ta
+                                                                {t(
+                                                                    'count_unit',
+                                                                    'ta',
+                                                                )}
                                                             </span>
                                                         </div>
                                                         {item.telegram_group_id && (
@@ -782,8 +804,11 @@ export default function BranchShowPage({
                                                                 <span className="flex items-center gap-1">
                                                                     <Send className="h-3 w-3 text-sky-500" />
                                                                     <span>
-                                                                        TG
-                                                                        guruh:
+                                                                        {t(
+                                                                            'telegram_group',
+                                                                            'TG guruh',
+                                                                        )}
+                                                                        :
                                                                     </span>
                                                                 </span>
                                                                 <span className="max-w-[100px] truncate font-mono text-foreground">
@@ -830,14 +855,23 @@ export default function BranchShowPage({
                                         <h3 className="flex items-center gap-2 text-base font-bold text-foreground">
                                             <Users className="h-4 w-4 text-emerald-500" />
                                             <span>
-                                                {activeClass?.name} sinfi —{' '}
+                                                {activeClass?.name}{' '}
+                                                {t(
+                                                    'classes.class_word',
+                                                    'sinfi',
+                                                )}{' '}
+                                                —{' '}
                                                 {t(
                                                     'students_list',
                                                     'O‘quvchilar',
                                                 )}
                                             </span>
                                             <span className="text-xs font-normal text-muted-foreground">
-                                                ({students.total || 0} ta)
+                                                ({students.total || 0}{' '}
+                                                {t(
+                                                    'count_unit',
+                                                    'ta',
+                                                )})
                                             </span>
                                         </h3>
                                         <p className="mt-0.5 text-xs text-muted-foreground">
@@ -987,7 +1021,10 @@ export default function BranchShowPage({
                                                                             )
                                                                         }
                                                                         className="rounded p-1 text-muted-foreground hover:text-foreground"
-                                                                        title="Nusxalash"
+                                                                        title={t(
+                                                                            'common.copy',
+                                                                            'Nusxalash',
+                                                                        )}
                                                                     >
                                                                         {copiedId ===
                                                                         String(
@@ -1011,8 +1048,14 @@ export default function BranchShowPage({
                                                                 >
                                                                     {student.status ===
                                                                     'active'
-                                                                        ? 'Faol'
-                                                                        : 'Nofaol'}
+                                                                        ? t(
+                                                                              'students.active',
+                                                                              'Faol',
+                                                                          )
+                                                                        : t(
+                                                                              'students.inactive',
+                                                                              'Nofaol',
+                                                                          )}
                                                                 </span>
                                                             </td>
                                                             <td className="px-3 py-2.5 text-right">

@@ -195,14 +195,14 @@ export default function UsersIndex({
                                 <SelectTrigger className="h-9 rounded-xl text-xs">
                                     <SelectValue
                                         placeholder={t(
-                                            'users.role',
+                                            'all_roles',
                                             'Barcha rollar',
                                         )}
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">
-                                        {t('common.all', 'Barcha rollar')}
+                                        {t('all_roles', 'Barcha rollar')}
                                     </SelectItem>
                                     {roles.map((r) => (
                                         <SelectItem key={r.id} value={r.name}>
@@ -228,7 +228,7 @@ export default function UsersIndex({
                                     <SelectTrigger className="h-9 rounded-xl text-xs">
                                         <SelectValue
                                             placeholder={t(
-                                                'select_school',
+                                                'all_schools',
                                                 'Barcha maktablar',
                                             )}
                                         />
@@ -236,7 +236,7 @@ export default function UsersIndex({
                                     <SelectContent>
                                         <SelectItem value="all">
                                             {t(
-                                                'select_school',
+                                                'all_schools',
                                                 'Barcha maktablar',
                                             )}
                                         </SelectItem>

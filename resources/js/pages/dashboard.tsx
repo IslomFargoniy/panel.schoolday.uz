@@ -121,7 +121,7 @@ export default function Dashboard() {
                                         <SelectTrigger className="h-9 rounded-xl text-xs">
                                             <SelectValue
                                                 placeholder={t(
-                                                    'select_school',
+                                                    'all_schools',
                                                     'Barcha maktablar',
                                                 )}
                                             />
@@ -129,7 +129,7 @@ export default function Dashboard() {
                                         <SelectContent>
                                             <SelectItem value="all">
                                                 {t(
-                                                    'select_school',
+                                                    'all_schools',
                                                     'Barcha maktablar',
                                                 )}
                                             </SelectItem>
@@ -158,7 +158,7 @@ export default function Dashboard() {
                                         <SelectTrigger className="h-9 rounded-xl text-xs">
                                             <SelectValue
                                                 placeholder={t(
-                                                    'branches.select_branch',
+                                                    'all_branches',
                                                     'Barcha filiallar',
                                                 )}
                                             />
@@ -166,7 +166,7 @@ export default function Dashboard() {
                                         <SelectContent>
                                             <SelectItem value="all">
                                                 {t(
-                                                    'branches.select_branch',
+                                                    'all_branches',
                                                     'Barcha filiallar',
                                                 )}
                                             </SelectItem>

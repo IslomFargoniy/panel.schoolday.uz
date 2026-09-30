@@ -230,7 +230,10 @@ export default function StudentHikvisionEventsModal({
                                                         )
                                                     }
                                                     className="group relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border"
-                                                    title="Terminal suratini kattalashtirish"
+                                                    title={t(
+                                                        'enlarge_terminal_photo',
+                                                        'Terminal suratini kattalashtirish',
+                                                    )}
                                                 >
                                                     <img
                                                         src={photoUrl}

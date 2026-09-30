@@ -260,7 +260,7 @@ export default function BranchDeviceTable({
                                         {item.device_id && (
                                             <div className="flex items-center justify-between text-[11px]">
                                                 <span className="font-sans text-muted-foreground">
-                                                    Device ID:
+                                                    {t('device_id_label', 'Device ID')}:
                                                 </span>
                                                 <span className="rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 font-semibold text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-400">
                                                     {item.device_id}
@@ -271,7 +271,7 @@ export default function BranchDeviceTable({
                                         {/* MAC Address with copy */}
                                         <div className="flex items-center justify-between text-[11px]">
                                             <span className="font-sans text-muted-foreground">
-                                                MAC:
+                                                {t('mac_label', 'MAC')}:
                                             </span>
                                             <div className="flex items-center gap-1.5">
                                                 <span className="text-foreground">
@@ -303,12 +303,12 @@ export default function BranchDeviceTable({
                                         {/* Port & Protocol */}
                                         <div className="flex items-center justify-between border-t border-border pt-1 text-[11px]">
                                             <span className="font-sans text-muted-foreground">
-                                                Port / Protocol:
+                                                {t('port_protocol_label', 'Port / Protokol')}:
                                             </span>
                                             <span className="font-sans text-[11px] text-foreground">
                                                 {isIsup
-                                                    ? 'Port 7660 (ISUP)'
-                                                    : 'Port 80/443 (HTTP)'}
+                                                    ? t('port_isup', 'Port 7660 (ISUP)')
+                                                    : t('port_http', 'Port 80/443 (HTTP)')}
                                             </span>
                                         </div>
                                     </div>

@@ -225,7 +225,10 @@ export default function CreateBranchClassModal({
                         </Label>
                         <Input
                             id="class-name"
-                            placeholder="Masalan: 10-A yoki 7-B"
+                            placeholder={t(
+                                'classes.placeholder_name',
+                                'Masalan: 10-A yoki 7-B',
+                            )}
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required

@@ -163,7 +163,10 @@ export default function CreateBranchShiftModal({
                         </Label>
                         <Input
                             id="shift-name"
-                            placeholder="Masalan: 1-smena (Ertalabki)"
+                            placeholder={t(
+                                'shifts.placeholder_name',
+                                'Masalan: 1-smena (Ertalabki)',
+                            )}
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required

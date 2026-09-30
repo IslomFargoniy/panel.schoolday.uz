@@ -87,14 +87,14 @@ export function ShiftsTable({
                                 <SelectTrigger className="h-9 rounded-xl text-xs">
                                     <SelectValue
                                         placeholder={t(
-                                            'select_school',
+                                            'all_schools',
                                             'Barcha maktablar',
                                         )}
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">
-                                        {t('select_school', 'Barcha maktablar')}
+                                        {t('all_schools', 'Barcha maktablar')}
                                     </SelectItem>
                                     {schools.map((s) => (
                                         <SelectItem
@@ -123,7 +123,7 @@ export function ShiftsTable({
                             <SelectTrigger className="h-9 rounded-xl text-xs">
                                 <SelectValue
                                     placeholder={t(
-                                        'branches.select_branch',
+                                        'all_branches',
                                         'Barcha filiallar',
                                     )}
                                 />
@@ -131,7 +131,7 @@ export function ShiftsTable({
                             <SelectContent>
                                 <SelectItem value="all">
                                     {t(
-                                        'branches.select_branch',
+                                        'all_branches',
                                         'Barcha filiallar',
                                     )}
                                 </SelectItem>

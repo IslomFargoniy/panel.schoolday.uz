@@ -245,7 +245,7 @@ export default function DevicesPage({
                                     <SelectTrigger className="h-9 rounded-xl text-xs">
                                         <SelectValue
                                             placeholder={t(
-                                                'select_school',
+                                                'all_schools',
                                                 'Barcha maktablar',
                                             )}
                                         />
@@ -253,7 +253,7 @@ export default function DevicesPage({
                                     <SelectContent>
                                         <SelectItem value="all">
                                             {t(
-                                                'select_school',
+                                                'all_schools',
                                                 'Barcha maktablar',
                                             )}
                                         </SelectItem>

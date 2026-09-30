@@ -23,22 +23,56 @@ export interface DatePickerProps {
     required?: boolean;
 }
 
-const MONTH_NAMES_UZ = [
-    'Yanvar',
-    'Fevral',
-    'Mart',
-    'Aprel',
-    'May',
-    'Iyun',
-    'Iyul',
-    'Avgust',
-    'Sentyabr',
-    'Oktyabr',
-    'Noyabr',
-    'Dekabr',
-];
+const MONTH_NAMES: Record<string, string[]> = {
+    uz: [
+        'Yanvar',
+        'Fevral',
+        'Mart',
+        'Aprel',
+        'May',
+        'Iyun',
+        'Iyul',
+        'Avgust',
+        'Sentyabr',
+        'Oktyabr',
+        'Noyabr',
+        'Dekabr',
+    ],
+    ru: [
+        'Январь',
+        'Февраль',
+        'Март',
+        'Апрель',
+        'Май',
+        'Июнь',
+        'Июль',
+        'Август',
+        'Сентябрь',
+        'Октябрь',
+        'Ноябрь',
+        'Декабрь',
+    ],
+    en: [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+    ],
+};
 
-const WEEKDAYS_UZ = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
+const WEEKDAYS: Record<string, string[]> = {
+    uz: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+    ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+    en: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+};
 
 export function DatePicker({
     value = '',
@@ -194,6 +228,14 @@ export function DatePicker({
     const currentYear = today.getFullYear();
     const years = Array.from({ length: 15 }, (_, i) => currentYear - 3 + i);
 
+    const currentLang = i18n.language?.startsWith('ru')
+        ? 'ru'
+        : i18n.language?.startsWith('en')
+          ? 'en'
+          : 'uz';
+    const monthNames = MONTH_NAMES[currentLang] || MONTH_NAMES.uz;
+    const weekdays = WEEKDAYS[currentLang] || WEEKDAYS.uz;
+
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <div className="relative flex items-center w-full">
@@ -268,7 +310,7 @@ export function DatePicker({
                             onChange={(e) => setViewMonth(Number(e.target.value))}
                             className="h-7 text-xs font-semibold rounded-lg bg-muted/60 hover:bg-muted border-none px-2 py-0 cursor-pointer focus:ring-1 focus:ring-ring"
                         >
-                            {MONTH_NAMES_UZ.map((mName, idx) => (
+                            {monthNames.map((mName, idx) => (
                                 <option key={idx} value={idx}>
                                     {mName}
                                 </option>
@@ -302,7 +344,7 @@ export function DatePicker({
 
                 {/* 2. Weekdays Header */}
                 <div className="grid grid-cols-7 gap-1 pt-2 pb-1 text-center text-[11px] font-semibold text-muted-foreground">
-                    {WEEKDAYS_UZ.map((wd, i) => (
+                    {weekdays.map((wd, i) => (
                         <div key={i} className="py-1">
                             {wd}
                         </div>
@@ -350,23 +392,23 @@ export function DatePicker({
                             onClick={handleSetToday}
                             className="px-2 py-1 rounded-md bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors"
                         >
-                            Bugun
+                            {t('today', 'Bugun')}
                         </button>
                         <button
                             type="button"
                             onClick={() => handleAddYears(1)}
                             className="px-2 py-1 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300 font-semibold transition-colors"
-                            title="1 yil qo‘shish (masalan 2027)"
+                            title={t('add_1_year_desc', '1 yil qo‘shish (masalan 2027)')}
                         >
-                            +1 yil
+                            {t('add_1_year', '+1 yil')}
                         </button>
                         <button
                             type="button"
                             onClick={() => handleAddYears(2)}
                             className="px-2 py-1 rounded-md bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors"
-                            title="2 yil qo‘shish"
+                            title={t('add_2_years_desc', '2 yil qo‘shish')}
                         >
-                            +2 yil
+                            {t('add_2_years', '+2 yil')}
                         </button>
                     </div>
 

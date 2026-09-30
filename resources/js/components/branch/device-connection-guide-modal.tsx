@@ -127,18 +127,11 @@ export default function DeviceConnectionGuideModal({
                                     'ISUP 5.0 (EHome 5.0) ning afzalliklari:',
                                 )}
                             </strong>
-                            <p className="text-muted-foreground">
-                                1. <strong>Statik IP kerak emas:</strong>{' '}
-                                Terminal Wi-Fi, 4G yoki oddiy provayderda
-                                ishlayveradi.
-                                <br />
-                                2.{' '}
-                                <strong>
-                                    2 tomonlama to‘liq sinxronizatsiya:
-                                </strong>{' '}
-                                Davomat sekundiga keladi, internet uzilib qolsa
-                                terminal xotirada saqlab, keyin avtomatik
-                                yuklaydi.
+                            <p className="whitespace-pre-line text-muted-foreground">
+                                {t(
+                                    'device_guide_modal.isup_adv_desc',
+                                    '1. Statik IP kerak emas: Terminal Wi-Fi, 4G yoki oddiy provayderda ishlayveradi.\n2. 2 tomonlama to‘liq sinxronizatsiya: Davomat sekundiga keladi, internet uzilib qolsa terminal xotirada saqlab, keyin avtomatik yuklaydi.',
+                                )}
                             </p>
                         </div>
 
@@ -315,12 +308,10 @@ export default function DeviceConnectionGuideModal({
                                 )}
                             </h4>
                             <p className="pl-6 text-muted-foreground">
-                                <strong>Save</strong> tugmasini bosing. 5-15
-                                soniya ichida Register Status:{' '}
-                                <strong className="text-emerald-500">
-                                    🟢 Online
-                                </strong>{' '}
-                                bo‘ladi.
+                                {t(
+                                    'device_guide_modal.save_isup_desc',
+                                    'Save tugmasini bosing. 5-15 soniya ichida Register Status: 🟢 Online bo‘ladi.',
+                                )}
                             </p>
                         </div>
                     </div>
@@ -338,9 +329,10 @@ export default function DeviceConnectionGuideModal({
                                 )}
                             </strong>
                             <p className="text-muted-foreground">
-                                Ushbu usulda terminal har safar o‘quvchi yuzini
-                                skaner qilganda serverga to‘g‘ridan-to‘g‘ri HTTP
-                                webhook POST yuboradi.
+                                {t(
+                                    'device_guide_modal.http_desc',
+                                    'Ushbu usulda terminal har safar o‘quvchi yuzini skaner qilganda serverga to‘g‘ridan-to‘g‘ri HTTP webhook POST yuboradi.',
+                                )}
                             </p>
                         </div>
 
@@ -459,9 +451,10 @@ export default function DeviceConnectionGuideModal({
                                 )}
                             </h4>
                             <p className="pl-6 text-muted-foreground">
-                                <strong>Save</strong> tugmasini bosing. Shundan
-                                so‘ng o‘quvchilar yuzini ko‘rsatganda davomat
-                                avtomatik serverga uzatiladi.
+                                {t(
+                                    'device_guide_modal.save_http_desc',
+                                    'Save tugmasini bosing. Shundan so‘ng o‘quvchilar yuzini ko‘rsatganda davomat avtomatik serverga uzatiladi.',
+                                )}
                             </p>
                         </div>
                     </div>

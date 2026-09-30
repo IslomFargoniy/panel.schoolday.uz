@@ -145,14 +145,14 @@ export function ReportFilters({
                                 <SelectTrigger className="h-9 rounded-xl text-xs">
                                     <SelectValue
                                         placeholder={t(
-                                            'select_school',
+                                            'all_schools',
                                             'Barcha maktablar',
                                         )}
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">
-                                        {t('select_school', 'Barcha maktablar')}
+                                        {t('all_schools', 'Barcha maktablar')}
                                     </SelectItem>
                                     {schools.map((s) => (
                                         <SelectItem
