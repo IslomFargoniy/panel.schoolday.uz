@@ -129,11 +129,11 @@ deploy() {
     run_remote "$PHP artisan event:cache"
     log_success "Keshlar yaratildi"
 
-    # 8. Queue worker restart
+    # 8. Queue worker & Reverb restart
     if [[ "$MODE" == "full" ]]; then
-        log_info "Queue worker qayta ishga tushirilmoqda..."
-        run_remote "supervisorctl restart schoolday-worker:*" || log_warn "Supervisor restart xatosi (ehtimol allaqachon ishlayapti)"
-        log_success "Queue worker qayta ishga tushdi"
+        log_info "Queue worker va Reverb qayta ishga tushirilmoqda..."
+        run_remote "supervisorctl restart schoolday-worker:* schoolday-reverb:*" || log_warn "Supervisor restart xatosi"
+        log_success "Queue worker va Reverb qayta ishga tushdi"
     fi
 
     # 9. Maintenance off

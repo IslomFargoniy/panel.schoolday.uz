@@ -10,3 +10,14 @@ declare module '@inertiajs/core' {
         };
     }
 }
+
+declare global {
+    interface Window {
+        __REVERB__?: {
+            key?: string;
+            host?: string;
+            port?: number;
+            scheme?: string;
+        };
+    }
+}

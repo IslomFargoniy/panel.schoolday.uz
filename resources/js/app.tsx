@@ -8,26 +8,29 @@ import './i18n';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
 
-const reverbKey =
-    import.meta.env.VITE_REVERB_APP_KEY || 'schoolday_reverb_key_918237';
-const reverbHost = import.meta.env.VITE_REVERB_HOST;
-const reverbPort = import.meta.env.VITE_REVERB_PORT;
-const reverbScheme = import.meta.env.VITE_REVERB_SCHEME;
+const reverbCfg = (typeof window !== 'undefined' && window.__REVERB__) || {};
 
 const isHttps =
-    reverbScheme === 'https' ||
-    (typeof window !== 'undefined' && window.location.protocol === 'https:');
+    reverbCfg.scheme === 'https' ||
+    (typeof window !== 'undefined' && window.location.protocol === 'https:') ||
+    import.meta.env.VITE_REVERB_SCHEME === 'https';
 
-const isLocalHost =
-    !reverbHost || reverbHost === 'localhost' || reverbHost === '127.0.0.1';
+const reverbKey =
+    reverbCfg.key ||
+    import.meta.env.VITE_REVERB_APP_KEY ||
+    'schoolday-key';
 
 const wsHost =
-    typeof window !== 'undefined' && isLocalHost
-        ? window.location.hostname
-        : reverbHost || 'localhost';
+    reverbCfg.host ||
+    import.meta.env.VITE_REVERB_HOST ||
+    (typeof window !== 'undefined' ? window.location.hostname : 'localhost');
 
-const defaultPort = isHttps ? 443 : 8080;
-const resolvedPort = Number(reverbPort || defaultPort);
+const resolvedPort = Number(
+    reverbCfg.port ||
+    (typeof window !== 'undefined' && window.location.protocol === 'https:'
+        ? 443
+        : (import.meta.env.VITE_REVERB_PORT || (isHttps ? 443 : 8080)))
+);
 
 configureEcho({
     broadcaster: 'reverb',
