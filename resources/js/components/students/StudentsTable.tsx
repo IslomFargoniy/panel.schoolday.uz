@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ interface StudentsTableProps {
     onDelete: (student: any) => void;
     onImageClick: (url: string) => void;
     onImportClick?: () => void;
+    onCreate?: () => void;
 }
 
 export function StudentsTable({
@@ -17,6 +18,7 @@ export function StudentsTable({
     onDelete,
     onImageClick,
     onImportClick,
+    onCreate,
 }: StudentsTableProps) {
     const { t } = useTranslation();
 
@@ -26,19 +28,31 @@ export function StudentsTable({
                 <h3 className="flex-1 font-semibold">
                     {t('students.list', "O'quvchilar ro'yxati")}
                 </h3>
-                {onImportClick && (
-                    <Button
-                        onClick={onImportClick}
-                        size="sm"
-                        variant="outline"
-                        className="gap-2"
-                    >
-                        <Upload className="h-4 w-4" />
-                        <span className="hidden sm:inline">
-                            {t('students.import_excel', 'Excel orqali yuklash')}
-                        </span>
-                    </Button>
-                )}
+                <div className="flex items-center gap-2">
+                    {onImportClick && (
+                        <Button
+                            onClick={onImportClick}
+                            size="sm"
+                            variant="outline"
+                            className="gap-2 rounded-xl"
+                        >
+                            <Upload className="h-4 w-4" />
+                            <span className="hidden sm:inline">
+                                {t('students.import_excel', 'Excel orqali yuklash')}
+                            </span>
+                        </Button>
+                    )}
+                    {onCreate && (
+                        <Button
+                            onClick={onCreate}
+                            size="sm"
+                            className="gap-1.5 rounded-xl font-medium shadow-xs"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>{t('students.add_new', "O'quvchi qo'shish")}</span>
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <div className="overflow-x-auto">

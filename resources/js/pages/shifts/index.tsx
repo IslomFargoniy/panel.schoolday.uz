@@ -2,9 +2,17 @@ import { Head, useForm, router } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import { ShiftForm } from '@/components/shifts/ShiftForm';
 import { ShiftsTable } from '@/components/shifts/ShiftsTable';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Shift, Branch, PaginatedResponse } from '@/types';
 
@@ -52,6 +60,9 @@ export default function ShiftsPage({
     };
 
     const [editing, setEditing] = useState<Shift | null>(null);
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+    const [deleteShiftId, setDeleteShiftId] = useState<number | null>(null);
+
     const {
         data: formData,
         setData,
@@ -87,22 +98,11 @@ export default function ShiftsPage({
         setData(field, formatted);
     };
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        if (!formData.branch_id) {
-            alert(t('shifts.branch_required', 'Filialni tanlash majburiy!'));
-            return;
-        }
-        if (editing) {
-            put(`/shifts/${editing.id}`, {
-                onSuccess: () => {
-                    setEditing(null);
-                    reset();
-                },
-            });
-        } else {
-            post('/shifts', { onSuccess: () => reset() });
-        }
+    const handleOpenCreate = () => {
+        setEditing(null);
+        reset();
+        clearErrors();
+        setIsFormModalOpen(true);
     };
 
     const handleEdit = (shift: Shift) => {
@@ -116,39 +116,44 @@ export default function ShiftsPage({
             end_time: shift.end_time ? shift.end_time.substring(0, 5) : '',
             branch_id: shift.branch_id ? String(shift.branch_id) : '',
         });
+        setIsFormModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        if (
-            confirm(
-                t(
-                    'shifts.delete_confirm',
-                    'Are you sure you want to delete this shift?',
-                ),
-            )
-        ) {
-            destroy(`/shifts/${id}`);
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (!formData.branch_id) {
+            toast.error(t('shifts.branch_required', 'Filialni tanlash majburiy!'));
+            return;
         }
+        if (editing) {
+            put(`/shifts/${editing.id}`, {
+                onSuccess: () => {
+                    setIsFormModalOpen(false);
+                    setEditing(null);
+                    reset();
+                },
+            });
+        } else {
+            post('/shifts', {
+                onSuccess: () => {
+                    setIsFormModalOpen(false);
+                    reset();
+                },
+            });
+        }
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deleteShiftId) return;
+        destroy(`/shifts/${deleteShiftId}`, {
+            onSuccess: () => setDeleteShiftId(null),
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('shifts.title', 'Shifts Management')} />
-            <div className="grid grid-cols-1 items-start gap-6 p-6 lg:grid-cols-3">
-                <ShiftForm
-                    editing={editing}
-                    formData={formData}
-                    errors={errors}
-                    branches={branches}
-                    setData={setData}
-                    onTimeChange={handleTimeChange}
-                    onSubmit={handleSubmit}
-                    onCancel={() => {
-                        setEditing(null);
-                        reset();
-                        clearErrors();
-                    }}
-                />
+            <div className="p-6">
                 <ShiftsTable
                     shifts={shifts}
                     schools={schools}
@@ -156,10 +161,61 @@ export default function ShiftsPage({
                     filterData={filterData}
                     onFilterChange={handleFilterChange}
                     onResetFilters={handleResetFilters}
+                    onCreate={handleOpenCreate}
                     onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onDelete={(id) => setDeleteShiftId(id)}
                 />
             </div>
+
+            {/* Create / Edit Shift Modal */}
+            <Dialog
+                open={isFormModalOpen}
+                onOpenChange={(open) => {
+                    setIsFormModalOpen(open);
+                    if (!open) {
+                        setEditing(null);
+                        reset();
+                        clearErrors();
+                    }
+                }}
+            >
+                <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editing
+                                ? t('shifts.edit', 'Smenani tahrirlash')
+                                : t('shifts.add_new', 'Yangi smena qo‘shish')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <ShiftForm
+                        editing={editing}
+                        formData={formData}
+                        errors={errors}
+                        branches={branches}
+                        setData={setData}
+                        onTimeChange={handleTimeChange}
+                        onSubmit={handleSubmit}
+                        onCancel={() => {
+                            setIsFormModalOpen(false);
+                            setEditing(null);
+                            reset();
+                            clearErrors();
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmDialog
+                open={deleteShiftId !== null}
+                onOpenChange={(open) => !open && setDeleteShiftId(null)}
+                onConfirm={handleConfirmDelete}
+                title={t('shifts.delete_confirm_title', 'Smenani o‘chirish')}
+                description={t(
+                    'shifts.delete_confirm',
+                    'Ushbu smenani o‘chirishni tasdiqlaysizmi? Unga bog‘langan ma’lumotlar ta’sirlanishi mumkin.',
+                )}
+            />
         </AppLayout>
     );
 }

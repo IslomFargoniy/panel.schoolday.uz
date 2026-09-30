@@ -44,12 +44,7 @@ export function BranchForm({
     };
 
     return (
-        <div className="sticky top-6 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm dark:border-sidebar-border">
-            <h3 className="mb-4 text-xl font-semibold tracking-tight">
-                {editing
-                    ? t('branches.edit', 'Edit Branch')
-                    : t('branches.add_new', 'Add New Branch')}
-            </h3>
+        <div>
             <form onSubmit={onSubmit} className="space-y-4">
                 {/* School Selection */}
                 {schools.length > 0 && (
@@ -173,22 +168,20 @@ export function BranchForm({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                    <Button type="submit" className="flex-1">
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onCancel}
+                        className="rounded-xl"
+                    >
+                        {t('branches.cancel', 'Cancel')}
+                    </Button>
+                    <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
                         {editing
                             ? t('branches.edit', 'Update Branch')
                             : t('branches.save', 'Save Branch')}
                     </Button>
-                    {editing && (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={onCancel}
-                        >
-                            {t('branches.cancel', 'Cancel')}
-                        </Button>
-                    )}
                 </div>
             </form>
         </div>

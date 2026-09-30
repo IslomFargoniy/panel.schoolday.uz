@@ -27,12 +27,7 @@ export function ClassForm({
     const { t } = useTranslation();
 
     return (
-        <div className="sticky top-6 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm dark:border-sidebar-border/70">
-            <h3 className="mb-4 text-xl font-semibold tracking-tight">
-                {editing
-                    ? t('classes.edit', 'Edit')
-                    : t('classes.add_new', 'Add New Class')}
-            </h3>
+        <div>
             <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">
@@ -100,22 +95,19 @@ export function ClassForm({
                         </p>
                     )}
                 </div>
-                <div className="flex gap-2 pt-2">
-                    <Button type="submit" className="flex-1">
-                        {editing
-                            ? t('classes.update', 'Update Class')
-                            : t('classes.save', 'Save Class')}
+                <div className="flex items-center justify-end gap-2 pt-4 border-t border-border/50">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onCancel}
+                    >
+                        {t('common.cancel', 'Bekor qilish')}
                     </Button>
-                    {editing && (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={onCancel}
-                        >
-                            {t('classes.cancel', 'Cancel')}
-                        </Button>
-                    )}
+                    <Button type="submit">
+                        {editing
+                            ? t('classes.update', 'Saqlash')
+                            : t('classes.save', 'Qo‘shish')}
+                    </Button>
                 </div>
             </form>
         </div>

@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,7 @@ interface ClassFiltersProps {
     shifts?: { id: number; name: string; branch_id?: number; start_time?: string; end_time?: string }[];
     onFilterChange: (key: string, value: string) => void;
     onReset: () => void;
+    onCreate?: () => void;
 }
 
 export function ClassFilters({
@@ -32,6 +33,7 @@ export function ClassFilters({
     shifts = [],
     onFilterChange,
     onReset,
+    onCreate,
 }: ClassFiltersProps) {
     const { t } = useTranslation();
 
@@ -188,6 +190,17 @@ export function ClassFilters({
                         <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
                     </SelectContent>
                 </Select>
+
+                {onCreate && (
+                    <Button
+                        onClick={onCreate}
+                        size="sm"
+                        className="h-9 gap-1.5 rounded-xl font-medium shadow-xs"
+                    >
+                        <Plus className="h-4 w-4" />
+                        <span>{t('classes.add_new', 'Sinf qo‘shish')}</span>
+                    </Button>
+                )}
             </div>
         </div>
     );

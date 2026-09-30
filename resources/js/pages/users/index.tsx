@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import {
     Dialog,
     DialogContent,
@@ -59,6 +60,7 @@ export default function UsersIndex({
     const { t } = useTranslation();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editUser, setEditUser] = useState<UserItem | null>(null);
+    const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
 
     const [filterData, setFilterData] = useState({
         role: filters?.role || '',
@@ -144,18 +146,14 @@ export default function UsersIndex({
     };
 
     const handleDelete = (id: number) => {
-        if (
-            confirm(
-                t(
-                    'common.confirm_delete',
-                    'Are you sure you want to delete this item?',
-                ),
-            )
-        ) {
-            destroy(`/users/${id}`, {
-                onSuccess: () => {},
-            });
-        }
+        setDeleteUserId(id);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deleteUserId) return;
+        destroy(`/users/${deleteUserId}`, {
+            onSuccess: () => setDeleteUserId(null),
+        });
     };
 
     return (
@@ -508,6 +506,17 @@ export default function UsersIndex({
                         </form>
                     </DialogContent>
                 </Dialog>
+
+                <DeleteConfirmDialog
+                    open={deleteUserId !== null}
+                    onOpenChange={(open) => !open && setDeleteUserId(null)}
+                    onConfirm={handleConfirmDelete}
+                    title={t('users.delete_confirm_title', 'Foydalanuvchini o‘chirish')}
+                    description={t(
+                        'common.confirm_delete',
+                        'Ushbu foydalanuvchini o‘chirishni tasdiqlaysizmi?',
+                    )}
+                />
             </div>
         </AppLayout>
     );

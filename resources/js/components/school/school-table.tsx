@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Building2, Pencil, Settings, Trash2, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { formatDate } from '@/lib/utils';
 import CreateSchoolModal from './create-school-modal';
 import UpdateSchoolModal from './update-school-modal';
@@ -22,6 +23,7 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
     const [editOpen, setEditOpen] = useState(false);
     const [settingOpen, setSettingOpen] = useState(false);
     const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
+    const [deleteSchoolId, setDeleteSchoolId] = useState<number | null>(null);
 
     const { auth } = usePage().props as unknown as { auth: { user: any } };
     const isAdmin = auth?.user?.roles?.some((role: any) => 
@@ -39,14 +41,17 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
     };
 
     const handleDelete = (id: number) => {
-        if (!confirm(t('confirm_delete_school', 'Haqiqatan ham bu maktabni o‘chirmoqchimisiz?'))) {
-            return;
-        }
+        setDeleteSchoolId(id);
+    };
 
-        router.delete(`/school/${id}`, {
+    const handleConfirmDelete = () => {
+        if (!deleteSchoolId) return;
+
+        router.delete(`/school/${deleteSchoolId}`, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(t('deleted_successfully', 'Maktab muvaffaqiyatli o‘chirildi'));
+                setDeleteSchoolId(null);
             },
             onError: (err: any) => {
                 const errorMessage = err?.error || t('delete_failed', 'O‘chirishda xatolik yuz berdi');
@@ -196,6 +201,17 @@ export default function SchoolTable({ searchData, ...schools }: SchoolTableProps
                 school={selectedSchool}
                 open={settingOpen}
                 onOpenChange={setSettingOpen}
+            />
+
+            <DeleteConfirmDialog
+                open={deleteSchoolId !== null}
+                onOpenChange={(open) => !open && setDeleteSchoolId(null)}
+                onConfirm={handleConfirmDelete}
+                title={t('confirm_delete_school_title', 'Maktabni o‘chirish')}
+                description={t(
+                    'confirm_delete_school',
+                    'Haqiqatan ham bu maktabni o‘chirmoqchimisiz?',
+                )}
             />
         </div>
     );

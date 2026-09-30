@@ -58,15 +58,7 @@ export function StudentForm({
     const [showDeviceSettings, setShowDeviceSettings] = useState(false);
 
     return (
-        <div className="sticky top-6 rounded-xl border border-sidebar-border bg-card p-6 shadow-sm dark:border-sidebar-border">
-            <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-xl font-semibold tracking-tight">
-                    {editing
-                        ? t('students.edit', 'Edit Student')
-                        : t('students.add_new', 'Add New Student')}
-                </h3>
-            </div>
-
+        <div>
             <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">
@@ -440,22 +432,19 @@ export function StudentForm({
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                    <Button type="submit" className="flex-1">
-                        {editing
-                            ? t('students.edit', 'Update Student')
-                            : t('students.save', 'Save Student')}
+                <div className="flex items-center justify-end gap-2 pt-4 border-t border-border/50">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onCancel}
+                    >
+                        {t('common.cancel', 'Bekor qilish')}
                     </Button>
-                    {editing && (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={onCancel}
-                        >
-                            {t('students.cancel', 'Cancel')}
-                        </Button>
-                    )}
+                    <Button type="submit">
+                        {editing
+                            ? t('students.edit', 'Saqlash')
+                            : t('students.save', 'Qo‘shish')}
+                    </Button>
                 </div>
             </form>
         </div>

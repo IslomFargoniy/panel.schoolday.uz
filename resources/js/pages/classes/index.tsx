@@ -2,10 +2,18 @@ import { Head, useForm, router } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import { ClassesTable } from '@/components/classes/ClassesTable';
 import { ClassFilters } from '@/components/classes/ClassFilters';
 import { ClassForm } from '@/components/classes/ClassForm';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import type {
     BreadcrumbItem,
@@ -64,6 +72,9 @@ export default function ClassesPage({
     };
 
     const [editing, setEditing] = useState<SchoolClass | null>(null);
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+    const [deleteClassId, setDeleteClassId] = useState<number | null>(null);
+
     const {
         data: formData,
         setData,
@@ -79,22 +90,11 @@ export default function ClassesPage({
         telegram_group_id: '',
     });
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        if (!formData.shift_id) {
-            alert(t('classes.shift_required', 'Smenani tanlash majburiy!'));
-            return;
-        }
-        if (editing) {
-            put(`/classes/${editing.id}`, {
-                onSuccess: () => {
-                    setEditing(null);
-                    reset();
-                },
-            });
-        } else {
-            post('/classes', { onSuccess: () => reset() });
-        }
+    const handleOpenCreate = () => {
+        setEditing(null);
+        reset();
+        clearErrors();
+        setIsFormModalOpen(true);
     };
 
     const handleEdit = (schoolClass: SchoolClass) => {
@@ -105,54 +105,108 @@ export default function ClassesPage({
             shift_id: String(schoolClass.shift_id),
             telegram_group_id: schoolClass.telegram_group_id || '',
         });
+        setIsFormModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        if (
-            confirm(
-                t(
-                    'classes.delete_confirm',
-                    'Are you sure you want to delete this class?',
-                ),
-            )
-        ) {
-            destroy(`/classes/${id}`);
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (!formData.shift_id) {
+            toast.error(t('classes.shift_required', 'Smenani tanlash majburiy!'));
+            return;
         }
+        if (editing) {
+            put(`/classes/${editing.id}`, {
+                onSuccess: () => {
+                    setIsFormModalOpen(false);
+                    setEditing(null);
+                    reset();
+                },
+            });
+        } else {
+            post('/classes', {
+                onSuccess: () => {
+                    setIsFormModalOpen(false);
+                    reset();
+                },
+            });
+        }
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deleteClassId) return;
+        destroy(`/classes/${deleteClassId}`, {
+            onSuccess: () => setDeleteClassId(null),
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('classes.title', 'Classes')} />
-            <div className="grid grid-cols-1 items-start gap-6 p-6 lg:grid-cols-3">
-                <ClassForm
-                    editing={editing}
-                    formData={formData}
-                    errors={errors}
+            <div className="flex flex-col gap-4 p-6 w-full">
+                <ClassFilters
+                    filterData={filterData}
+                    schools={schools}
+                    branches={branches}
                     shifts={shifts}
-                    setData={setData}
-                    onSubmit={handleSubmit}
-                    onCancel={() => {
+                    onFilterChange={handleFilterChange}
+                    onReset={clearFilters}
+                    onCreate={handleOpenCreate}
+                />
+                <ClassesTable
+                    classes={classes}
+                    onEdit={handleEdit}
+                    onDelete={(id) => setDeleteClassId(id)}
+                />
+            </div>
+
+            {/* Create / Edit Class Modal */}
+            <Dialog
+                open={isFormModalOpen}
+                onOpenChange={(open) => {
+                    setIsFormModalOpen(open);
+                    if (!open) {
                         setEditing(null);
                         reset();
                         clearErrors();
-                    }}
-                />
-                <div className="flex flex-col gap-4 lg:col-span-2">
-                    <ClassFilters
-                        filterData={filterData}
-                        schools={schools}
-                        branches={branches}
+                    }
+                }}
+            >
+                <DialogContent className="max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editing
+                                ? t('classes.edit', 'Sinfni tahrirlash')
+                                : t('classes.add_new', 'Yangi sinf qo‘shish')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <ClassForm
+                        editing={editing}
+                        formData={formData}
+                        errors={errors}
                         shifts={shifts}
-                        onFilterChange={handleFilterChange}
-                        onReset={clearFilters}
+                        setData={setData}
+                        onSubmit={handleSubmit}
+                        onCancel={() => {
+                            setIsFormModalOpen(false);
+                            setEditing(null);
+                            reset();
+                            clearErrors();
+                        }}
                     />
-                    <ClassesTable
-                        classes={classes}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
-                </div>
-            </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmDialog
+                open={deleteClassId !== null}
+                onOpenChange={(open) => !open && setDeleteClassId(null)}
+                onConfirm={handleConfirmDelete}
+                title={t('classes.delete_confirm_title', 'Sinfni o‘chirish')}
+                description={t(
+                    'classes.delete_confirm',
+                    'Ushbu sinfni o‘chirishni tasdiqlaysizmi? Barcha biriktirilgan o‘quvchilar va jurnallar ta’sirlanishi mumkin.',
+                )}
+            />
         </AppLayout>
     );
 }

@@ -32,6 +32,7 @@ import CreateBranchStudentModal from '@/components/branch/create-branch-student-
 import StudentHikvisionEventsModal from '@/components/branch/student-hikvision-events-modal';
 import { ImageModal } from '@/components/students/ImageModal';
 import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
 import type { Branch, BreadcrumbItem, PaginatedResponse, SchoolClass, Shift, Student } from '@/types';
@@ -71,6 +72,7 @@ export default function BranchShowPage({
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
     const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
+    const [deleteStudentItem, setDeleteStudentItem] = useState<Student | null>(null);
 
     const shifts: Shift[] = (branch as any).shifts || [];
     const isupDevicesCount = branch.devices?.filter((d) => d.connection_type === 'isup').length || 0;
@@ -123,13 +125,16 @@ export default function BranchShowPage({
     };
 
     const handleDeleteStudent = (student: Student) => {
-        if (!confirm(t('confirm_delete_student', 'Haqiqatan ham bu o‘quvchini o‘chirmoqchimisiz?'))) {
-            return;
-        }
-        router.delete(`/students/${student.id}`, {
+        setDeleteStudentItem(student);
+    };
+
+    const handleConfirmDeleteStudent = () => {
+        if (!deleteStudentItem) return;
+        router.delete(`/students/${deleteStudentItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(t('deleted_successfully', 'O‘quvchi o‘chirildi'));
+                setDeleteStudentItem(null);
             },
             onError: (err: any) => {
                 toast.error(err?.message || t('delete_failed', 'O‘chirishda xatolik'));
@@ -686,6 +691,17 @@ export default function BranchShowPage({
                     setIsStudentModalOpen(open);
                     if (!open) setStudentToEdit(null);
                 }}
+            />
+
+            <DeleteConfirmDialog
+                open={deleteStudentItem !== null}
+                onOpenChange={(open) => !open && setDeleteStudentItem(null)}
+                onConfirm={handleConfirmDeleteStudent}
+                title={t('confirm_delete_student_title', 'O‘quvchini o‘chirish')}
+                description={t(
+                    'confirm_delete_student',
+                    'Haqiqatan ham bu o‘quvchini o‘chirmoqchimisiz?',
+                )}
             />
         </AppLayout>
     );

@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ interface ShiftsTableProps {
     };
     onFilterChange: (key: string, value: string) => void;
     onResetFilters: () => void;
+    onCreate?: () => void;
     onEdit: (shift: any) => void;
     onDelete: (id: number) => void;
 }
@@ -34,6 +35,7 @@ export function ShiftsTable({
     filterData,
     onFilterChange,
     onResetFilters,
+    onCreate,
     onEdit,
     onDelete,
 }: ShiftsTableProps) {
@@ -49,7 +51,7 @@ export function ShiftsTable({
     );
 
     return (
-        <div className="lg:col-span-2 space-y-4">
+        <div className="w-full space-y-4">
             {/* Filter Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
                 <div className="flex flex-wrap items-center gap-2 flex-1">
@@ -146,6 +148,17 @@ export function ShiftsTable({
                             <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    {onCreate && (
+                        <Button
+                            onClick={onCreate}
+                            size="sm"
+                            className="h-9 gap-1.5 rounded-xl font-medium shadow-xs"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>{t('shifts.add_new', 'Smena qo‘shish')}</span>
+                        </Button>
+                    )}
                 </div>
             </div>
 

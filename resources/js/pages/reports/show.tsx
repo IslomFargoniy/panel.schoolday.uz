@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ImageModal } from '@/components/students/ImageModal';
 import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, DailyAttendance } from '@/types';
 
@@ -47,6 +48,8 @@ export default function ReportDetailsPage({
 }) {
     const { t } = useTranslation();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isDeleteAttendanceOpen, setIsDeleteAttendanceOpen] = useState(false);
+    const [deleteEventId, setDeleteEventId] = useState<number | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -60,31 +63,25 @@ export default function ReportDetailsPage({
     ];
 
     const handleDelete = () => {
-        if (
-            confirm(
-                t(
-                    'common.confirm_delete',
-                    'Are you sure you want to delete this attendance record?',
-                ),
-            )
-        ) {
-            router.delete(`/reports/${attendance.id}`);
-        }
+        setIsDeleteAttendanceOpen(true);
+    };
+
+    const handleConfirmDeleteAttendance = () => {
+        router.delete(`/reports/${attendance.id}`, {
+            onSuccess: () => setIsDeleteAttendanceOpen(false),
+        });
     };
 
     const handleDeleteEvent = (eventId: number) => {
-        if (
-            confirm(
-                t(
-                    'common.confirm_delete',
-                    'Are you sure you want to delete this access event?',
-                ),
-            )
-        ) {
-            router.delete(`/report-events/${eventId}`, {
-                preserveScroll: true,
-            });
-        }
+        setDeleteEventId(eventId);
+    };
+
+    const handleConfirmDeleteEvent = () => {
+        if (!deleteEventId) return;
+        router.delete(`/report-events/${deleteEventId}`, {
+            preserveScroll: true,
+            onSuccess: () => setDeleteEventId(null),
+        });
     };
 
     const student = attendance.student;
@@ -380,6 +377,28 @@ export default function ReportDetailsPage({
                 <ImageModal
                     imageUrl={selectedImage}
                     onClose={() => setSelectedImage(null)}
+                />
+
+                <DeleteConfirmDialog
+                    open={isDeleteAttendanceOpen}
+                    onOpenChange={setIsDeleteAttendanceOpen}
+                    onConfirm={handleConfirmDeleteAttendance}
+                    title={t('reports.delete_attendance_title', 'Davomat yozuvini o‘chirish')}
+                    description={t(
+                        'reports.confirm_delete_attendance',
+                        'Ushbu kunlik davomat yozuvini o‘chirishni tasdiqlaysizmi?',
+                    )}
+                />
+
+                <DeleteConfirmDialog
+                    open={deleteEventId !== null}
+                    onOpenChange={(open) => !open && setDeleteEventId(null)}
+                    onConfirm={handleConfirmDeleteEvent}
+                    title={t('reports.delete_event_title', 'Kirish-chiqish hodisasini o‘chirish')}
+                    description={t(
+                        'reports.confirm_delete_event',
+                        'Ushbu hodisani o‘chirishni tasdiqlaysizmi?',
+                    )}
                 />
             </div>
         </AppLayout>

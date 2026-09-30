@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ScanFace, Search, X } from 'lucide-react';
+import { ScanFace, Search, X, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ interface BranchesTableProps {
     filterData: { school_id?: string; search?: string; per_page: string };
     onFilterChange: (key: string, value: string) => void;
     onResetFilters: () => void;
+    onCreate?: () => void;
     onEdit: (branch: any) => void;
     onDelete: (id: number) => void;
     onManageDevices: (branch: any) => void;
@@ -29,6 +30,7 @@ export function BranchesTable({
     filterData,
     onFilterChange,
     onResetFilters,
+    onCreate,
     onEdit,
     onDelete,
     onManageDevices,
@@ -38,7 +40,7 @@ export function BranchesTable({
     const hasFilters = Boolean(filterData.school_id || filterData.search || filterData.per_page !== '20');
 
     return (
-        <div className="xl:col-span-3 space-y-4">
+        <div className="w-full space-y-4">
             {/* Filter Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-sidebar-border bg-card p-3 shadow-xs dark:border-sidebar-border/70">
                 <div className="flex flex-wrap items-center gap-2 flex-1">
@@ -104,6 +106,18 @@ export function BranchesTable({
                             <SelectItem value="all">{t('common.all', 'Barchasi')}</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    {onCreate && (
+                        <Button
+                            type="button"
+                            onClick={onCreate}
+                            size="sm"
+                            className="h-9 gap-1.5 rounded-xl bg-indigo-600 text-xs font-semibold text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 shadow-xs"
+                        >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>{t('branches.add_new', 'Filial qo‘shish')}</span>
+                        </Button>
+                    )}
                 </div>
             </div>
 

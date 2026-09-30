@@ -23,6 +23,7 @@ import AppLayout from '@/layouts/app-layout';
 import CreateBranchDeviceModal from '@/components/branch/create-branch-device-modal';
 import DeviceConnectionGuideModal from '@/components/branch/device-connection-guide-modal';
 import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -54,6 +55,7 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [syncingId, setSyncingId] = useState<number | null>(null);
+    const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t('sidebar.devices', 'Qurilmalar'), href: '/devices' },
@@ -133,14 +135,17 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
     };
 
     const handleDelete = (id: number) => {
-        if (!confirm(t('confirm_delete_device', 'Haqiqatan ham bu qurilmani o‘chirmoqchimisiz?'))) {
-            return;
-        }
+        setDeleteDeviceId(id);
+    };
 
-        router.delete(`/branch_device/${id}`, {
+    const handleConfirmDelete = () => {
+        if (!deleteDeviceId) return;
+
+        router.delete(`/branch_device/${deleteDeviceId}`, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(t('deleted_successfully', 'Qurilma muvaffaqiyatli o‘chirildi'));
+                setDeleteDeviceId(null);
             },
             onError: (err: any) => {
                 toast.error(err?.error || t('delete_failed', 'O‘chirishda xatolik yuz berdi'));
@@ -475,6 +480,17 @@ export default function DevicesPage({ devices, schools = [], branches, filters }
                     )}
                 </div>
             </div>
+
+            <DeleteConfirmDialog
+                open={deleteDeviceId !== null}
+                onOpenChange={(open) => !open && setDeleteDeviceId(null)}
+                onConfirm={handleConfirmDelete}
+                title={t('confirm_delete_device_title', 'Qurilmani o‘chirish')}
+                description={t(
+                    'confirm_delete_device',
+                    'Haqiqatan ham bu qurilmani o‘chirmoqchimisiz?',
+                )}
+            />
         </AppLayout>
     );
 }

@@ -52,6 +52,8 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
     };
 
     const [editing, setEditing] = useState<Branch | null>(null);
+    const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+    const [deleteBranchId, setDeleteBranchId] = useState<number | null>(null);
     const [devicesBranch, setDevicesBranch] = useState<Branch | null>(null);
 
     const {
@@ -70,17 +72,30 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
         mac_addresses: [] as string[],
     });
 
+    const handleOpenCreate = () => {
+        setEditing(null);
+        clearErrors();
+        reset();
+        setIsFormModalOpen(true);
+    };
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (editing) {
             put(`/branches/${editing.id}`, {
                 onSuccess: () => {
+                    setIsFormModalOpen(false);
                     setEditing(null);
                     reset();
                 },
             });
         } else {
-            post('/branches', { onSuccess: () => reset() });
+            post('/branches', {
+                onSuccess: () => {
+                    setIsFormModalOpen(false);
+                    reset();
+                },
+            });
         }
     };
 
@@ -93,19 +108,14 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
             description: branch.description || '',
             mac_addresses: branch.mac_address_list || [],
         });
+        setIsFormModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        if (
-            confirm(
-                t(
-                    'branches.delete_confirm',
-                    'Are you sure you want to delete this branch?',
-                ),
-            )
-        ) {
-            destroy(`/branches/${id}`);
-        }
+    const handleConfirmDelete = () => {
+        if (!deleteBranchId) return;
+        destroy(`/branches/${deleteBranchId}`, {
+            onSuccess: () => setDeleteBranchId(null),
+        });
     };
 
     // Reactively find the active branch from updated props
@@ -117,31 +127,68 @@ export default function BranchesPage({ branches, schools = [], filters }: Branch
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('branches.title', 'Branches')} />
-            <div className="grid grid-cols-1 items-start gap-6 p-6 xl:grid-cols-4">
-                <BranchForm
-                    editing={editing}
-                    formData={formData}
-                    errors={errors}
-                    setData={setData}
-                    onSubmit={handleSubmit}
-                    schools={schools}
-                    onCancel={() => {
-                        setEditing(null);
-                        reset();
-                        clearErrors();
-                    }}
-                />
+            <div className="p-6">
                 <BranchesTable
                     branches={branches}
                     schools={schools}
                     filterData={filterData}
                     onFilterChange={handleFilterChange}
                     onResetFilters={handleResetFilters}
+                    onCreate={handleOpenCreate}
                     onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onDelete={(id) => setDeleteBranchId(id)}
                     onManageDevices={(branch) => setDevicesBranch(branch)}
                 />
             </div>
+
+            {/* Create / Edit Branch Modal */}
+            <Dialog
+                open={isFormModalOpen}
+                onOpenChange={(open) => {
+                    setIsFormModalOpen(open);
+                    if (!open) {
+                        setEditing(null);
+                        reset();
+                        clearErrors();
+                    }
+                }}
+            >
+                <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto rounded-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-bold">
+                            {editing
+                                ? t('branches.edit', 'Filialni tahrirlash')
+                                : t('branches.add_new', 'Yangi filial qo‘shish')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <BranchForm
+                        editing={editing}
+                        formData={formData}
+                        errors={errors}
+                        setData={setData}
+                        onSubmit={handleSubmit}
+                        schools={schools}
+                        onCancel={() => {
+                            setIsFormModalOpen(false);
+                            setEditing(null);
+                            reset();
+                            clearErrors();
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmDialog
+                open={!!deleteBranchId}
+                onOpenChange={(open) => !open && setDeleteBranchId(null)}
+                title={t('branches.delete_title', 'Filialni o‘chirish')}
+                description={t(
+                    'branches.delete_confirm',
+                    'Haqiqatan ham bu filialni o‘chirib tashlamoqchimisiz? Ushbu filialga tegishli barcha smenalar va ma‘lumotlar ta‘sir ko‘rishi mumkin.',
+                )}
+                onConfirm={handleConfirmDelete}
+            />
 
             {/* Hikvision Devices Management Dialog */}
             <Dialog
