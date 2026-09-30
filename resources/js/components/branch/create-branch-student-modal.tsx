@@ -117,7 +117,7 @@ export default function CreateBranchStudentModal({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (studentToEdit) {
-            put(`/students/${studentToEdit.id}`, {
+            post(`/students/${studentToEdit.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     toast.success(

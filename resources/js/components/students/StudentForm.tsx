@@ -13,6 +13,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Camera, X } from 'lucide-react';
+import WebcamCaptureModal from '@/components/webcam-capture-modal';
 
 interface StudentFormProps {
     editing: any;
@@ -56,6 +58,7 @@ export function StudentForm({
 }: StudentFormProps) {
     const { t } = useTranslation();
     const [showDeviceSettings, setShowDeviceSettings] = useState(false);
+    const [cameraModalOpen, setCameraModalOpen] = useState(false);
 
     return (
         <div>
@@ -188,33 +191,66 @@ export function StudentForm({
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="face_image">
+                <div className="space-y-1.5">
+                    <Label htmlFor="face_image" className="text-xs font-medium text-foreground">
                         {t('students.face_image', 'Yuz rasmi')}
                     </Label>
-                    <Input
-                        id="face_image"
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={(e) => {
-                            const file = e.target.files
-                                ? e.target.files[0]
-                                : null;
-                            onImageChange(file ?? null);
-                        }}
-                    />
+                    <div className="flex items-center gap-3">
+                        {formImagePreview ? (
+                            <div className="relative group size-12 shrink-0">
+                                <img
+                                    src={formImagePreview}
+                                    alt="Face Preview"
+                                    className="size-12 rounded-xl object-cover border-2 border-indigo-500 shadow-xs"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onImageChange(null);
+                                        if (fileInputRef?.current) fileInputRef.current.value = '';
+                                    }}
+                                    className="absolute -top-1.5 -right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-xs hover:bg-rose-600 transition-colors"
+                                    title="Rasmni o‘chirish"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/40 p-1 text-center text-[10px] font-medium text-muted-foreground">
+                                {t('no_image', 'Rasm yo‘q')}
+                            </div>
+                        )}
+                        <div className="flex-1 flex gap-2">
+                            <Input
+                                id="face_image"
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={(e) => {
+                                    const file = e.target.files
+                                        ? e.target.files[0]
+                                        : null;
+                                    onImageChange(file ?? null);
+                                }}
+                                className="flex-1 h-9 rounded-xl text-xs"
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCameraModalOpen(true)}
+                                className="shrink-0 flex items-center gap-1.5 h-9 px-3 rounded-xl text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
+                                title="Kamera orqali rasmga olish"
+                            >
+                                <Camera className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">{t('camera.snap', 'Kamera')}</span>
+                            </Button>
+                        </div>
+                    </div>
                     {errors.face_image && (
                         <p className="text-xs text-destructive">
                             {errors.face_image}
                         </p>
-                    )}
-                    {formImagePreview && (
-                        <img
-                            src={formImagePreview}
-                            alt="Face Preview"
-                            className="mt-2 h-20 w-20 rounded-md border object-cover"
-                        />
                     )}
                 </div>
 
@@ -443,6 +479,12 @@ export function StudentForm({
                     </Button>
                 </div>
             </form>
+
+            <WebcamCaptureModal
+                open={cameraModalOpen}
+                onOpenChange={setCameraModalOpen}
+                onCapture={(file) => onImageChange(file)}
+            />
         </div>
     );
 }

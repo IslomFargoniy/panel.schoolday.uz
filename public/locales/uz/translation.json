@@ -712,5 +712,15 @@
   "enlarge_terminal_photo": "Terminal suratini kattalashtirish",
   "toggle_theme": "Mavzuni almashtirish",
   "port_isup": "Port 7660 (ISUP)",
-  "port_http": "Port 80/443 (HTTP)"
+  "port_http": "Port 80/443 (HTTP)",
+  "camera": {
+    "modal_title": "Kamera orqali rasmga olish",
+    "align_face": "Yuzni markazga joylashtiring",
+    "retake": "Qayta olish",
+    "use_photo": "Tanlash",
+    "snap": "Kamera",
+    "take_photo": "Rasmga olish"
+  },
+  "camera_permission_denied": "Kameraga ulanishda xatolik. Brauzerda kamera ruxsatini yoqing.",
+  "no_image": "Rasm yo‘q"
 }

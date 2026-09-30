@@ -13,7 +13,7 @@ i18n.use(Backend)
             escapeValue: false, // not needed for react as it escapes by default
         },
         backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json?v=1.7',
+            loadPath: '/locales/{{lng}}/{{ns}}.json?v=1.8',
         },
         detection: {
             order: ['cookie', 'localStorage', 'navigator', 'htmlTag'],

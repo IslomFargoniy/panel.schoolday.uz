@@ -712,5 +712,15 @@
   "enlarge_terminal_photo": "Увеличить снимок с терминала",
   "toggle_theme": "Переключить тему",
   "port_isup": "Порт 7660 (ISUP)",
-  "port_http": "Порт 80/443 (HTTP)"
+  "port_http": "Порт 80/443 (HTTP)",
+  "camera": {
+    "modal_title": "Сделать фото с камеры",
+    "align_face": "Поместите лицо в центр",
+    "retake": "Переснять",
+    "use_photo": "Выбрать",
+    "snap": "Камера",
+    "take_photo": "Сфотографировать"
+  },
+  "camera_permission_denied": "Ошибка доступа к камере. Разрешите доступ к камере в браузере.",
+  "no_image": "Нет фото"
 }

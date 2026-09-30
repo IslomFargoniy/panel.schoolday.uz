@@ -712,5 +712,15 @@
   "enlarge_terminal_photo": "Enlarge terminal photo",
   "toggle_theme": "Toggle theme",
   "port_isup": "Port 7660 (ISUP)",
-  "port_http": "Port 80/443 (HTTP)"
+  "port_http": "Port 80/443 (HTTP)",
+  "camera": {
+    "modal_title": "Take photo with camera",
+    "align_face": "Center your face in the frame",
+    "retake": "Retake",
+    "use_photo": "Use photo",
+    "snap": "Camera",
+    "take_photo": "Take photo"
+  },
+  "camera_permission_denied": "Camera access error. Please grant camera permission in your browser.",
+  "no_image": "No image"
 }
