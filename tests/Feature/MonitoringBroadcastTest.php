@@ -54,3 +54,41 @@ test('daily attendance changes dispatch monitoring update event', function () {
 
     Event::assertDispatched(MonitoringUpdate::class);
 });
+
+test('Broadcaster exception tashlasa ham DailyAttendance saqlanadi', function () {
+    Event::listen(MonitoringUpdate::class, function () {
+        throw new Illuminate\Broadcasting\BroadcastException('Reverb connection failed');
+    });
+
+    $shift = App\Models\Shift::create([
+        'name' => '1-Smena',
+        'start_time' => '08:00',
+        'end_time' => '13:00',
+    ]);
+
+    $class = App\Models\SchoolClass::create([
+        'name' => '5-A',
+        'shift_id' => $shift->id,
+    ]);
+
+    $student = Student::create([
+        'name' => 'Vali Aliyev',
+        'employeeNoString' => '99002',
+        'status' => 'active',
+        'class_id' => $class->id,
+    ]);
+
+    $attendance = null;
+    expect(function () use ($student, &$attendance) {
+        Illuminate\Support\Facades\DB::transaction(function () use ($student, &$attendance) {
+            $attendance = DailyAttendance::create([
+                'student_id' => $student->id,
+                'date' => now()->toDateString(),
+                'first_check_in' => now(),
+            ]);
+        });
+    })->not->toThrow(Throwable::class);
+
+    expect($attendance)->not->toBeNull();
+    expect(DailyAttendance::where('student_id', $student->id)->exists())->toBeTrue();
+});

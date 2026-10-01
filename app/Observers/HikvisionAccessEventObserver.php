@@ -153,14 +153,19 @@ class HikvisionAccessEventObserver
             }
         });
 
-        // Send Telegram notification asynchronously via Queue
+        // Send Telegram notification asynchronously via Queue (skip if synced and > 10 min old)
         if ($statusToNotify) {
-            SendTelegramNotificationJob::dispatch(
-                $student,
-                $event,
-                $statusToNotify,
-                $now->format('Y-m-d H:i:s')
-            )->afterCommit();
+            $isSynced = ($event->access?->eventDescription === 'ISUP AcsEvent Sync');
+            $isOlderThan10Min = $now->lessThan(now()->subMinutes(10));
+
+            if (! ($isSynced && $isOlderThan10Min)) {
+                SendTelegramNotificationJob::dispatch(
+                    $student,
+                    $event,
+                    $statusToNotify,
+                    $now->format('Y-m-d H:i:s')
+                )->afterCommit();
+            }
         }
     }
 }

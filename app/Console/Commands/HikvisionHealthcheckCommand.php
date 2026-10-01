@@ -16,7 +16,7 @@ class HikvisionHealthcheckCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'hikvision:healthcheck {--restart : Force restart the daemon via Supervisor}';
+    protected $signature = 'hikvision:healthcheck {--restart : Force restart the daemon via configured restart command}';
 
     /**
      * The console command description.
@@ -30,7 +30,7 @@ class HikvisionHealthcheckCommand extends Command
      */
     public function handle(): int
     {
-        $gatewayBaseUrl = rtrim(config('hikvision.gateway_url', 'http://127.0.0.1:7661'), '/');
+        $gatewayBaseUrl = rtrim(config('hikvision.gateway_url'), '/');
         $healthUrl = $gatewayBaseUrl . '/health';
         $devicesUrl = $gatewayBaseUrl . '/api/devices';
         $cacheKeyFailures = 'hikvision_gateway_consecutive_failures';
@@ -85,10 +85,16 @@ class HikvisionHealthcheckCommand extends Command
         $this->error($alertMsg);
         Log::critical("Hikvision ISUP Gateway Healthcheck Failed ({$failures} consecutive): {$errorMessage}");
 
-        // Self-healing: if failed 3 or more times, attempt restart via Supervisor
+        // Self-healing: if failed 3 or more times, attempt restart via configured command
         if ($failures >= 3) {
-            $this->warn('Self-healing triggered: attempting supervisor restart...');
-            $this->restartGateway();
+            $restartCmd = config('hikvision.restart_command');
+            if ($restartCmd) {
+                $this->warn('Self-healing triggered: attempting daemon restart...');
+                $this->restartGateway();
+            } else {
+                $this->warn('Self-healing is disabled (hikvision.restart_command is not configured).');
+                Log::warning('Hikvision self-healing skipped: HIKVISION_RESTART_COMMAND not set.');
+            }
         }
 
         return 1;
@@ -153,16 +159,26 @@ class HikvisionHealthcheckCommand extends Command
     }
 
     /**
-     * Restart the C++ daemon using supervisorctl
+     * Restart the daemon using the configured restart command.
+     *
+     * Configure via HIKVISION_RESTART_COMMAND in .env, e.g.:
+     *   HIKVISION_RESTART_COMMAND="systemctl restart hikvision-isup-schoolday"
      */
     protected function restartGateway(): bool
     {
+        $restartCmd = (string) config('hikvision.restart_command');
+        if (empty($restartCmd)) {
+            Log::warning('Hikvision restartGateway called but HIKVISION_RESTART_COMMAND is not configured.');
+
+            return false;
+        }
+
         $output = [];
         $returnVar = 0;
-        @exec('sudo supervisorctl restart hikvision-gateway 2>&1', $output, $returnVar);
+        @exec($restartCmd . ' 2>&1', $output, $returnVar);
 
         $outputText = implode("\n", $output);
-        Log::info("Supervisor restart hikvision-gateway output: {$outputText} (code: {$returnVar})");
+        Log::info("Hikvision daemon restart output: {$outputText} (code: {$returnVar})");
 
         return $returnVar === 0;
     }

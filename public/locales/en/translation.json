@@ -107,7 +107,18 @@
     "continue_setup": "Continue Setup",
     "recovery_codes_desc": "Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.",
     "regenerate_codes": "Regenerate Codes",
-    "enter_code_manually": "or, enter the code manually"
+    "enter_code_manually": "or, enter the code manually",
+    "continue": "Continue",
+    "enable_2fa_title": "Enable Two-Factor Authentication",
+    "enable_2fa_modal_desc": "Are you sure you want to enable two-factor authentication for enhanced security?",
+    "two_factor_desc": "Two-factor authentication adds an extra layer of security to your account. You will be prompted for a code from your TOTP app on each login.",
+    "two_factor_enabled_title": "Two-Factor Authentication Enabled!",
+    "two_factor_enabled_modal_desc": "Two-factor authentication has been successfully enabled. A TOTP code will now be required on each login.",
+    "verify_auth_code": "Verify Authentication Code",
+    "enter_6_digit_code": "Enter the 6-digit code from your TOTP app",
+    "recovery_codes_title": "2FA Recovery Codes",
+    "view_codes": "View Codes",
+    "hide_codes": "Hide Codes"
   },
   "students": {
     "title": "Students",
@@ -504,6 +515,8 @@
   "update_failed": "Failed to update",
   "create_failed": "Failed to create",
   "refresh": "Refresh",
+  "biometric_sync": "Biometric Sync",
+  "retry": "Retry",
   "appearance_toggle": {
     "light": "Light",
     "dark": "Dark",
@@ -752,5 +765,9 @@
     "take_photo": "Take photo"
   },
   "camera_permission_denied": "Camera access error. Please grant camera permission in your browser.",
-  "no_image": "No image"
+  "no_image": "No image",
+  "school_inactive_or_expired": "The assigned schools are inactive or expired.",
+  "school_inactive_title": "School Inactive or Expired",
+  "school_inactive_desc": "Your assigned school subscription has expired or has been deactivated. Please contact the platform administrator to restore access.",
+  "until": "Valid until:"
 }

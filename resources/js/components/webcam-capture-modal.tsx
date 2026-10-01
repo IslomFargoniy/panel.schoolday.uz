@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -14,18 +14,24 @@ export default function WebcamCaptureModal({ open, onOpenChange, onCapture }: We
     const { t } = useTranslation();
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [stream, setStream] = useState<MediaStream | null>(null);
+    const streamRef = useRef<MediaStream | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('user');
 
-    const startCamera = async () => {
-        try {
-            setError(null);
-            if (stream) {
-                stream.getTracks().forEach((track) => track.stop());
-            }
+    const stopCamera = useCallback(() => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+        }
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+        }
+    }, []);
 
+    const startCamera = useCallback(async () => {
+        stopCamera();
+        try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: cameraFacing,
@@ -35,31 +41,58 @@ export default function WebcamCaptureModal({ open, onOpenChange, onCapture }: We
                 audio: false,
             });
 
-            setStream(mediaStream);
+            streamRef.current = mediaStream;
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
             }
-        } catch (err: any) {
+            setError(null);
+        } catch {
             setError(t('camera_permission_denied', 'Kameraga ulanishda xatolik. Brauzerda kamera ruxsatini yoqing.'));
         }
-    };
+    }, [cameraFacing, stopCamera, t]);
 
     useEffect(() => {
+        let active = true;
+
         if (open && !capturedImage) {
-            startCamera();
+            const init = async () => {
+                stopCamera();
+                try {
+                    const mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: cameraFacing,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                        },
+                        audio: false,
+                    });
+
+                    if (!active) {
+                        mediaStream.getTracks().forEach((track) => track.stop());
+                        return;
+                    }
+
+                    streamRef.current = mediaStream;
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = mediaStream;
+                    }
+                    setError(null);
+                } catch {
+                    if (active) {
+                        setError(t('camera_permission_denied', 'Kameraga ulanishda xatolik. Brauzerda kamera ruxsatini yoqing.'));
+                    }
+                }
+            };
+            init();
         } else {
-            if (stream) {
-                stream.getTracks().forEach((track) => track.stop());
-                setStream(null);
-            }
+            stopCamera();
         }
 
         return () => {
-            if (stream) {
-                stream.getTracks().forEach((track) => track.stop());
-            }
+            active = false;
+            stopCamera();
         };
-    }, [open, cameraFacing]);
+    }, [open, capturedImage, cameraFacing, stopCamera, t]);
 
     const takePhoto = () => {
         if (!videoRef.current || !canvasRef.current) return;
@@ -89,17 +122,11 @@ export default function WebcamCaptureModal({ open, onOpenChange, onCapture }: We
         ctx.drawImage(video, startX, startY, size, size, 0, 0, size, size);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         setCapturedImage(dataUrl);
-
-        // Stop video stream after snapshot
-        if (stream) {
-            stream.getTracks().forEach((track) => track.stop());
-            setStream(null);
-        }
+        stopCamera();
     };
 
     const retake = () => {
         setCapturedImage(null);
-        startCamera();
     };
 
     const confirmPhoto = () => {
@@ -169,7 +196,7 @@ export default function WebcamCaptureModal({ open, onOpenChange, onCapture }: We
                         size="sm"
                         type="button"
                         onClick={() => {
-                            if (stream) stream.getTracks().forEach((t) => t.stop());
+                            stopCamera();
                             setCapturedImage(null);
                             onOpenChange(false);
                         }}

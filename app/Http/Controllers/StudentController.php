@@ -119,11 +119,7 @@ class StudentController extends Controller
             $validated['face_image'] = '/storage/' . $path;
         }
 
-        $student = Student::create($validated);
-
-        if (! isset($validated['employeeNoString']) || empty($validated['employeeNoString'])) {
-            $student->update(['employeeNoString' => (string) $student->id]);
-        }
+        Student::create($validated);
 
         return redirect()->back()->with('success', 'crud.created');
     }
@@ -189,11 +185,11 @@ class StudentController extends Controller
 
         $file = $request->file('excel_file');
 
-        // Background queue processing requires the file to be saved first
+        // Save the file first so it can be processed in the background queue
         $path = $file->store('imports');
 
-        // Queue the import process in the background
-        \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\StudentsImport($classId), $path);
+        // Queue the import process in the background (StudentsImport implements ShouldQueue)
+        \Maatwebsite\Excel\Facades\Excel::queueImport(new \App\Imports\StudentsImport($classId), $path);
 
         return redirect()->back()->with('success', ['key' => 'crud.students_imported_queued']);
     }

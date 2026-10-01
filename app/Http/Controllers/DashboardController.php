@@ -93,10 +93,12 @@ class DashboardController extends Controller
             $present = $data ? (int) $data->present : 0;
             $late = $data ? (int) $data->late : 0;
 
+            $absent = $present > 0 ? max(0, $totalStudents - $present) : 0;
+
             $monthlyStats[] = [
                 'date' => $currentDate->format('d.m'),
                 'present' => $present,
-                'absent' => max(0, $totalStudents - $present),
+                'absent' => $absent,
                 'late' => $late,
                 'on_time' => max(0, $present - $late),
             ];

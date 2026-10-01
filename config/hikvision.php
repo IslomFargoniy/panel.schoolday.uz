@@ -24,4 +24,14 @@ return [
     'alarm_port' => (int) env('HIKVISION_ALARM_PORT', 7270),
 
     'timeout' => (int) env('HIKVISION_TIMEOUT', 10),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Self-healing restart command
+    |--------------------------------------------------------------------------
+    | Shell command to restart the ISUP daemon when consecutive health-check
+    | failures exceed the threshold. Set to null to disable self-healing.
+    | Example: "systemctl restart hikvision-isup-schoolday"
+    */
+    'restart_command' => env('HIKVISION_RESTART_COMMAND', null),
 ];

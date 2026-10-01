@@ -4,6 +4,9 @@ namespace App\Observers;
 
 use App\Events\MonitoringUpdate;
 use App\Models\DailyAttendance;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class DailyAttendanceObserver
 {
@@ -12,11 +15,17 @@ class DailyAttendanceObserver
      */
     public function saved(DailyAttendance $attendance): void
     {
-        MonitoringUpdate::dispatch([
-            'type' => 'attendance_saved',
-            'student_id' => $attendance->student_id,
-            'date' => $attendance->date,
-        ]);
+        DB::afterCommit(function () use ($attendance) {
+            try {
+                MonitoringUpdate::dispatch([
+                    'type' => 'attendance_saved',
+                    'student_id' => $attendance->student_id,
+                    'date' => $attendance->date,
+                ]);
+            } catch (Throwable $e) {
+                Log::warning('MonitoringUpdate broadcast failed on saved: ' . $e->getMessage());
+            }
+        });
     }
 
     /**
@@ -24,10 +33,16 @@ class DailyAttendanceObserver
      */
     public function deleted(DailyAttendance $attendance): void
     {
-        MonitoringUpdate::dispatch([
-            'type' => 'attendance_deleted',
-            'student_id' => $attendance->student_id,
-            'date' => $attendance->date,
-        ]);
+        DB::afterCommit(function () use ($attendance) {
+            try {
+                MonitoringUpdate::dispatch([
+                    'type' => 'attendance_deleted',
+                    'student_id' => $attendance->student_id,
+                    'date' => $attendance->date,
+                ]);
+            } catch (Throwable $e) {
+                Log::warning('MonitoringUpdate broadcast failed on deleted: ' . $e->getMessage());
+            }
+        });
     }
 }

@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/hikvision/*',
             'api/hikvision-callback',
             'api/hikvision-device-status',
+            'api/telegram/webhook',
         ]);
 
         $middleware->web(append: [

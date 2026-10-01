@@ -171,8 +171,8 @@ class HikvisionController extends Controller
 
             // --- 6. Persist HikvisionAccess (device-level row) ---------------
             $eventDateTime = isset($eventData->dateTime)
-                ? Carbon::parse($eventData->dateTime)->setTimezone(config('app.timezone'))
-                : now();
+                ? Carbon::parse($eventData->dateTime)->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s')
+                : now()->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s');
 
             $hikvisionAccess = HikvisionAccess::create([
                 'ipAddress' => $eventData->ipAddress ?? null,

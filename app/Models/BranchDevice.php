@@ -23,12 +23,14 @@ class BranchDevice extends Model
         'is_online',
         'last_seen_at',
         'encryption_key',
+        'last_event_synced_at',
     ];
 
     protected $casts = [
         'status' => 'boolean',
         'is_online' => 'boolean',
         'last_seen_at' => 'datetime:Y-m-d H:i:s',
+        'last_event_synced_at' => 'datetime:Y-m-d H:i:s',
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

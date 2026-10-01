@@ -29,7 +29,6 @@ export default function SystemSettings({
     const { data, setData, post, processing, recentlySuccessful, errors } =
         useForm({
             telegram_bot_token: settings.telegram_bot_token || '',
-            branch_limit: settings.branch_limit || '1',
         });
 
     const submit = (e: FormEvent) => {
@@ -88,36 +87,6 @@ export default function SystemSettings({
                                     </p>
                                 )}
                             </div>
-
-                            {isSuperadmin && (
-                                <div>
-                                    <Label htmlFor="branch_limit">
-                                        {t(
-                                            'settings.branch_limit',
-                                            'Branch Limit',
-                                        )}
-                                    </Label>
-                                    <Input
-                                        id="branch_limit"
-                                        type="number"
-                                        min="1"
-                                        className="mt-1 block w-full"
-                                        value={data.branch_limit}
-                                        onChange={(e) =>
-                                            setData(
-                                                'branch_limit',
-                                                e.target.value,
-                                            )
-                                        }
-                                        autoComplete="off"
-                                    />
-                                    {errors.branch_limit && (
-                                        <p className="mt-2 text-sm text-destructive">
-                                            {errors.branch_limit}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
 
                             <div className="flex items-center gap-4">
                                 <Button disabled={processing}>

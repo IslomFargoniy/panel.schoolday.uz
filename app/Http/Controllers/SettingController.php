@@ -23,10 +23,6 @@ class SettingController extends Controller
             'telegram_bot_token' => 'nullable|string',
         ];
 
-        if (auth()->user()->hasRole('Superadmin')) {
-            $rules['branch_limit'] = 'nullable|integer|min:1';
-        }
-
         $validated = $request->validate($rules);
 
         foreach ($validated as $key => $value) {

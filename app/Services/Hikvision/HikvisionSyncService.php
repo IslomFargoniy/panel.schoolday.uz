@@ -15,7 +15,7 @@ class HikvisionSyncService
 {
     protected function gatewayUrl(): string
     {
-        return rtrim(config('hikvision.gateway_url', 'http://127.0.0.1:7661'), '/') . '/api/isapi';
+        return rtrim(config('hikvision.gateway_url'), '/') . '/api/isapi';
     }
 
     /**
@@ -241,8 +241,21 @@ class HikvisionSyncService
             return ['success' => false, 'message' => 'Qurilma ISUP rejimida emas yoki Device ID mavjud emas.'];
         }
 
-        $startTime = $startTime ?: now()->subDays(1)->format('Y-m-d\T00:00:00+05:00');
-        $endTime = $endTime ?: now()->addHours(1)->format('Y-m-d\T23:59:59+05:00');
+        // Check if school is active
+        $school = $device->branch?->school;
+        if ($school && (! $school->status || ($school->valid_date && Carbon::parse($school->valid_date)->isPast()))) {
+            Log::warning("HikvisionSync: Skipped sync for device {$device->id} because school [{$school->id}] is inactive or expired.");
+
+            return ['success' => false, 'message' => 'Maktab faol emas yoki muddati tugagan'];
+        }
+
+        $appTimezone = config('app.timezone', 'Asia/Tashkent');
+        $startTime = $startTime ?: (
+            $device->last_event_synced_at
+                ? Carbon::parse($device->last_event_synced_at)->subMinutes(5)->format('Y-m-d\TH:i:s+05:00')
+                : now()->subDays(1)->format('Y-m-d\T00:00:00+05:00')
+        );
+        $endTime = $endTime ?: now()->addHours(1)->format('Y-m-d\TH:i:s+05:00');
 
         try {
             $syncedCount = 0;
@@ -290,17 +303,59 @@ class HikvisionSyncService
                     break;
                 }
 
+                // Batch load students for this page
+                $employeeNos = collect($infoList)->pluck('employeeNoString')->filter()->map(fn ($e) => (string) $e)->unique()->values()->all();
+                $students = Student::with('schoolClass.shift')
+                    ->whereIn('employeeNoString', $employeeNos)
+                    ->where('status', 'active')
+                    ->get()
+                    ->keyBy('employeeNoString');
+
+                // Batch duplicate detection: by serialNo and by (employeeNo + dateTime)
+                $serialNos = collect($infoList)->pluck('serialNo')->filter()->map(fn ($s) => (string) $s)->unique()->values()->all();
+                $existingBySerial = [];
+                if (! empty($serialNos)) {
+                    $existingBySerial = HikvisionAccessEvent::whereIn('serialNo', $serialNos)
+                        ->whereHas('access', function ($q) use ($device) {
+                            $q->where('shortSerialNumber', $device->device_id)
+                                ->orWhere('macAddress', $device->mac_address);
+                        })
+                        ->pluck('serialNo')
+                        ->map(fn ($s) => (string) $s)
+                        ->flip()
+                        ->all();
+                }
+
+                $dateTimes = [];
+                foreach ($infoList as $evt) {
+                    if (! empty($evt['time'])) {
+                        $dateTimes[] = Carbon::parse($evt['time'])->setTimezone($appTimezone)->format('Y-m-d H:i:s');
+                    }
+                }
+                $dateTimes = array_unique($dateTimes);
+
+                $existingByEmployeeTime = [];
+                if (! empty($employeeNos) && ! empty($dateTimes)) {
+                    $existingEvents = HikvisionAccessEvent::whereIn('employeeNoString', $employeeNos)
+                        ->whereHas('access', function ($q) use ($dateTimes) {
+                            $q->whereIn('dateTime', $dateTimes);
+                        })
+                        ->with('access:id,dateTime')
+                        ->get();
+
+                    foreach ($existingEvents as $ev) {
+                        $dtStr = $ev->access?->dateTime ? Carbon::parse($ev->access->dateTime)->setTimezone($appTimezone)->format('Y-m-d H:i:s') : '';
+                        $existingByEmployeeTime[$ev->employeeNoString . '_' . $dtStr] = true;
+                    }
+                }
+
                 foreach ($infoList as $event) {
-                    $employeeNo = $event['employeeNoString'] ?? null;
+                    $employeeNo = isset($event['employeeNoString']) ? (string) $event['employeeNoString'] : null;
                     if (empty($employeeNo)) {
                         continue;
                     }
 
-                    $student = Student::with('schoolClass.shift')
-                        ->where('employeeNoString', $employeeNo)
-                        ->where('status', 'active')
-                        ->first();
-
+                    $student = $students->get($employeeNo);
                     if (! $student) {
                         continue;
                     }
@@ -310,27 +365,28 @@ class HikvisionSyncService
                         continue;
                     }
 
-                    $eventDateTime = Carbon::parse($rawTime)->timezone('Asia/Tashkent');
+                    $eventDateTime = Carbon::parse($rawTime)->setTimezone($appTimezone);
                     $eventDateStr = $eventDateTime->format('Y-m-d H:i:s');
                     $serialNo = (string) ($event['serialNo'] ?? '');
 
-                    // Check for duplicate by employeeNo and exact access dateTime
-                    $existing = HikvisionAccessEvent::where('employeeNoString', $employeeNo)
-                        ->whereHas('access', function ($q) use ($eventDateStr) {
-                            $q->where('dateTime', $eventDateStr);
-                        })
-                        ->exists();
-
-                    if ($existing) {
+                    if (
+                        (! empty($serialNo) && isset($existingBySerial[$serialNo])) ||
+                        isset($existingByEmployeeTime[$employeeNo . '_' . $eventDateStr])
+                    ) {
                         continue;
                     }
 
                     $attendanceStatus = $event['attendanceStatus'] ?? null;
                     if (empty($attendanceStatus) || $attendanceStatus === 'undefined') {
-                        $attendanceStatus = 'checkIn';
+                        $attendanceStatus = null;
+                        $label = null;
+                    } else {
+                        $cleanStatus = strtolower(trim((string) $attendanceStatus));
+                        $label = in_array($cleanStatus, ['checkin', 'onduty', 'in'], true)
+                            ? 'Keldi'
+                            : (in_array($cleanStatus, ['checkout', 'offduty', 'out'], true) ? 'Ketdi' : $attendanceStatus);
                     }
 
-                    $label = ($attendanceStatus === 'checkIn') ? 'Keldi' : 'Ketdi';
                     $shift = $student->schoolClass?->shift;
 
                     $access = HikvisionAccess::create([
@@ -359,6 +415,11 @@ class HikvisionSyncService
                     $eventModel->updated_at = $eventDateTime;
                     $eventModel->save();
 
+                    if (! empty($serialNo)) {
+                        $existingBySerial[$serialNo] = true;
+                    }
+                    $existingByEmployeeTime[$employeeNo . '_' . $eventDateStr] = true;
+
                     if (isset($event['FaceRect']) && is_array($event['FaceRect'])) {
                         $eventModel->faceRects()->create([
                             'height' => $event['FaceRect']['height'] ?? null,
@@ -376,6 +437,8 @@ class HikvisionSyncService
                     break;
                 }
             }
+
+            $device->update(['last_event_synced_at' => now()]);
 
             Log::info("HikvisionSync [ISUP Events]: Device {$device->device_id} synced {$syncedCount} events.");
 

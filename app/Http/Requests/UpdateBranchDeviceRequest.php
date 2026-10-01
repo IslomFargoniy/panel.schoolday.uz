@@ -54,11 +54,13 @@ class UpdateBranchDeviceRequest extends FormRequest
      */
     public function rules(): array
     {
+        $deviceId = $this->route('branch_device')?->id ?? $this->route('device')?->id ?? $this->route('branch_device') ?? $this->route('device');
+
         return [
             'branch_id' => 'required|exists:branches,id',
             'mac_address' => 'required_if:connection_type,http_listening|nullable|string|max:255',
             'name' => 'nullable|string|max:255',
-            'device_id' => 'required_if:connection_type,isup|nullable|string|max:255',
+            'device_id' => 'required_if:connection_type,isup|nullable|string|max:255|unique:branch_devices,device_id,' . $deviceId,
             'connection_type' => 'nullable|in:isup,http_listening',
             'encryption_key' => 'nullable|string|max:255',
         ];

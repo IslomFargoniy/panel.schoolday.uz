@@ -98,59 +98,149 @@ class ReportController extends Controller
         $status = $filters['status'];
 
         if ($status === 'absent') {
-            $query = Student::where('status', 'active')
-                ->with(['schoolClass.shift.branch.school'])
-                ->whereDoesntHave('attendances', function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('date', [$startDate, $endDate]);
-                });
+            $start = Carbon::parse($startDate)->startOfDay();
+            $end = Carbon::parse($endDate)->endOfDay();
+            if ($start->greaterThan($end)) {
+                $temp = clone $start;
+                $start = clone $end;
+                $end = $temp;
+            }
+            if ($start->diffInDays($end) > 31) {
+                $end = (clone $start)->addDays(31)->endOfDay();
+            }
 
-            // Multi-tenant check
+            // Determine active school days per branch (only dates where at least 1 attendance occurred in that branch)
+            $activeDatesQuery = DailyAttendance::query()
+                ->join('students', 'daily_attendances.student_id', '=', 'students.id')
+                ->join('classes', 'students.class_id', '=', 'classes.id')
+                ->join('shifts', 'classes.shift_id', '=', 'shifts.id')
+                ->whereBetween('daily_attendances.date', [$start->toDateString(), $end->toDateString()]);
+
             if (! Tenant::isGlobalAdmin()) {
-                $query->whereHas('schoolClass.shift.branch', function ($b) {
+                $activeDatesQuery->join('branches', 'shifts.branch_id', '=', 'branches.id')
+                    ->whereIn('branches.school_id', Tenant::schoolIds());
+            }
+
+            if ($schoolId) {
+                if (Tenant::isGlobalAdmin()) {
+                    $activeDatesQuery->join('branches as b_filter', 'shifts.branch_id', '=', 'b_filter.id')
+                        ->where('b_filter.school_id', $schoolId);
+                } else {
+                    $activeDatesQuery->where('branches.school_id', $schoolId);
+                }
+            }
+            if ($branchId) {
+                $activeDatesQuery->where('shifts.branch_id', $branchId);
+            }
+
+            $activeBranchDates = $activeDatesQuery
+                ->select('shifts.branch_id', 'daily_attendances.date')
+                ->distinct()
+                ->get()
+                ->groupBy('branch_id')
+                ->map(function ($items) {
+                    return $items->pluck('date')->map(fn ($d) => Carbon::parse($d)->toDateString())->unique()->values()->all();
+                })
+                ->all();
+
+            $studentQuery = Student::where('status', 'active')
+                ->with(['schoolClass.shift.branch.school']);
+
+            if (! Tenant::isGlobalAdmin()) {
+                $studentQuery->whereHas('schoolClass.shift.branch', function ($b) {
                     $b->whereIn('school_id', Tenant::schoolIds());
                 });
             }
 
             if ($studentId) {
-                $query->where('id', $studentId);
+                $studentQuery->where('id', $studentId);
             } else {
                 if ($classId) {
-                    $query->where('class_id', $classId);
+                    $studentQuery->where('class_id', $classId);
                 } elseif ($shiftId) {
-                    $query->whereHas('schoolClass', function ($q) use ($shiftId) {
+                    $studentQuery->whereHas('schoolClass', function ($q) use ($shiftId) {
                         $q->where('shift_id', $shiftId);
                     });
                 } elseif ($branchId) {
-                    $query->whereHas('schoolClass.shift', function ($q) use ($branchId) {
+                    $studentQuery->whereHas('schoolClass.shift', function ($q) use ($branchId) {
                         $q->where('branch_id', $branchId);
                     });
                 } elseif ($schoolId) {
-                    $query->whereHas('schoolClass.shift.branch', function ($q) use ($schoolId) {
+                    $studentQuery->whereHas('schoolClass.shift.branch', function ($q) use ($schoolId) {
                         $q->where('school_id', $schoolId);
                     });
                 }
             }
 
-            if ($paginate) {
-                $results = $query->paginate($limit);
-                $collection = $results->getCollection();
-            } else {
-                $results = $query->get();
-                $collection = $results;
+            $students = $studentQuery->get();
+            $studentIds = $students->pluck('id')->all();
+
+            $attendancesMap = [];
+            if (! empty($studentIds)) {
+                $attended = DailyAttendance::whereIn('student_id', $studentIds)
+                    ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                    ->select('student_id', 'date')
+                    ->get();
+
+                foreach ($attended as $att) {
+                    $d = Carbon::parse($att->date)->toDateString();
+                    $attendancesMap[$att->student_id . '_' . $d] = true;
+                }
             }
 
-            $collection->transform(function ($student) use ($startDate) {
-                $item = new DailyAttendance([
-                    'date' => clone Carbon::parse($startDate),
-                ]);
-                $item->id = 'absent-' . $student->id;
-                $item->setRelation('student', $student);
-                $item->is_absent_placeholder = true;
+            $absentRows = [];
+            $curDate = clone $end;
+            while ($curDate->greaterThanOrEqualTo($start)) {
+                $dateStr = $curDate->toDateString();
 
-                return $item;
-            });
+                foreach ($students as $student) {
+                    $bId = $student->schoolClass?->shift?->branch_id;
+                    if (! $bId) {
+                        continue;
+                    }
 
-            return $results;
+                    // Only count as school day if the branch had at least 1 attendance on this date
+                    $branchDates = $activeBranchDates[$bId] ?? [];
+                    if (! in_array($dateStr, $branchDates, true)) {
+                        continue;
+                    }
+
+                    // If student attended, skip
+                    if (isset($attendancesMap[$student->id . '_' . $dateStr])) {
+                        continue;
+                    }
+
+                    $item = new DailyAttendance([
+                        'date' => Carbon::parse($dateStr),
+                    ]);
+                    $item->id = 'absent-' . $student->id . '-' . $dateStr;
+                    $item->setRelation('student', $student);
+                    $item->is_absent_placeholder = true;
+
+                    $absentRows[] = $item;
+                }
+
+                $curDate->subDay();
+            }
+
+            if ($paginate) {
+                $page = (int) request()->input('page', 1);
+                $total = count($absentRows);
+                $slice = array_slice($absentRows, ($page - 1) * $limit, $limit);
+
+                return new \Illuminate\Pagination\LengthAwarePaginator(
+                    $slice,
+                    $total,
+                    $limit,
+                    $page,
+                    [
+                        'path' => request()->url(),
+                        'query' => request()->query(),
+                    ]
+                );
+            }
+
+            return collect($absentRows);
         } else {
             $query = DailyAttendance::with(['student.schoolClass.shift.branch.school'])
                 ->whereBetween('date', [$startDate, $endDate])

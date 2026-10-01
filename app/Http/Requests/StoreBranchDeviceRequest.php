@@ -47,7 +47,7 @@ class StoreBranchDeviceRequest extends FormRequest
             'branch_id' => 'required|exists:branches,id',
             'mac_address' => 'required_if:connection_type,http_listening|nullable|string|max:255',
             'name' => 'nullable|string|max:255',
-            'device_id' => 'required_if:connection_type,isup|nullable|string|max:255',
+            'device_id' => 'required_if:connection_type,isup|nullable|string|max:255|unique:branch_devices,device_id',
             'connection_type' => 'nullable|in:isup,http_listening',
             'encryption_key' => 'nullable|string|max:255',
         ];

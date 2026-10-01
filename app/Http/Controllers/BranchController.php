@@ -244,7 +244,7 @@ class BranchController extends Controller
                 ['mac_address' => $mac],
                 [
                     'name' => 'Hikvision Terminal',
-                    'device_id' => 'branch' . $branch->id,
+                    'device_id' => null,
                     'connection_type' => 'http_listening',
                     'status' => true,
                 ]

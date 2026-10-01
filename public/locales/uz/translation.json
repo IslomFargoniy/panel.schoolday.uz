@@ -107,7 +107,18 @@
     "continue_setup": "Sozlashni davom ettirish",
     "recovery_codes_desc": "Tiklash kodlari 2FA qurilmangizni yo'qotganingizda hisobingizga kirishni qayta tiklashga imkon beradi. Ularni xavfsiz parollar menejerida saqlang.",
     "regenerate_codes": "Kodlarni qayta yaratish",
-    "enter_code_manually": "yoki, kodni qo'lda kiriting"
+    "enter_code_manually": "yoki, kodni qo'lda kiriting",
+    "continue": "Davom etish",
+    "enable_2fa_title": "Ikki bosqichli autentifikatsiyani yoqish",
+    "enable_2fa_modal_desc": "Xavfsizlikni oshirish uchun ikki bosqichli autentifikatsiyani yoqishni tasdiqlaysizmi?",
+    "two_factor_desc": "Ikki bosqichli autentifikatsiya hisobingizga qo'shimcha xavfsizlik qatlamini qo'shadi. Tizimga kirishda TOTP ilovangiz yordamida yaratilgan kodni kiritishingiz talab qilinadi.",
+    "two_factor_enabled_title": "Ikki bosqichli autentifikatsiya yoqildi!",
+    "two_factor_enabled_modal_desc": "Ikki bosqichli autentifikatsiya muvaffaqiyatli yoqildi. Endi tizimga kirishda TOTP kodi talab qilinadi.",
+    "verify_auth_code": "Autentifikatsiya kodini tasdiqlash",
+    "enter_6_digit_code": "TOTP ilovangizdan 6 xonali kodni kiriting",
+    "recovery_codes_title": "2FA Tiklash Kodlari",
+    "view_codes": "Kodlarni ko'rish",
+    "hide_codes": "Kodlarni yashirish"
   },
   "students": {
     "title": "O'quvchilar",
@@ -504,6 +515,8 @@
   "update_failed": "Yangilashda xatolik yuz berdi",
   "create_failed": "Yaratishda xatolik yuz berdi",
   "refresh": "Yangilash",
+  "biometric_sync": "Biometrik sinxronlash",
+  "retry": "Qayta urinish",
   "appearance_toggle": {
     "light": "Yorug‘",
     "dark": "Qorong‘u",
@@ -752,5 +765,9 @@
     "take_photo": "Rasmga olish"
   },
   "camera_permission_denied": "Kameraga ulanishda xatolik. Brauzerda kamera ruxsatini yoqing.",
-  "no_image": "Rasm yo‘q"
+  "no_image": "Rasm yo‘q",
+  "school_inactive_or_expired": "Siz biriktirilgan maktablarning faoliyati to‘xtatilgan yoki muddati tugagan.",
+  "school_inactive_title": "Maktab faoliyati to‘xtatilgan",
+  "school_inactive_desc": "Siz biriktirilgan maktab(lar)ning tizimdan foydalanish muddati tugagan yoki faoliyati to‘xtatilgan. Tizimga qayta kirish huquqini tiklash uchun platforma ma’muri bilan bog‘laning.",
+  "until": "Muddati:"
 }

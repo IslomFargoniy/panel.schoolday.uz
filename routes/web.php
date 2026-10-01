@@ -19,7 +19,8 @@ use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StudentController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', App\Http\Middleware\CheckSchoolActive::class])->group(function () {
+    Route::get('school-inactive', [App\Http\Controllers\SchoolInactiveController::class, 'index'])->name('school.inactive');
     Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring');
     Route::get('monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -43,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('branch_device', App\Http\Controllers\BranchDeviceController::class)
         ->only(['store', 'update', 'destroy']);
     Route::get('devices', [App\Http\Controllers\BranchDeviceController::class, 'index'])->name('devices.index');
-    Route::post('branch_device/{device}/sync', [App\Http\Controllers\Api\HikvisionController::class, 'syncDeviceEvents'])->name('branch_device.sync');
+    // Manual sync removed — synchronization is handled automatically by the scheduler.
     Route::resource('shifts', ShiftController::class)->except(['create', 'show', 'edit']);
     Route::resource('classes', SchoolClassController::class)->except(['create', 'show', 'edit'])->parameters(['classes' => 'schoolClass']);
     Route::get('students/template', [StudentController::class, 'template'])->name('students.template');
