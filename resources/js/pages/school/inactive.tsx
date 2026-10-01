@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { AlertCircle, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import settings from '@/routes/settings';
 
 interface School {
     id: number;
@@ -66,7 +65,7 @@ export default function SchoolInactive({ schools = [] }: InactiveProps) {
                         variant="outline"
                         size="sm"
                         className="w-full sm:w-auto gap-2"
-                        onClick={() => router.get(settings.profile().url)}
+                        onClick={() => router.get('/settings/profile')}
                     >
                         <Settings className="h-4 w-4" />
                         <span>{t('settings.profile', 'Sozlamalar')}</span>
