@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\BranchDevice;
 use App\Models\DailyAttendance;
 use App\Models\HikvisionAccess;
 use App\Models\HikvisionAccessEvent;
@@ -159,7 +160,14 @@ test('explicit checkIn status never triggers check-out', function () {
 });
 
 test('hikvision store endpoint processes access event without picture file', function () {
+    BranchDevice::create([
+        'branch_id' => $this->branch->id,
+        'device_id' => 'DEV_GATE_01',
+        'status' => true,
+    ]);
+
     $payload = [
+        'device_id' => 'DEV_GATE_01',
         'AccessControllerEvent' => [
             'deviceName' => 'Main Gate',
             'employeeNoString' => 'STU_1001',

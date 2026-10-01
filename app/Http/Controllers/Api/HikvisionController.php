@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BranchDevice;
-use App\Models\BranchMacAddress;
 use App\Models\HikvisionAccess;
 use App\Models\HikvisionAccessEvent;
 use App\Models\Student;
 use App\Services\Hikvision\HikvisionSyncService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Telegram\Bot\Api;
 
 class HikvisionController extends Controller
@@ -29,25 +31,42 @@ class HikvisionController extends Controller
             $telegram = new Api($token);
             $telegram->sendMessage([
                 'chat_id' => $chat_id,
-                'text' => substr($message, 0, 4000), // Telegram message length limit info
+                'text' => substr($message, 0, 4000),
             ]);
         } catch (Exception $e) {
             Log::error('Telegram Log Error: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Check if request is from localhost or has valid X-Gateway-Secret header.
+     */
+    private function isGatewayAuthorized(Request $request): bool
+    {
+        $ip = $request->ip();
+        if ($ip === '127.0.0.1' || $ip === '::1') {
+            return true;
+        }
+
+        $secret = config('hikvision.gateway_secret');
+        $headerSecret = $request->header('X-Gateway-Secret');
+
+        if (! empty($secret) && ! empty($headerSecret) && hash_equals($secret, (string) $headerSecret)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function store(Request $request)
     {
         try {
             // --- 1. Parse incoming payload -----------------------------------
-            // Hikvision sends multipart/form-data: the JSON blob comes as the
-            // "AccessControllerEvent" field, and the face photo as "Picture".
             $rawJson = $request->input('AccessControllerEvent');
 
             if ($rawJson && is_string($rawJson)) {
                 $eventData = json_decode($rawJson);
             } else {
-                // Fallback: try the raw body (application/json)
                 $eventData = json_decode($request->getContent());
             }
 
@@ -65,6 +84,7 @@ class HikvisionController extends Controller
             $branchDevice = null;
             if ($incomingMac || $shortSerial || $deviceId) {
                 $branchDevice = BranchDevice::where('status', true)
+                    ->with('branch.school')
                     ->where(function ($q) use ($incomingMac, $shortSerial, $deviceId) {
                         if ($incomingMac) {
                             $q->orWhereRaw('UPPER(mac_address) = ?', [$incomingMac]);
@@ -77,51 +97,40 @@ class HikvisionController extends Controller
                         }
                     })
                     ->first();
-
-                if ($branchDevice) {
-                    $branchDevice->update([
-                        'is_online' => true,
-                        'last_seen_at' => now(),
-                    ]);
-                }
             }
 
-            $totalConfigured = BranchDevice::count() + BranchMacAddress::count();
-            if ($totalConfigured > 0 && $incomingMac && ! $branchDevice) {
-                $allowed = BranchMacAddress::whereRaw('UPPER(mac_address) = ?', [$incomingMac])->exists()
-                    || BranchDevice::whereRaw('UPPER(mac_address) = ?', [$incomingMac])->exists();
-                if (! $allowed) {
-                    Log::info("Hikvision: rejected event from unregistered device [{$incomingMac}]");
+            if (! $branchDevice) {
+                Log::info("Hikvision: rejected event from unregistered or inactive device [MAC: {$incomingMac}, Serial: {$shortSerial}, DeviceId: {$deviceId}]");
 
-                    return response()->json(['success' => false, 'reason' => 'device_not_allowed'], 200);
-                }
+                return response()->json(['success' => false, 'reason' => 'device_not_allowed'], 200);
             }
+
+            // Check if school is active
+            $school = $branchDevice->branch?->school;
+            if ($school && (! $school->status || ($school->valid_date && Carbon::parse($school->valid_date)->isPast()))) {
+                Log::warning("Hikvision: rejected event because school [{$school->id}] is inactive or expired.");
+
+                return response()->json(['success' => false, 'reason' => 'school_inactive'], 200);
+            }
+
+            $branchDevice->update([
+                'is_online' => true,
+                'last_seen_at' => now(),
+            ]);
 
             // --- 3. We only care about AccessControllerEvent type -----------
             $accessEventData = $eventData->AccessControllerEvent ?? null;
 
             if (! $accessEventData) {
-                // Not an access-controller event — ignore silently
                 return response()->json(['success' => true, 'reason' => 'ignored']);
             }
 
-            // --- 4. Save uploaded face photo (if present) -------------------
-            $filename = '';
-            if ($request->hasFile('Picture')) {
-                $picture = $request->file('Picture');
-                $shortSerial = $eventData->shortSerialNumber ?? 'unknown_device';
-                $filename = time() . '_' . rand(1, 99) . '_' . $picture->getClientOriginalName();
-                $savedPath = $picture->storeAs("hikvision/{$shortSerial}", $filename, 'public');
-                $filename = $savedPath; // store full relative path
-            }
-
-            // --- 5. Find the matching student --------------------------------
+            // --- 4. Find the matching student --------------------------------
             $employeeNo = $accessEventData->employeeNoString ?? null;
 
             if ($employeeNo) {
-                // Prevent multiple entries for the same student within 10 seconds
                 $lockKey = 'hikvision_debounce_' . $employeeNo;
-                if (! \Illuminate\Support\Facades\Cache::add($lockKey, true, 10)) {
+                if (! Cache::add($lockKey, true, 10)) {
                     Log::info("Hikvision: ignored duplicate event for employee {$employeeNo}");
 
                     return response()->json(['success' => true, 'reason' => 'duplicate_ignored']);
@@ -139,14 +148,39 @@ class HikvisionController extends Controller
                 return response()->json(['success' => false, 'reason' => 'student_not_found']);
             }
 
+            // Student must belong to this device's branch
+            $studentBranchId = $checkStudent->schoolClass?->shift?->branch_id;
+            if ($studentBranchId !== $branchDevice->branch_id) {
+                Log::warning("Hikvision: student [{$checkStudent->id}] branch [{$studentBranchId}] does not match device branch [{$branchDevice->branch_id}]");
+
+                return response()->json(['success' => false, 'reason' => 'student_branch_mismatch'], 200);
+            }
+
+            // --- 5. Save uploaded face photo (ONLY after student is verified) -
+            $filename = '';
+            if ($request->hasFile('Picture')) {
+                $picture = $request->file('Picture');
+                $rawSerial = (string) ($eventData->shortSerialNumber ?? $branchDevice->device_id ?? 'unknown');
+                $sanitizedSerial = preg_replace('/[^A-Za-z0-9_-]/', '', $rawSerial);
+                $folder = ! empty($sanitizedSerial) ? $sanitizedSerial : 'unknown';
+                $extension = $picture->guessExtension() ?: 'jpg';
+                $filename = Str::uuid() . '.' . $extension;
+                $savedPath = $picture->storeAs("hikvision/{$folder}", $filename, 'public');
+                $filename = $savedPath;
+            }
+
             // --- 6. Persist HikvisionAccess (device-level row) ---------------
+            $eventDateTime = isset($eventData->dateTime)
+                ? Carbon::parse($eventData->dateTime)->setTimezone(config('app.timezone'))
+                : now();
+
             $hikvisionAccess = HikvisionAccess::create([
                 'ipAddress' => $eventData->ipAddress ?? null,
                 'portNo' => $eventData->portNo ?? null,
                 'protocol' => $eventData->protocol ?? null,
                 'macAddress' => $eventData->macAddress ?? null,
                 'channelId' => $eventData->channelID ?? $eventData->channelId ?? null,
-                'dateTime' => isset($eventData->dateTime) ? \Carbon\Carbon::parse($eventData->dateTime) : now(),
+                'dateTime' => $eventDateTime,
                 'activePostCount' => $eventData->activePostCount ?? null,
                 'eventType' => $eventData->eventType ?? null,
                 'eventState' => $eventData->eventState ?? null,
@@ -198,7 +232,7 @@ class HikvisionController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Serverda xatolik yuz berdi.'], 500);
         }
     }
 
@@ -207,13 +241,21 @@ class HikvisionController extends Controller
      */
     public function getDeviceKey(Request $request)
     {
+        if (! $this->isGatewayAuthorized($request)) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
         $deviceId = $request->query('device_id') ?? $request->query('deviceId') ?? $request->input('device_id') ?? $request->input('deviceId');
         if (! $deviceId) {
             return response()->json(['error' => 'Device ID required'], 400);
         }
 
         $device = BranchDevice::where('device_id', $deviceId)->first();
-        $key = ($device && ! empty($device->encryption_key)) ? $device->encryption_key : 'SchoolDay142026';
+        $key = (! empty($device?->encryption_key)) ? $device->encryption_key : config('hikvision.default_encryption_key');
+
+        if (empty($key)) {
+            return response()->json(['error' => 'Encryption key not found'], 404);
+        }
 
         return response()->json([
             'success' => true,
@@ -229,6 +271,10 @@ class HikvisionController extends Controller
      */
     public function updateDeviceStatus(Request $request)
     {
+        if (! $this->isGatewayAuthorized($request)) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
         $deviceId = $request->input('device_id') ?? $request->input('deviceId') ?? $request->query('device_id') ?? $request->query('deviceId');
         $status = $request->input('status') ?? $request->query('status'); // 'online' or 'offline'
         $ip = $request->input('ip') ?? $request->query('ip');

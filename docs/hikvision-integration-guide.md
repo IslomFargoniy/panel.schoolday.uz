@@ -18,7 +18,7 @@ SchoolDay tizimi Hikvision qurilmalari bilan 2 xil rejimda ishlay oladi:
 ```mermaid
 flowchart LR
     subgraph Usul 1 [1-Usul: ISUP 5.0 - Tavsiya Etiladi]
-        T1[Terminal] -->|2 Tomonlama Avtomatik| G[ISUP Gateway :7660]
+        T1[Terminal] -->|2 Tomonlama Avtomatik| G[ISUP Gateway :7670]
         G -->|Yuz rasmi & O'quvchi| T1
         T1 -->|Jonli davomat| G
     end
@@ -26,6 +26,9 @@ flowchart LR
         T2[Terminal] -->|Bir tomonlama POST| W[Webhook /api/hikvision-callback yoki /api/hikvision/events]
     end
 ```
+
+> [!NOTE]
+> **Portlar taqsimoti:** SchoolDay loyihasida ISUP CMS porti **7670**, Gateway REST API **7671**, Alarm porti **7270**. (PayDay loyihasida esa CMS 7660, Gateway REST API 7661, Alarm 7200 ishlatiladi). Loyihalar portlarini aralashtirib yubormang!
 
 ---
 
@@ -50,11 +53,14 @@ flowchart LR
    - **Protocol Version:** `ISUP 5.0` (yoki EHome 5.0)
    - **Server Address Type:** `IP Address`
    - **Server IP:** Serveringizning ochiq Statik Public IP manzili (Masalan: `193.180.213.188`)
-   - **Server Port:** `7660`
+   - **Server Port:** `7670`
    - **Device ID:** SchoolDay panelida filiallaringiz uchun kiritgan unikal qurilma ID (Masalan: `TERM_SCH_01`)
    - **Device Key (Encryption Key / Register Password):** SchoolDay panelida qurilma qo‘shishda kiritilgan kalit (Masalan: `Hik12345678`)
 4. **Save (Saqlash)** tugmasini bosing.
 5. 10-30 soniya ichida **Status** qatorida `Online` (Yashil) yozuvi chiqishi kerak.
+
+### 3.3. Gateway Daemon Xavfsizlik Header'i (`X-Gateway-Secret`)
+ISUP Gateway daemon SchoolDay backendiga (`/api/hikvision-device-key` va `/api/hikvision-device-status`) so'rov yuborganida, xavfsizlik maqsadida `X-Gateway-Secret` sarlavhasini (header) yuborishi shart (yoki so'rov to'g'ridan-to'g'ri `127.0.0.1`/`::1` dan amalga oshirilishi kerak). Bu kalit `.env` dagi `HIKVISION_GATEWAY_SECRET` bilan mos kelishi zarur. Aks holda API 403 Forbidden qaytaradi.
 
 ---
 

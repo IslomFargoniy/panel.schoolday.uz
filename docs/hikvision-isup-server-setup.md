@@ -1,6 +1,12 @@
 # Hikvision ISUP 5.0 Server O‘rnatish va Portlarni Sozlash Qo‘llanmasi
 
-Ushbu qo‘llanma **panel.payday.uz** va **SchoolDay** loyihalarida qo‘llanilgan **Hikvision ISUP 5.0 (EHome 5.0)** arxitekturasini yangi Linux (Ubuntu/Debian) serverda noldan o‘rnatish, **7660** kabi portlarni ochish, ISUP Gateway demonini sozlash hamda tizimga ulash bo‘yicha to‘liq texnik ko‘rsatmalarni o‘z ichiga oladi.
+Ushbu qo‘llanma **SchoolDay** loyihasida qo‘llanilgan **Hikvision ISUP 5.0 (EHome 5.0)** arxitekturasini yangi Linux (Ubuntu/Debian) serverda noldan o‘rnatish, **7670** kabi portlarni ochish, ISUP Gateway demonini sozlash hamda tizimga ulash bo‘yicha to‘liq texnik ko‘rsatmalarni o‘z ichiga oladi.
+
+> [!IMPORTANT]
+> **Loyiha portlari farqi:**
+> - **SchoolDay:** CMS port: **7670**, Local REST API port: **7671**, Alarm port: **7270**.
+> - **PayDay (panel.payday.uz):** CMS port: **7660**, Local REST API port: **7661**, Alarm port: **7200**.
+> Har ikkala loyiha bitta serverda yoki alohida serverlarda ishlaganda portlarni bir-biri bilan aralashtirib yubormang!
 
 ---
 
@@ -11,26 +17,26 @@ Hikvision ISUP (EHome) protokoli terminallar (Face & Card) va server o‘rtasida
 ```mermaid
 flowchart TD
     subgraph Tashqi Tarmoq [Maktab Filiali / Tashqi Tarmoq]
-        T1[Hikvision Face Terminal 1] -->|TCP 7660 - Ro'yxatdan o'tish & Heartbeat| G[ISUP Gateway Daemon :7660]
-        T2[Hikvision Face Terminal 2] -->|TCP 7660| G
+        T1[Hikvision Face Terminal 1] -->|TCP 7670 - Ro'yxatdan o'tish & Heartbeat| G[ISUP Gateway Daemon :7670]
+        T2[Hikvision Face Terminal 2] -->|TCP 7670| G
     end
 
     subgraph Linux Server [Ubuntu Server 22.04 / 24.04]
-        G[ISUP Gateway Daemon] -->|Local REST :7661| L[Laravel Application]
-        L -->|REST ISAPI :7661| G
+        G[ISUP Gateway Daemon] -->|Local REST :7671| L[Laravel Application]
+        L -->|REST ISAPI :7671| G
         L -->|Qurilma paroli & Holati| G
         G -->|Yuz rasmlari & Foydalanuvchilar| T1
         T1 -->|Jonli davomat hodisalari| G
     end
 ```
 
-### Portlar jadvali:
+### Portlar jadvali (SchoolDay):
 
 | Port | Protokol | Qayerga yo‘naltiriladi | Vazifasi |
 |---|---|---|---|
-| **7660** | **TCP / UDP** | **Public (Tashqi internetga ochiq)** | **CMS (Central Management Server)** — Barcha terminallar shu portga ulanadi, ro‘yxatdan o‘tadi va doimiy ulanishni ushlab turadi. |
-| **7661** | **TCP** | **Faqat Localhost (127.0.0.1)** | **Gateway REST API** — Laravel bilan C++ daemon o‘rtasidagi ichki API (`/health`, `/api/devices`, `/api/isapi`). Tashqariga ochilmasligi shart! |
-| **7200** | **TCP** | **Public (Ixtiyoriy)** | **Alarm / Event Center** — Signalizatsiya va tezkor hodisalar oqimi uchun. |
+| **7670** | **TCP / UDP** | **Public (Tashqi internetga ochiq)** | **CMS (Central Management Server)** — Barcha terminallar shu portga ulanadi, ro‘yxatdan o‘tadi va doimiy ulanishni ushlab turadi. *(PayDay loyihasida: 7660)* |
+| **7671** | **TCP** | **Faqat Localhost (127.0.0.1)** | **Gateway REST API** — Laravel bilan C++ daemon o‘rtasidagi ichki API (`/health`, `/api/devices`, `/api/isapi`). Tashqariga ochilmasligi shart! *(PayDay loyihasida: 7661)* |
+| **7270** | **TCP** | **Public (Ixtiyoriy)** | **Alarm / Event Center** — Signalizatsiya va tezkor hodisalar oqimi uchun. *(PayDay loyihasida: 7200)* |
 | **80 / 443** | **TCP** | **Public** | **Nginx Web Server** — Panel va Webhooklar (`/api/hikvision/...`). |
 
 ---
@@ -43,12 +49,12 @@ Serverga ulanib, **UFW** (yoki iptables) orqali ISUP uchun zarur portlarni ochin
 # 1. UFW holatini tekshirish
 sudo ufw status
 
-# 2. ISUP CMS asosiy portini ochish (7660 TCP va UDP)
-sudo ufw allow 7660/tcp comment "Hikvision ISUP CMS Port"
-sudo ufw allow 7660/udp comment "Hikvision ISUP Heartbeat"
+# 2. ISUP CMS asosiy portini ochish (7670 TCP va UDP)
+sudo ufw allow 7670/tcp comment "Hikvision ISUP CMS Port (SchoolDay)"
+sudo ufw allow 7670/udp comment "Hikvision ISUP Heartbeat (SchoolDay)"
 
-# 3. Agar Alarm Center porti ishlatilsa (7200 TCP)
-sudo ufw allow 7200/tcp comment "Hikvision Alarm Port"
+# 3. Agar Alarm Center porti ishlatilsa (7270 TCP)
+sudo ufw allow 7270/tcp comment "Hikvision Alarm Port (SchoolDay)"
 
 # 4. Webhook va panel uchun veb portlar
 sudo ufw allow 80/tcp comment "HTTP Web"
@@ -62,7 +68,7 @@ sudo ufw status verbose
 ```
 
 > [!CAUTION]
-> **Port 7661 ni hech qachon tashqi internetga ochmang!** U faqat server ichida `127.0.0.1:7661` orqali Laravel ilovasi uchun ishlashi kerak.
+> **Port 7671 ni hech qachon tashqi internetga ochmang!** U faqat server ichida `127.0.0.1:7671` orqali Laravel ilovasi uchun ishlashi kerak.
 
 ---
 
@@ -109,14 +115,15 @@ sudo ldconfig
 ```json
 {
   "server": {
-    "cms_port": 7660,
-    "alarm_port": 7200,
-    "api_port": 7661,
+    "cms_port": 7670,
+    "alarm_port": 7270,
+    "api_port": 7671,
     "api_host": "127.0.0.1",
     "threads": 4
   },
   "backend": {
     "base_url": "http://127.0.0.1",
+    "gateway_secret": "SecretGatewayKeyChangeInProduction123456",
     "get_device_key_url": "/api/hikvision-device-key",
     "device_status_url": "/api/hikvision-device-status",
     "events_callback_url": "/api/hikvision/events"
@@ -127,6 +134,9 @@ sudo ldconfig
   }
 }
 ```
+
+> [!TIP]
+> Daemon backend API-ga so'rov yuborayotganda `X-Gateway-Secret` sarlavhasida yuqoridagi `gateway_secret` qiymatini yuboradi (yoki so'rov bevosita localhost 127.0.0.1 dan bo'lishi shart).
 
 ---
 
@@ -174,11 +184,11 @@ sudo supervisorctl status hikvision-gateway
 
 ### 4.4. Portlarning tinglanayotganini tekshirish
 ```bash
-sudo ss -tulpn | grep -E '7660|7661'
+sudo ss -tulpn | grep -E '7670|7671'
 ```
 Natijada:
-- `0.0.0.0:7660` — barcha IP lardan ulanish uchun ochiq.
-- `127.0.0.1:7661` — ichki API uchun tinglanayotgan bo‘lishi lozim.
+- `0.0.0.0:7670` — barcha IP lardan ulanish uchun ochiq.
+- `127.0.0.1:7671` — ichki API uchun tinglanayotgan bo‘lishi lozim.
 
 ---
 
@@ -187,15 +197,14 @@ Natijada:
 Loyihaning `/var/www/schoolday/.env` fayliga quyidagi qatorlarni kiriting:
 
 ```env
-# Hikvision Gateway sozlamalari
-HIKVISION_GATEWAY_URL=http://127.0.0.1:7661
+# Hikvision Gateway sozlamalari (SchoolDay)
+HIKVISION_GATEWAY_URL=http://127.0.0.1:7671
 HIKVISION_DAS_ADDRESS=193.180.213.188     # Serveringizning ochiq statik IP manzili
-HIKVISION_CMS_PORT=7660
-HIKVISION_ALARM_PORT=7200
+HIKVISION_CMS_PORT=7670
+HIKVISION_ALARM_PORT=7270
 HIKVISION_TIMEOUT=10
-
-# External Sync Tool (Windows .exe) uchun token
-SYNC_API_TOKEN=SchooldaySecretSyncToken2026!
+HIKVISION_GATEWAY_SECRET=SecretGatewayKeyChangeInProduction123456
+HIKVISION_DEFAULT_KEY=null
 ```
 
 Konfiguratsiya keshini tozalang:

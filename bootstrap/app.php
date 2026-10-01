@@ -19,10 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->preventRequestForgery(except: [
-            'hikvision/proxy',
-            'hikvision/events',
-            'hikvision-callback',
-            'hikvision-device-status',
             'api/hikvision/*',
             'api/hikvision-callback',
             'api/hikvision-device-status',
