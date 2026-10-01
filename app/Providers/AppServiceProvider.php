@@ -24,6 +24,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerPolicies();
+    }
+
+    protected function registerPolicies(): void
+    {
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\School::class, \App\Policies\SchoolPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Branch::class, \App\Policies\BranchPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Shift::class, \App\Policies\ShiftPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\SchoolClass::class, \App\Policies\SchoolClassPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Student::class, \App\Policies\StudentPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\BranchDevice::class, \App\Policies\BranchDevicePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\DailyAttendance::class, \App\Policies\DailyAttendancePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\HikvisionAccessEvent::class, \App\Policies\HikvisionAccessEventPolicy::class);
     }
 
     /**

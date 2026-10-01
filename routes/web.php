@@ -19,11 +19,9 @@ use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\StudentController;
 
-// Public monitoring routes
-Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring');
-Route::get('monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring');
+    Route::get('monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
@@ -44,7 +42,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('branch_device/{device}/sync', [App\Http\Controllers\Api\HikvisionController::class, 'syncDeviceEvents'])->name('branch_device.sync');
     Route::resource('shifts', ShiftController::class)->except(['create', 'show', 'edit']);
     Route::resource('classes', SchoolClassController::class)->except(['create', 'show', 'edit'])->parameters(['classes' => 'schoolClass']);
-    Route::get('students/all', [StudentController::class, 'all'])->name('students.all');
     Route::get('students/template', [StudentController::class, 'template'])->name('students.template');
     Route::get('students/{student}/hikvision-events', [StudentController::class, 'hikvisionEvents'])->name('students.hikvision-events');
     Route::match(['put', 'patch', 'post'], 'students/{student}', [StudentController::class, 'update'])->name('students.update');

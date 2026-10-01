@@ -11,6 +11,28 @@ class StudentRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if (\App\Support\Tenant::isGlobalAdmin($user)) {
+            return true;
+        }
+
+        $classId = $this->input('class_id');
+        if ($classId) {
+            $class = \App\Models\SchoolClass::with('shift.branch')->find($classId);
+            if (! $class || ! \App\Support\Tenant::canAccessSchool($class->shift?->branch?->school_id, $user)) {
+                return false;
+            }
+        }
+
+        $student = $this->route('student');
+        if ($student instanceof \App\Models\Student) {
+            return \App\Support\Tenant::canAccessSchool($student->schoolClass?->shift?->branch?->school_id, $user);
+        }
+
         return true;
     }
 

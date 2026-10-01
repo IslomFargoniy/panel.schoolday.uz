@@ -11,7 +11,18 @@ class StoreBranchDeviceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if (\App\Support\Tenant::isGlobalAdmin($user)) {
+            return true;
+        }
+
+        $branch = \App\Models\Branch::find($this->input('branch_id'));
+
+        return $branch ? \App\Support\Tenant::canAccessSchool($branch->school_id, $user) : false;
     }
 
     protected function prepareForValidation(): void

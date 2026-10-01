@@ -3,25 +3,12 @@
 namespace App\Observers;
 
 use App\Models\BranchDevice;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Hikvision\HikvisionSyncService;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class BranchDeviceObserver
 {
-    /**
-     * Handle the BranchDevice "creating" event.
-     */
-    public function creating(BranchDevice $branchDevice): void
-    {
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId && Auth::user()->user_schools()->exists()) {
-                Auth::user()->user_schools()
-                    ->where('school_id', $schoolId)
-                    ->firstOrFail();
-            }
-        }
-    }
-
     /**
      * Handle the BranchDevice "created" event.
      */
@@ -29,39 +16,9 @@ class BranchDeviceObserver
     {
         if ($branchDevice->status && $branchDevice->connection_type === 'isup' && ! empty($branchDevice->device_id)) {
             try {
-                app(\App\Services\Hikvision\HikvisionSyncService::class)->syncAllStudentsToDevice($branchDevice);
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('BranchDeviceObserver initial sync failed: ' . $e->getMessage());
-            }
-        }
-    }
-
-    /**
-     * Handle the BranchDevice "updating" event.
-     */
-    public function updating(BranchDevice $branchDevice): void
-    {
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId && Auth::user()->user_schools()->exists()) {
-                Auth::user()->user_schools()
-                    ->where('school_id', $schoolId)
-                    ->firstOrFail();
-            }
-        }
-    }
-
-    /**
-     * Handle the BranchDevice "deleting" event.
-     */
-    public function deleting(BranchDevice $branchDevice): void
-    {
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $schoolId = $branchDevice->branch?->school_id;
-            if ($schoolId && Auth::user()->user_schools()->exists()) {
-                Auth::user()->user_schools()
-                    ->where('school_id', $schoolId)
-                    ->firstOrFail();
+                app(HikvisionSyncService::class)->syncAllStudentsToDevice($branchDevice);
+            } catch (Exception $e) {
+                Log::warning('BranchDeviceObserver initial sync failed: ' . $e->getMessage());
             }
         }
     }

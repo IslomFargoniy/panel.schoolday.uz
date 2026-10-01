@@ -90,13 +90,15 @@ export default function Welcome() {
                         </div>
 
                         <nav className="flex items-center gap-2 sm:gap-4">
-                            <Link
-                                href="/monitoring"
-                                className="hidden items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-600 transition-all hover:bg-emerald-500/20 hover:text-emerald-700 md:flex dark:text-emerald-400 dark:hover:text-emerald-300"
-                            >
-                                <Activity className="h-4 w-4" />
-                                Monitoring
-                            </Link>
+                            {auth?.user && (
+                                <Link
+                                    href="/monitoring"
+                                    className="hidden items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-600 transition-all hover:bg-emerald-500/20 hover:text-emerald-700 md:flex dark:text-emerald-400 dark:hover:text-emerald-300"
+                                >
+                                    <Activity className="h-4 w-4" />
+                                    Monitoring
+                                </Link>
+                            )}
                             <a
                                 href="#contact"
                                 className="hidden px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-orange-500 md:block dark:text-slate-300 dark:hover:text-orange-400"

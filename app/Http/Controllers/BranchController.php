@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\School;
+use App\Support\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -59,9 +60,8 @@ class BranchController extends Controller
         }
 
         // Multi-tenant check: non-admins only see branches of their schools
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $query->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereIn('school_id', Tenant::schoolIds());
         }
 
         $branches = $query->latest()
@@ -80,9 +80,8 @@ class BranchController extends Controller
 
         // List schools accessible to user
         $schoolsQuery = School::query();
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
         }
         $schools = $schoolsQuery->select('id', 'name', 'branch_limit')->get();
 
@@ -99,13 +98,7 @@ class BranchController extends Controller
 
     public function show(Request $request, Branch $branch)
     {
-        // Multi-tenant check: non-admins must belong to the branch's school
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id')->toArray();
-            if (! in_array($branch->school_id, $userSchoolIds)) {
-                abort(403, 'Ushbu filialga kirish huquqi yo‘q.');
-            }
-        }
+        $this->authorize('view', $branch);
 
         $branch->load([
             'school',
@@ -175,17 +168,17 @@ class BranchController extends Controller
         if (! $schoolId && Auth::check()) {
             $schoolId = Auth::user()->user_schools()->value('school_id');
         }
-        if (! $schoolId) {
+        if (! $schoolId && Tenant::isGlobalAdmin()) {
             $schoolId = School::first()?->id;
         }
 
-        if ($schoolId) {
-            $school = School::find($schoolId);
-            if ($school && $school->branch_limit <= $school->branches()->count()) {
-                return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $school->branch_limit . ' ta) tugagan.');
-            }
-            $validated['school_id'] = $schoolId;
+        Tenant::authorizeSchool($schoolId);
+
+        $school = School::findOrFail($schoolId);
+        if ($school->branch_limit !== null && $school->branches()->count() >= $school->branch_limit) {
+            return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $school->branch_limit . ' ta) tugagan.');
         }
+        $validated['school_id'] = $schoolId;
 
         $branch = Branch::create($validated);
 
@@ -196,9 +189,19 @@ class BranchController extends Controller
 
     public function update(\App\Http\Requests\BranchRequest $request, Branch $branch)
     {
+        $this->authorize('update', $branch);
+
         $validated = $request->validated();
         $macAddresses = $validated['mac_addresses'] ?? [];
         unset($validated['mac_addresses']);
+
+        if (isset($validated['school_id']) && (int) $validated['school_id'] !== (int) $branch->school_id) {
+            Tenant::authorizeSchool((int) $validated['school_id']);
+            $newSchool = School::findOrFail($validated['school_id']);
+            if ($newSchool->branch_limit !== null && $newSchool->branches()->count() >= $newSchool->branch_limit) {
+                return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $newSchool->branch_limit . ' ta) tugagan.');
+            }
+        }
 
         $branch->update($validated);
 
@@ -209,6 +212,7 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch)
     {
+        $this->authorize('delete', $branch);
         try {
             $branch->delete();
 

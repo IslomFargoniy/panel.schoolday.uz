@@ -11,6 +11,29 @@ class UpdateBranchDeviceRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if (\App\Support\Tenant::isGlobalAdmin($user)) {
+            return true;
+        }
+
+        $branchDevice = $this->route('branch_device') ?? $this->route('device');
+        if ($branchDevice instanceof \App\Models\BranchDevice) {
+            if (! \App\Support\Tenant::canAccessSchool($branchDevice->branch?->school_id, $user)) {
+                return false;
+            }
+        }
+
+        if ($this->has('branch_id')) {
+            $branch = \App\Models\Branch::find($this->input('branch_id'));
+            if (! $branch || ! \App\Support\Tenant::canAccessSchool($branch->school_id, $user)) {
+                return false;
+            }
+        }
+
         return true;
     }
 

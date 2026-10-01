@@ -7,17 +7,12 @@ use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Shift;
 use App\Models\Student;
+use App\Support\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class StudentController extends Controller
 {
-    public function all()
-    {
-        return response()->json(Student::all());
-    }
-
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', '20');
@@ -32,10 +27,9 @@ class StudentController extends Controller
         $query = Student::with(['schoolClass.shift.branch.school'])->orderBy('name', 'asc');
 
         // Multi-tenant check: non-admins only see students from their schools
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $query->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereHas('schoolClass.shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -79,15 +73,14 @@ class StudentController extends Controller
         $shiftsQuery = Shift::with('branch');
         $classesQuery = SchoolClass::with('shift.branch');
 
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
-            $shiftsQuery->whereHas('branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $shiftsQuery->whereHas('branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
-            $classesQuery->whereHas('shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+            $classesQuery->whereHas('shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -118,6 +111,9 @@ class StudentController extends Controller
     {
         $validated = $request->validated();
 
+        $class = SchoolClass::with('shift.branch')->findOrFail($validated['class_id']);
+        Tenant::authorizeSchool($class->shift?->branch?->school_id);
+
         if ($request->hasFile('face_image')) {
             $path = $request->file('face_image')->store('faces', 'public');
             $validated['face_image'] = '/storage/' . $path;
@@ -134,7 +130,14 @@ class StudentController extends Controller
 
     public function update(\App\Http\Requests\StudentRequest $request, Student $student)
     {
+        $this->authorize('update', $student);
+
         $validated = $request->validated();
+
+        if (isset($validated['class_id']) && (int) $validated['class_id'] !== (int) $student->class_id) {
+            $newClass = SchoolClass::with('shift.branch')->findOrFail($validated['class_id']);
+            Tenant::authorizeSchool($newClass->shift?->branch?->school_id);
+        }
 
         if ($request->hasFile('face_image')) {
             $path = $request->file('face_image')->store('faces', 'public');
@@ -150,6 +153,8 @@ class StudentController extends Controller
 
     public function destroy(Student $student)
     {
+        $this->authorize('delete', $student);
+
         try {
             $student->delete();
 
@@ -179,6 +184,9 @@ class StudentController extends Controller
         ]);
 
         $classId = $request->input('class_id');
+        $class = SchoolClass::with('shift.branch')->findOrFail($classId);
+        Tenant::authorizeSchool($class->shift?->branch?->school_id);
+
         $file = $request->file('excel_file');
 
         // Background queue processing requires the file to be saved first
@@ -192,6 +200,8 @@ class StudentController extends Controller
 
     public function hikvisionEvents(Student $student)
     {
+        $this->authorize('view', $student);
+
         $events = \App\Models\HikvisionAccessEvent::with('access')
             ->where('employeeNoString', $student->employeeNoString)
             ->latest()

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserSchoolRequest;
 use App\Models\UserSchool;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class UserSchoolController extends Controller
@@ -15,17 +14,15 @@ class UserSchoolController extends Controller
      */
     public function store(StoreUserSchoolRequest $request)
     {
-        if (! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            abort(403, 'Unauthorized');
-        }
-
         try {
             UserSchool::firstOrCreate($request->validated());
 
             return back()->with('success', __('Foydalanuvchi maktabga biriktirildi.'));
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('UserSchool store error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage()],
+                'error' => [__('Foydalanuvchini maktabga biriktirishda xatolik yuz berdi.')],
             ]);
         }
     }
@@ -35,7 +32,7 @@ class UserSchoolController extends Controller
      */
     public function destroy(UserSchool $userSchool)
     {
-        if (! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
+        if (! \App\Support\Tenant::isGlobalAdmin()) {
             abort(403, 'Unauthorized');
         }
 
@@ -44,8 +41,10 @@ class UserSchoolController extends Controller
 
             return back()->with('success', __('Foydalanuvchi maktabdan ajratildi.'));
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('UserSchool destroy error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage()],
+                'error' => [__('Foydalanuvchini maktabdan ajratishda xatolik yuz berdi.')],
             ]);
         }
     }

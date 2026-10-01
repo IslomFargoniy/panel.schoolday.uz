@@ -7,9 +7,9 @@ use App\Models\DailyAttendance;
 use App\Models\HikvisionAccessEvent;
 use App\Models\School;
 use App\Models\Student;
+use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -25,19 +25,16 @@ class DashboardController extends Controller
         $eventQuery = HikvisionAccessEvent::with(['student.schoolClass', 'faceRects', 'access'])->orderBy('id', 'desc');
 
         // Multi-tenant check
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            if ($userSchoolIds->isNotEmpty()) {
-                $studentQuery->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                    $b->whereIn('school_id', $userSchoolIds);
-                });
-                $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                    $b->whereIn('school_id', $userSchoolIds);
-                });
-                $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                    $b->whereIn('school_id', $userSchoolIds);
-                });
-            }
+        if (! Tenant::isGlobalAdmin()) {
+            $studentQuery->whereHas('schoolClass.shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
+            });
+            $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
+            });
+            $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
+            });
         }
 
         if ($schoolId) {
@@ -109,12 +106,9 @@ class DashboardController extends Controller
         $schoolsQuery = School::query();
         $branchesQuery = Branch::query();
 
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            if ($userSchoolIds->isNotEmpty()) {
-                $schoolsQuery->whereIn('id', $userSchoolIds);
-                $branchesQuery->whereIn('school_id', $userSchoolIds);
-            }
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();

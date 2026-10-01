@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Lock, Palette, Shield, Sliders, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,14 @@ const getSidebarNavItems = (t: any): NavItem[] => [
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentUrl } = useCurrentUrl();
     const { t } = useTranslation();
-    const sidebarNavItems = getSidebarNavItems(t);
+    const { auth } = usePage().props as any;
+    const isSuperadmin = auth?.user?.roles?.includes('Superadmin');
+    const sidebarNavItems = getSidebarNavItems(t).filter((item) => {
+        if (item.href === '/settings/system') {
+            return isSuperadmin;
+        }
+        return true;
+    });
 
     if (typeof window === 'undefined') {
         return null;

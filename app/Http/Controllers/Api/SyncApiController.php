@@ -19,7 +19,7 @@ class SyncApiController extends Controller
     /**
      * Simple token guard — checks Authorization: Bearer <token>
      */
-    private function authorize(Request $request): bool
+    private function authorizeToken(Request $request): bool
     {
         $token = config('services.sync_api.token');
 
@@ -37,7 +37,7 @@ class SyncApiController extends Controller
      */
     public function students(Request $request)
     {
-        if (! $this->authorize($request)) {
+        if (! $this->authorizeToken($request)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 

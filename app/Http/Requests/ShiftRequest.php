@@ -11,6 +11,28 @@ class ShiftRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if (\App\Support\Tenant::isGlobalAdmin($user)) {
+            return true;
+        }
+
+        $branchId = $this->input('branch_id');
+        if ($branchId) {
+            $branch = \App\Models\Branch::find($branchId);
+            if (! $branch || ! \App\Support\Tenant::canAccessSchool($branch->school_id, $user)) {
+                return false;
+            }
+        }
+
+        $shift = $this->route('shift');
+        if ($shift instanceof \App\Models\Shift) {
+            return \App\Support\Tenant::canAccessSchool($shift->branch?->school_id, $user);
+        }
+
         return true;
     }
 

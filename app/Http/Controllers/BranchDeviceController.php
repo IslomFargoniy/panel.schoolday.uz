@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBranchDeviceRequest;
 use App\Http\Requests\UpdateBranchDeviceRequest;
 use App\Models\BranchDevice;
+use App\Support\Tenant;
 use Exception;
 use Illuminate\Validation\ValidationException;
 
@@ -21,10 +22,9 @@ class BranchDeviceController extends Controller
         $query = BranchDevice::with(['branch.school'])->latest();
 
         // Multi-tenant check
-        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
-            $query->whereHas('branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereHas('branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -62,10 +62,9 @@ class BranchDeviceController extends Controller
         $schoolsQuery = \App\Models\School::query();
         $branchesQuery = \App\Models\Branch::with('school');
 
-        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();
@@ -96,7 +95,9 @@ class BranchDeviceController extends Controller
 
             return back()->with('success', 'Qurilma muvaffaqiyatli qo\'shildi.');
         } catch (Exception $e) {
-            return back()->with('error', $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('BranchDevice store error: ' . $e->getMessage());
+
+            return back()->with('error', 'Qurilmani saqlashda xatolik yuz berdi.');
         }
     }
 
@@ -105,12 +106,16 @@ class BranchDeviceController extends Controller
      */
     public function update(UpdateBranchDeviceRequest $request, BranchDevice $branchDevice)
     {
+        $this->authorize('update', $branchDevice);
+
         try {
             $branchDevice->update($request->validated());
 
             return back()->with('success', 'Qurilma ma\'lumotlari yangilandi.');
         } catch (Exception $e) {
-            return back()->with('error', $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('BranchDevice update error: ' . $e->getMessage());
+
+            return back()->with('error', 'Qurilmani yangilashda xatolik yuz berdi.');
         }
     }
 
@@ -119,13 +124,17 @@ class BranchDeviceController extends Controller
      */
     public function destroy(BranchDevice $branchDevice)
     {
+        $this->authorize('delete', $branchDevice);
+
         try {
             $branchDevice->delete();
 
             return back()->with('success', 'Qurilma muvaffaqiyatli o\'chirildi.');
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('BranchDevice destroy error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage()],
+                'error' => ['Qurilmani o‘chirishda xatolik yuz berdi.'],
             ]);
         }
     }

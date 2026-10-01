@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSchoolRequest;
 use App\Http\Requests\UpdateSchoolRequest;
 use App\Models\School;
+use App\Support\Tenant;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,10 +40,8 @@ class SchoolController extends Controller
             });
         }
 
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $query->whereHas('user_schools', function ($q) {
-                $q->where('user_id', Auth::id());
-            });
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereIn('id', Tenant::schoolIds());
         }
 
         $schools = $query->paginate($per_page);
@@ -85,11 +84,7 @@ class SchoolController extends Controller
      */
     public function show(Request $request, School $school)
     {
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            Auth::user()->user_schools()
-                ->where('school_id', $school->id)
-                ->firstOrFail();
-        }
+        $this->authorize('view', $school);
 
         $school->load([
             'branches.devices',
@@ -105,13 +100,17 @@ class SchoolController extends Controller
      */
     public function update(UpdateSchoolRequest $request, School $school)
     {
+        $this->authorize('update', $school);
+
         try {
             $school->update($request->validated());
 
             return redirect()->back()->with('success', __('Maktab muvaffaqiyatli yangilandi.'));
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('School update error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
+                'error' => [__('Maktabni yangilashda xatolik yuz berdi.')],
             ]);
         }
     }
@@ -121,14 +120,20 @@ class SchoolController extends Controller
      */
     public function destroy(School $school)
     {
+        $this->authorize('delete', $school);
+
+        if ($school->branches()->count() > 0) {
+            return redirect()->back()->with('error', __('Ushbu maktabda filiallar mavjud bo‘lganligi sababli uni o‘chirib bo‘lmaydi.'));
+        }
+
         try {
             $school->delete();
 
             return redirect()->back()->with('success', __('Maktab muvaffaqiyatli o‘chirildi.'));
         } catch (Exception $e) {
-            throw ValidationException::withMessages([
-                'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
-            ]);
+            \Illuminate\Support\Facades\Log::error('School delete error: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', __('Maktabni o‘chirishda xatolik yuz berdi.'));
         }
     }
 }

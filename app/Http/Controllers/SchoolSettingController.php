@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSchoolSettingRequest;
 use App\Models\SchoolSetting;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class SchoolSettingController extends Controller
@@ -18,25 +17,17 @@ class SchoolSettingController extends Controller
         try {
             $schoolId = $request->school_id;
 
-            if (! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-                Auth::user()->user_schools()
-                    ->where('school_id', $schoolId)
-                    ->firstOrFail();
-            }
-
             SchoolSetting::updateOrCreate(
                 ['school_id' => $schoolId],
                 $request->validated()
             );
 
             return back()->with('success', __('Maktab sozlamalari saqlandi.'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            throw ValidationException::withMessages([
-                'error' => ['Sizda bu maktab sozlamalarini o‘zgartirish huquqi yo‘q.'],
-            ]);
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('SchoolSetting save error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage()],
+                'error' => [__('Maktab sozlamalarini saqlashda xatolik yuz berdi.')],
             ]);
         }
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Shift;
+use App\Support\Tenant;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,10 +39,9 @@ class ShiftController extends Controller
             }]);
 
         // Multi-tenant check
-        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
-            $query->whereHas('branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereHas('branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -70,10 +70,9 @@ class ShiftController extends Controller
         $schoolsQuery = \App\Models\School::query();
         $branchesQuery = Branch::query();
 
-        if (\Illuminate\Support\Facades\Auth::check() && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Admin') && ! \Illuminate\Support\Facades\Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = \Illuminate\Support\Facades\Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();
@@ -103,6 +102,8 @@ class ShiftController extends Controller
 
     public function update(\App\Http\Requests\ShiftRequest $request, Shift $shift)
     {
+        $this->authorize('update', $shift);
+
         $validated = $request->validated();
 
         $shift->update($validated);
@@ -112,6 +113,8 @@ class ShiftController extends Controller
 
     public function destroy(Shift $shift)
     {
+        $this->authorize('delete', $shift);
+
         try {
             $shift->delete();
 

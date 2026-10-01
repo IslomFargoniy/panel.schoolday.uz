@@ -27,8 +27,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     }
     )->name('appearance.edit');
 
-    Route::get('settings/system', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.system.index');
-    Route::post('settings/system', [App\Http\Controllers\SettingController::class, 'store'])->name('settings.system.store');
+    Route::middleware(App\Http\Middleware\SuperadminMiddleware::class)->group(function () {
+        Route::get('settings/system', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.system.index');
+        Route::post('settings/system', [App\Http\Controllers\SettingController::class, 'store'])->name('settings.system.store');
+    });
 
     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');

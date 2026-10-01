@@ -6,8 +6,8 @@ use App\Models\Branch;
 use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Shift;
+use App\Support\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class SchoolClassController extends Controller
@@ -44,10 +44,9 @@ class SchoolClassController extends Controller
             ->orderBy('name', 'asc');
 
         // Multi-tenant check
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $query->whereHas('shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $query->whereHas('shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -76,12 +75,11 @@ class SchoolClassController extends Controller
         $branchesQuery = Branch::query();
         $shiftsQuery = Shift::with('branch');
 
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
-            $shiftsQuery->whereHas('branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $shiftsQuery->whereHas('branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -108,6 +106,9 @@ class SchoolClassController extends Controller
     {
         $validated = $request->validated();
 
+        $shift = Shift::with('branch')->findOrFail($validated['shift_id']);
+        Tenant::authorizeSchool($shift->branch?->school_id);
+
         SchoolClass::create($validated);
 
         return redirect()->back()->with('success', 'crud.created');
@@ -115,7 +116,14 @@ class SchoolClassController extends Controller
 
     public function update(\App\Http\Requests\SchoolClassRequest $request, SchoolClass $schoolClass)
     {
+        $this->authorize('update', $schoolClass);
+
         $validated = $request->validated();
+
+        if (isset($validated['shift_id']) && (int) $validated['shift_id'] !== (int) $schoolClass->shift_id) {
+            $newShift = Shift::with('branch')->findOrFail($validated['shift_id']);
+            Tenant::authorizeSchool($newShift->branch?->school_id);
+        }
 
         $schoolClass->update($validated);
 
@@ -124,6 +132,8 @@ class SchoolClassController extends Controller
 
     public function destroy(SchoolClass $schoolClass)
     {
+        $this->authorize('delete', $schoolClass);
+
         try {
             $schoolClass->delete();
 

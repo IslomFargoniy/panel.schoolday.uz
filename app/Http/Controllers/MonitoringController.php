@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\DailyAttendance;
+use App\Models\School;
+use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
@@ -12,12 +14,17 @@ class MonitoringController extends Controller
 {
     public function index()
     {
-        $schools = \App\Models\School::select('id', 'name')->get();
-        $branches = Branch::select('id', 'name', 'school_id')->get();
+        $schoolsQuery = School::select('id', 'name');
+        $branchesQuery = Branch::select('id', 'name', 'school_id');
+
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+        }
 
         return Inertia::render('monitoring', [
-            'schools' => $schools,
-            'branches' => $branches,
+            'schools' => $schoolsQuery->get(),
+            'branches' => $branchesQuery->get(),
         ]);
     }
 
@@ -31,6 +38,10 @@ class MonitoringController extends Controller
             ->toArray();
 
         $branchesQuery = Branch::query();
+
+        if (! Tenant::isGlobalAdmin()) {
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+        }
 
         if (request()->filled('school_id')) {
             $branchesQuery->where('school_id', request('school_id'));

@@ -8,9 +8,9 @@ use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Shift;
 use App\Models\Student;
+use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -27,18 +27,17 @@ class ReportController extends Controller
         $classesQuery = SchoolClass::with('shift.branch');
         $studentsQuery = Student::where('status', 'active');
 
-        if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-            $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-            $schoolsQuery->whereIn('id', $userSchoolIds);
-            $branchesQuery->whereIn('school_id', $userSchoolIds);
-            $shiftsQuery->whereHas('branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+        if (! Tenant::isGlobalAdmin()) {
+            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $shiftsQuery->whereHas('branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
-            $classesQuery->whereHas('shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+            $classesQuery->whereHas('shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
-            $studentsQuery->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                $b->whereIn('school_id', $userSchoolIds);
+            $studentsQuery->whereHas('schoolClass.shift.branch', function ($b) {
+                $b->whereIn('school_id', Tenant::schoolIds());
             });
         }
 
@@ -106,10 +105,9 @@ class ReportController extends Controller
                 });
 
             // Multi-tenant check
-            if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-                $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-                $query->whereHas('schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                    $b->whereIn('school_id', $userSchoolIds);
+            if (! Tenant::isGlobalAdmin()) {
+                $query->whereHas('schoolClass.shift.branch', function ($b) {
+                    $b->whereIn('school_id', Tenant::schoolIds());
                 });
             }
 
@@ -160,10 +158,9 @@ class ReportController extends Controller
                 ->orderBy('first_check_in', 'desc');
 
             // Multi-tenant check
-            if (Auth::check() && ! Auth::user()->hasRole('Admin') && ! Auth::user()->hasRole('Superadmin')) {
-                $userSchoolIds = Auth::user()->user_schools()->pluck('school_id');
-                $query->whereHas('student.schoolClass.shift.branch', function ($b) use ($userSchoolIds) {
-                    $b->whereIn('school_id', $userSchoolIds);
+            if (! Tenant::isGlobalAdmin()) {
+                $query->whereHas('student.schoolClass.shift.branch', function ($b) {
+                    $b->whereIn('school_id', Tenant::schoolIds());
                 });
             }
 
@@ -204,6 +201,8 @@ class ReportController extends Controller
     public function show($id)
     {
         $attendance = DailyAttendance::with(['student.schoolClass.shift.branch'])->findOrFail($id);
+        $this->authorize('view', $attendance);
+
         $events = [];
 
         if ($attendance->student && $attendance->student->employeeNoString) {
@@ -227,18 +226,22 @@ class ReportController extends Controller
     public function destroy($id)
     {
         $attendance = DailyAttendance::findOrFail($id);
+        $this->authorize('delete', $attendance);
+
         $attendance->delete();
 
         return redirect()->route('reports.index')
-            ->with('message', 'Attendance record deleted successfully');
+            ->with('success', 'Attendance record deleted successfully');
     }
 
     public function destroyEvent($id)
     {
         $event = \App\Models\HikvisionAccessEvent::findOrFail($id);
+        $this->authorize('delete', $event);
+
         $event->faceRects()->delete();
         $event->delete();
 
-        return back()->with('message', 'Access event deleted successfully');
+        return back()->with('success', 'Access event deleted successfully');
     }
 }
