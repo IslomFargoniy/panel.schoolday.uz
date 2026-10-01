@@ -62,6 +62,8 @@ flowchart LR
 ### 3.3. Gateway Daemon Xavfsizlik Header'i (`X-Gateway-Secret`)
 ISUP Gateway daemon SchoolDay backendiga (`/api/hikvision-device-key` va `/api/hikvision-device-status`) so'rov yuborganida, xavfsizlik maqsadida `X-Gateway-Secret` sarlavhasini (header) yuborishi shart (yoki so'rov to'g'ridan-to'g'ri `127.0.0.1`/`::1` dan amalga oshirilishi kerak). Bu kalit `.env` dagi `HIKVISION_GATEWAY_SECRET` bilan mos kelishi zarur. Aks holda API 403 Forbidden qaytaradi.
 
+> Agar Nginx oldida yana bir reverse proxy bo'lsa, barcha so'rovlar `127.0.0.1` dan kelgandek ko'rinadi. Bunday holda `.env` da `HIKVISION_TRUST_LOCALHOST=false` qiling va daemon `X-Gateway-Secret` yuborishini ta'minlang.
+
 ---
 
 ## 4. 2-Usul: HTTP Listening / Webhook Rejimi (Klassik)

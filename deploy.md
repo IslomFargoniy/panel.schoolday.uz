@@ -169,6 +169,69 @@ tail -f /var/www/panel_school_usr/data/logs/panel.schoolday.uz-frontend.error.lo
 
 ---
 
+## Xavfsizlik yangilanishidan keyingi qadamlar
+
+Multi-tenant ruxsatlar, Hikvision/Telegram himoyasi va queue job'lar kiritilgan relizdan keyin **tartib bilan** bajaring.
+
+### 1. Migratsiyadan OLDIN: takrorlangan ISUP `device_id` larni tekshiring
+
+`2026_10_01_060002` migratsiyasi `branch_devices.device_id` ga unique indeks qo'shadi. Takrorlangan qiymatlarni u **jimgina `null` qiladi**, shunda o'sha qurilma ishlamay qoladi. Avval qo'lda hal qiling:
+
+```sql
+SELECT device_id, COUNT(*) AS cnt
+FROM branch_devices
+WHERE connection_type = 'isup' AND device_id IS NOT NULL
+GROUP BY device_id
+HAVING COUNT(*) > 1;
+```
+
+Natija bo'sh bo'lmasa, takroriy qatorlarni o'chiring yoki ularga haqiqiy (terminaldagi) `device_id` ni yozing. `http_listening` qurilmalarning `device_id` si migratsiya paytida `null` qilinadi, bu normal holat.
+
+### 2. `.env` ga yangi o'zgaruvchilar
+
+| O'zgaruvchi | Vazifasi |
+|---|---|
+| `HIKVISION_GATEWAY_SECRET` | Gateway daemon `X-Gateway-Secret` sarlavhasida yuboradigan qiymat (uzun tasodifiy qator) |
+| `HIKVISION_TRUST_LOCALHOST` | `true` (default): 127.0.0.1/::1 dan kelgan so'rovga secret'siz ishoniladi. Nginx oldida yana proxy bo'lsa `false` qiling |
+| `HIKVISION_DEFAULT_KEY` | Qurilmada shifrlash kaliti yo'q bo'lsa ishlatiladigan zaxira kalit (bo'sh qoldirilsa, kalit topilmasa 404 qaytadi) |
+| `HIKVISION_RESTART_COMMAND` | Gateway self-healing buyrug'i, masalan `systemctl restart hikvision-isup-schoolday`. Bo'sh bo'lsa self-healing o'chiq |
+| `TELEGRAM_WEBHOOK_SECRET` | Telegram webhook secret'i. **Bo'sh bo'lsa webhook barcha so'rovlarga 403 qaytaradi** |
+| `SEED_SUPERADMIN_PASSWORD`, `SEED_ADMIN_PASSWORD` | Faqat yangi bazani seed qilganda ishlatiladi |
+
+### 3. Deploy
+
+```bash
+/opt/php83/bin/php artisan migrate --force
+/opt/php83/bin/php artisan config:cache
+/opt/php83/bin/php artisan queue:restart
+supervisorctl restart schoolday-worker:*
+```
+
+Queue worker ishlab turishi **shart**: o'quvchi qurilmaga yuborilishi/o'chirilishi, Telegram xabarlari va Excel import endi fon job'larida bajariladi.
+
+### 4. Gateway daemon sozlamasi
+
+Gateway daemon backendga (`/api/hikvision-device-key`, `/api/hikvision-device-status`) so'rov yuborganda `X-Gateway-Secret: <HIKVISION_GATEWAY_SECRET>` sarlavhasini yuborishi kerak. Daemon bir serverda (127.0.0.1) ishlasa va `HIKVISION_TRUST_LOCALHOST=true` bo'lsa, sarlavha shart emas.
+
+Real-time hodisalar (`/api/hikvision/events`) faqat panelda ro'yxatdan o'tgan va `status=true` qurilmadan qabul qilinadi. Qurilma `device_id`, `deviceId`, `deviceID` (payload yoki query string) yoki `shortSerialNumber`, `macAddress` orqali topiladi. Hodisa `device_not_allowed` bilan rad etilsa, `storage/logs/laravel.log` dagi `payload_keys` ro'yxatini tekshiring.
+
+### 5. Telegram webhook'ni qayta o'rnating
+
+```bash
+/opt/php83/bin/php artisan telegram:set-webhook
+```
+
+Buyruq global bot tokeni va `TELEGRAM_WEBHOOK_SECRET` bilan webhook'ni `APP_URL/api/telegram/webhook` manziliga ro'yxatdan o'tkazadi. Faqat bitta global bot ishlatiladi: maktabning alohida bot tokeni endi qo'llanmaydi.
+
+### 6. Tekshiruv
+
+- `/up` va login sahifasi ochiladi, `/monitoring` esa login'siz `/login` ga yo'naltiradi.
+- Superadmin bo'lmagan foydalanuvchi `/settings/system` ga kira olmaydi (403).
+- Terminal oldida yuzni skanerlang: davomat yoziladi va `storage/logs/laravel.log` da `device_not_allowed` yo'q.
+- `php artisan hikvision:sync-events` xatosiz tugaydi.
+
+---
+
 ## Portlar
 
 | Port | Servis | Tavsif |
