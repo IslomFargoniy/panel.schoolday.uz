@@ -258,10 +258,13 @@ class HikvisionSyncService
         $endTime = $endTime ?: now()->addHours(1)->format('Y-m-d\TH:i:s+05:00');
 
         try {
+            $syncStartedAt = now();
             $syncedCount = 0;
             $position = 0;
             $maxPerReq = 100;
             $totalMatches = 1;
+            $fullyRead = false;
+            $failureReason = null;
 
             while ($position < $totalMatches) {
                 $payload = [
@@ -284,6 +287,7 @@ class HikvisionSyncService
                 ]);
 
                 if (! $res->successful()) {
+                    $failureReason = 'Gateway HTTP ' . $res->status();
                     break;
                 }
 
@@ -292,6 +296,7 @@ class HikvisionSyncService
                 $acsData = is_string($rawResponse) ? json_decode($rawResponse, true) : $rawResponse;
 
                 if (! isset($acsData['AcsEvent'])) {
+                    $failureReason = 'Gateway javobida AcsEvent yo\'q';
                     break;
                 }
 
@@ -300,6 +305,8 @@ class HikvisionSyncService
                 $infoList = $acsData['AcsEvent']['InfoList'] ?? [];
 
                 if (empty($infoList)) {
+                    // No (more) matching events: the query itself succeeded
+                    $fullyRead = true;
                     break;
                 }
 
@@ -315,10 +322,15 @@ class HikvisionSyncService
                 $serialNos = collect($infoList)->pluck('serialNo')->filter()->map(fn ($s) => (string) $s)->unique()->values()->all();
                 $existingBySerial = [];
                 if (! empty($serialNos)) {
+                    // serialNo is only unique per device, so scope strictly to this device
                     $existingBySerial = HikvisionAccessEvent::whereIn('serialNo', $serialNos)
                         ->whereHas('access', function ($q) use ($device) {
-                            $q->where('shortSerialNumber', $device->device_id)
-                                ->orWhere('macAddress', $device->mac_address);
+                            $q->where(function ($inner) use ($device) {
+                                $inner->where('shortSerialNumber', $device->device_id);
+                                if (! empty($device->mac_address)) {
+                                    $inner->orWhere('macAddress', $device->mac_address);
+                                }
+                            });
                         })
                         ->pluck('serialNo')
                         ->map(fn ($s) => (string) $s)
@@ -434,11 +446,19 @@ class HikvisionSyncService
 
                 $position += $numOfMatches;
                 if ($numOfMatches === 0 || $position >= $totalMatches) {
+                    $fullyRead = true;
                     break;
                 }
             }
 
-            $device->update(['last_event_synced_at' => now()]);
+            if (! $fullyRead) {
+                // Do not advance last_event_synced_at: the next run must re-read this window
+                Log::warning("HikvisionSync: Event sync incomplete for device {$device->id}: {$failureReason}");
+
+                return ['success' => false, 'error' => $failureReason ?? 'Sinxronizatsiya to\'liq yakunlanmadi', 'synced_count' => $syncedCount];
+            }
+
+            $device->update(['last_event_synced_at' => $syncStartedAt]);
 
             Log::info("HikvisionSync [ISUP Events]: Device {$device->device_id} synced {$syncedCount} events.");
 
