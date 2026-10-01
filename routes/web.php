@@ -30,19 +30,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('report-events/{id}', [ReportController::class, 'destroyEvent'])->name('report-events.destroy');
 
     Route::resource('users', App\Http\Controllers\UserController::class)
-        ->except(['create', 'show', 'edit'])
+        ->only(['index', 'store', 'update', 'destroy'])
         ->middleware(App\Http\Middleware\SuperadminMiddleware::class);
-    Route::resource('school', App\Http\Controllers\SchoolController::class);
-    Route::resource('user_school', App\Http\Controllers\UserSchoolController::class);
-    Route::resource('school_setting', App\Http\Controllers\SchoolSettingController::class);
-    Route::resource('branches', BranchController::class)->except(['create', 'edit']);
-    Route::get('branch/{branch}', [BranchController::class, 'show'])->name('branch.show');
-    Route::resource('branch_device', App\Http\Controllers\BranchDeviceController::class);
+    Route::resource('school', App\Http\Controllers\SchoolController::class)
+        ->only(['index', 'store', 'show', 'update', 'destroy']);
+    Route::resource('user_school', App\Http\Controllers\UserSchoolController::class)
+        ->only(['store', 'destroy']);
+    Route::resource('school_setting', App\Http\Controllers\SchoolSettingController::class)
+        ->only(['store']);
+    Route::resource('branches', BranchController::class)
+        ->only(['index', 'store', 'show', 'update', 'destroy']);
+    Route::resource('branch_device', App\Http\Controllers\BranchDeviceController::class)
+        ->only(['store', 'update', 'destroy']);
     Route::get('devices', [App\Http\Controllers\BranchDeviceController::class, 'index'])->name('devices.index');
     Route::post('branch_device/{device}/sync', [App\Http\Controllers\Api\HikvisionController::class, 'syncDeviceEvents'])->name('branch_device.sync');
     Route::resource('shifts', ShiftController::class)->except(['create', 'show', 'edit']);
     Route::resource('classes', SchoolClassController::class)->except(['create', 'show', 'edit'])->parameters(['classes' => 'schoolClass']);
     Route::get('students/template', [StudentController::class, 'template'])->name('students.template');
+    Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
     Route::get('students/{student}/hikvision-events', [StudentController::class, 'hikvisionEvents'])->name('students.hikvision-events');
     Route::match(['put', 'patch', 'post'], 'students/{student}', [StudentController::class, 'update'])->name('students.update');
     Route::resource('students', StudentController::class)->except(['create', 'show', 'edit', 'update']);

@@ -85,7 +85,7 @@ class UserController extends Controller
 
         $user->assignRole($validated['role']);
 
-        return redirect()->back()->with('success', 'Foydalanuvchi yaratildi.');
+        return redirect()->back()->with('success', ['key' => 'crud.user_created']);
     }
 
     public function update(Request $request, User $user)
@@ -111,17 +111,17 @@ class UserController extends Controller
         $user->update($data);
         $user->syncRoles([$validated['role']]);
 
-        return redirect()->back()->with('success', 'Foydalanuvchi yangilandi.');
+        return redirect()->back()->with('success', ['key' => 'crud.user_updated']);
     }
 
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'O\'zingizni o\'chira olmaysiz.');
+            return redirect()->back()->with('error', ['key' => 'crud.cannot_delete_self']);
         }
 
         $user->delete();
 
-        return redirect()->back()->with('success', 'Foydalanuvchi o\'chirildi.');
+        return redirect()->back()->with('success', ['key' => 'crud.user_deleted']);
     }
 }

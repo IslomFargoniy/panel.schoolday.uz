@@ -231,7 +231,7 @@ class ReportController extends Controller
         $attendance->delete();
 
         return redirect()->route('reports.index')
-            ->with('success', 'Attendance record deleted successfully');
+            ->with('success', ['key' => 'crud.attendance_deleted']);
     }
 
     public function destroyEvent($id)
@@ -242,6 +242,6 @@ class ReportController extends Controller
         $event->faceRects()->delete();
         $event->delete();
 
-        return back()->with('success', 'Access event deleted successfully');
+        return back()->with('success', ['key' => 'crud.event_deleted']);
     }
 }

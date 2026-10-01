@@ -17,11 +17,24 @@ export default function AppSidebarLayout({
     const { flash } = usePage<any>().props;
 
     useEffect(() => {
+        const renderFlashMessage = (flashVal: any): string | null => {
+            if (!flashVal) return null;
+            if (typeof flashVal === 'object' && flashVal.key) {
+                return String(t(flashVal.key, flashVal.params || {}));
+            }
+            if (typeof flashVal === 'string') {
+                return String(t(flashVal));
+            }
+            return String(flashVal);
+        };
+
         if (flash?.success) {
-            toast.success(t(flash.success));
+            const msg = renderFlashMessage(flash.success);
+            if (msg) toast.success(msg);
         }
         if (flash?.error) {
-            toast.error(t(flash.error));
+            const msg = renderFlashMessage(flash.error);
+            if (msg) toast.error(msg);
         }
     }, [flash, t]);
 

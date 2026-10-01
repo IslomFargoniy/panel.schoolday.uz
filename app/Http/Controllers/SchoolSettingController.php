@@ -22,12 +22,12 @@ class SchoolSettingController extends Controller
                 $request->validated()
             );
 
-            return back()->with('success', __('Maktab sozlamalari saqlandi.'));
+            return back()->with('success', ['key' => 'crud.school_settings_saved']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('SchoolSetting save error: ' . $e->getMessage());
 
             throw ValidationException::withMessages([
-                'error' => [__('Maktab sozlamalarini saqlashda xatolik yuz berdi.')],
+                'error' => [__('crud.error')],
             ]);
         }
     }

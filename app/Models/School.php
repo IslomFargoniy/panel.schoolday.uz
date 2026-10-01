@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ObservedBy([SchoolObserver::class])]
@@ -56,10 +55,5 @@ class School extends Model
     public function school_setting(): HasOne
     {
         return $this->hasOne(SchoolSetting::class, 'school_id');
-    }
-
-    public function students(): HasManyThrough
-    {
-        return $this->hasManyThrough(Student::class, Branch::class, 'school_id', 'branch_id');
     }
 }

@@ -35,7 +35,7 @@ class HikvisionSyncService
             return ['success' => false, 'message' => 'Student has no assigned branch'];
         }
 
-        $devices = $branch->devices ?? $branch->branch_devices ?? [];
+        $devices = $branch->devices ?? [];
 
         foreach ($devices as $device) {
             $results[$device->id] = $this->syncStudentToDevice($student, $device);
@@ -163,7 +163,7 @@ class HikvisionSyncService
             $branch = $student->schoolClass?->shift?->branch;
         }
 
-        $devices = $branch->devices ?? $branch->branch_devices ?? [];
+        $devices = $branch->devices ?? [];
         $employeeNo = (string) ($student->employeeNoString ?: $student->id);
 
         foreach ($devices as $device) {
@@ -182,6 +182,7 @@ class HikvisionSyncService
                         ]),
                     ]);
                     $results[$device->id] = $delRes->json();
+
                     continue;
                 }
             } catch (Exception $e) {

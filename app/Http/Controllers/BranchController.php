@@ -176,7 +176,7 @@ class BranchController extends Controller
 
         $school = School::findOrFail($schoolId);
         if ($school->branch_limit !== null && $school->branches()->count() >= $school->branch_limit) {
-            return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $school->branch_limit . ' ta) tugagan.');
+            return redirect()->back()->with('error', ['key' => 'crud.branch_limit_reached', 'params' => ['limit' => $school->branch_limit]]);
         }
         $validated['school_id'] = $schoolId;
 
@@ -184,7 +184,7 @@ class BranchController extends Controller
 
         $this->syncMacAddresses($branch, $macAddresses);
 
-        return redirect()->back()->with('success', 'Filial muvaffaqiyatli yaratildi.');
+        return redirect()->back()->with('success', ['key' => 'crud.branch_created']);
     }
 
     public function update(\App\Http\Requests\BranchRequest $request, Branch $branch)
@@ -199,7 +199,7 @@ class BranchController extends Controller
             Tenant::authorizeSchool((int) $validated['school_id']);
             $newSchool = School::findOrFail($validated['school_id']);
             if ($newSchool->branch_limit !== null && $newSchool->branches()->count() >= $newSchool->branch_limit) {
-                return redirect()->back()->with('error', 'Tanlangan maktab bo\'yicha filiallar limiti (' . $newSchool->branch_limit . ' ta) tugagan.');
+                return redirect()->back()->with('error', ['key' => 'crud.branch_limit_reached', 'params' => ['limit' => $newSchool->branch_limit]]);
             }
         }
 
@@ -207,7 +207,7 @@ class BranchController extends Controller
 
         $this->syncMacAddresses($branch, $macAddresses);
 
-        return redirect()->back()->with('success', 'Filial muvaffaqiyatli yangilandi.');
+        return redirect()->back()->with('success', ['key' => 'crud.branch_updated']);
     }
 
     public function destroy(Branch $branch)
@@ -216,13 +216,13 @@ class BranchController extends Controller
         try {
             $branch->delete();
 
-            return redirect()->back()->with('success', 'Filial o‘chirildi.');
+            return redirect()->back()->with('success', ['key' => 'crud.branch_deleted']);
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'Bu filialda faol ma\'lumotlar mavjudligi sababli uni o\'chirib bo\'lmaydi.');
+                return redirect()->back()->with('error', ['key' => 'crud.branch_has_relations']);
             }
 
-            return redirect()->back()->with('error', 'O‘chirishda xatolik yuz berdi.');
+            return redirect()->back()->with('error', ['key' => 'crud.error']);
         }
     }
 

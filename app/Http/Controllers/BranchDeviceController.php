@@ -93,11 +93,11 @@ class BranchDeviceController extends Controller
         try {
             BranchDevice::create($request->validated());
 
-            return back()->with('success', 'Qurilma muvaffaqiyatli qo\'shildi.');
+            return back()->with('success', ['key' => 'crud.device_created']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('BranchDevice store error: ' . $e->getMessage());
 
-            return back()->with('error', 'Qurilmani saqlashda xatolik yuz berdi.');
+            return back()->with('error', ['key' => 'crud.device_save_error']);
         }
     }
 
@@ -111,11 +111,11 @@ class BranchDeviceController extends Controller
         try {
             $branchDevice->update($request->validated());
 
-            return back()->with('success', 'Qurilma ma\'lumotlari yangilandi.');
+            return back()->with('success', ['key' => 'crud.device_updated']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('BranchDevice update error: ' . $e->getMessage());
 
-            return back()->with('error', 'Qurilmani yangilashda xatolik yuz berdi.');
+            return back()->with('error', ['key' => 'crud.device_update_error']);
         }
     }
 
@@ -129,12 +129,12 @@ class BranchDeviceController extends Controller
         try {
             $branchDevice->delete();
 
-            return back()->with('success', 'Qurilma muvaffaqiyatli o\'chirildi.');
+            return back()->with('success', ['key' => 'crud.device_deleted']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('BranchDevice destroy error: ' . $e->getMessage());
 
             throw ValidationException::withMessages([
-                'error' => ['Qurilmani o‘chirishda xatolik yuz berdi.'],
+                'error' => [__('crud.device_delete_error')],
             ]);
         }
     }

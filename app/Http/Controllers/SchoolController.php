@@ -71,10 +71,12 @@ class SchoolController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', __('Maktab muvaffaqiyatli yaratildi.'));
+            return redirect()->back()->with('success', ['key' => 'crud.school_created']);
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\Log::error('School create error: ' . $e->getMessage());
+
             throw ValidationException::withMessages([
-                'error' => [$e->getMessage() ?: __('Xatolik yuz berdi')],
+                'error' => [__('crud.error')],
             ]);
         }
     }
@@ -105,12 +107,12 @@ class SchoolController extends Controller
         try {
             $school->update($request->validated());
 
-            return redirect()->back()->with('success', __('Maktab muvaffaqiyatli yangilandi.'));
+            return redirect()->back()->with('success', ['key' => 'crud.school_updated']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('School update error: ' . $e->getMessage());
 
             throw ValidationException::withMessages([
-                'error' => [__('Maktabni yangilashda xatolik yuz berdi.')],
+                'error' => [__('crud.error')],
             ]);
         }
     }
@@ -122,18 +124,23 @@ class SchoolController extends Controller
     {
         $this->authorize('delete', $school);
 
-        if ($school->branches()->count() > 0) {
-            return redirect()->back()->with('error', __('Ushbu maktabda filiallar mavjud bo‘lganligi sababli uni o‘chirib bo‘lmaydi.'));
+        $hasBranches = $school->branches()->exists();
+        $hasStudents = \App\Models\Student::whereHas('schoolClass.shift.branch', function ($q) use ($school) {
+            $q->where('school_id', $school->id);
+        })->exists();
+
+        if ($hasBranches || $hasStudents) {
+            return redirect()->back()->with('error', ['key' => 'crud.cannot_delete_school_with_data']);
         }
 
         try {
             $school->delete();
 
-            return redirect()->back()->with('success', __('Maktab muvaffaqiyatli o‘chirildi.'));
+            return redirect()->back()->with('success', ['key' => 'crud.school_deleted']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('School delete error: ' . $e->getMessage());
 
-            return redirect()->back()->with('error', __('Maktabni o‘chirishda xatolik yuz berdi.'));
+            return redirect()->back()->with('error', ['key' => 'crud.school_delete_error']);
         }
     }
 }

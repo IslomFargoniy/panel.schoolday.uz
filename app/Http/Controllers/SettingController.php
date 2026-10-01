@@ -45,6 +45,6 @@ class SettingController extends Controller
             }
         }
 
-        return redirect()->back()->with('message', 'Settings saved successfully');
+        return redirect()->back()->with('success', ['key' => 'crud.settings_saved']);
     }
 }

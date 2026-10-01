@@ -9,6 +9,7 @@ import {
     GraduationCap,
     Users,
     UserCog,
+    Cpu,
     Github,
     Send,
 } from 'lucide-react';
@@ -101,6 +102,11 @@ const getNavGroups = (t: any, user: any): NavGroup[] => {
             title: t('sidebar.students', 'O‘quvchilar'),
             href: '/students',
             icon: Users,
+        },
+        {
+            title: t('sidebar.devices', 'Qurilmalar'),
+            href: '/devices',
+            icon: Cpu,
         },
     );
 

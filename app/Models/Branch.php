@@ -20,27 +20,12 @@ class Branch extends Model
         return $this->belongsTo(School::class, 'school_id');
     }
 
-    public function students(): HasMany
-    {
-        return $this->hasMany(Student::class);
-    }
-
     public function shifts(): HasMany
     {
         return $this->hasMany(Shift::class);
     }
 
     public function devices(): HasMany
-    {
-        return $this->hasMany(BranchDevice::class);
-    }
-
-    public function branch_devices(): HasMany
-    {
-        return $this->hasMany(BranchDevice::class);
-    }
-
-    public function macAddresses(): HasMany
     {
         return $this->hasMany(BranchDevice::class);
     }

@@ -17,12 +17,12 @@ class UserSchoolController extends Controller
         try {
             UserSchool::firstOrCreate($request->validated());
 
-            return back()->with('success', __('Foydalanuvchi maktabga biriktirildi.'));
+            return back()->with('success', ['key' => 'crud.user_school_attached']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('UserSchool store error: ' . $e->getMessage());
 
             throw ValidationException::withMessages([
-                'error' => [__('Foydalanuvchini maktabga biriktirishda xatolik yuz berdi.')],
+                'error' => [__('crud.error')],
             ]);
         }
     }
@@ -39,7 +39,7 @@ class UserSchoolController extends Controller
         try {
             $userSchool->delete();
 
-            return back()->with('success', __('Foydalanuvchi maktabdan ajratildi.'));
+            return back()->with('success', ['key' => 'crud.user_school_detached']);
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('UserSchool destroy error: ' . $e->getMessage());
 

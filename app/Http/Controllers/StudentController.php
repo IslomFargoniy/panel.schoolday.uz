@@ -161,7 +161,7 @@ class StudentController extends Controller
             return redirect()->back()->with('success', 'crud.deleted');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'O\'chirish mumkin emas. Bu o\'quvchiga bog\'langan ma\'lumotlar (masalan: davomat) mavjud!');
+                return redirect()->back()->with('error', ['key' => 'crud.student_has_relations']);
             }
 
             return redirect()->back()->with('error', 'crud.error');
@@ -195,7 +195,7 @@ class StudentController extends Controller
         // Queue the import process in the background
         \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\StudentsImport($classId), $path);
 
-        return redirect()->back()->with('success', "O'quvchilarni yuklash orqa fonda boshlandi. Sahifani birozdan so'ng yangilang!");
+        return redirect()->back()->with('success', ['key' => 'crud.students_imported_queued']);
     }
 
     public function hikvisionEvents(Student $student)
