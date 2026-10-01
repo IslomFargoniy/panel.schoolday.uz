@@ -86,12 +86,12 @@ export default function BranchDeviceTable({
 
             const data = await response.json();
             if (response.ok && data.success !== false) {
-                const count = data.synced_count ?? 0;
                 toast.success(
-                    t(
-                        'sync_success',
-                        `ISUP hodisalar muvaffaqiyatli sinxronlandi (${count} ta yangi hodisa)`,
-                    ),
+                    data.message ||
+                        t(
+                            'sync_success',
+                            'Muvaffaqiyatli sinxronlandi!',
+                        ),
                 );
                 router.reload({ only: ['branch'] });
             } else {

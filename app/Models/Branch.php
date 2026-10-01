@@ -35,6 +35,11 @@ class Branch extends Model
         return $this->hasMany(BranchDevice::class);
     }
 
+    public function branch_devices(): HasMany
+    {
+        return $this->hasMany(BranchDevice::class);
+    }
+
     public function macAddresses(): HasMany
     {
         return $this->hasMany(BranchDevice::class);

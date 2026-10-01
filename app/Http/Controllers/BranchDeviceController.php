@@ -131,15 +131,27 @@ class BranchDeviceController extends Controller
     }
 
     /**
-     * Sync events from ISUP device
+     * Sync events from ISUP device and push branch students/faces to device
      */
     public function sync(BranchDevice $branchDevice, \App\Services\Hikvision\HikvisionSyncService $syncService)
     {
-        $result = $syncService->syncEventsFromDevice($branchDevice);
-        if ($result['success'] ?? false) {
-            return back()->with('success', $result['message'] ?? 'ISUP hodisalar muvaffaqiyatli sinxronlandi.');
+        $eventResult = $syncService->syncEventsFromDevice($branchDevice);
+        $studentResult = $syncService->syncAllStudentsToDevice($branchDevice);
+
+        $eventCount = (int) ($eventResult['synced_count'] ?? 0);
+        $studentCount = (int) ($studentResult['synced_count'] ?? 0);
+
+        $msg = "Muvaffaqiyatli sinxronlandi! Qurilmaga {$studentCount} ta o‘quvchi yuklandi, {$eventCount} ta yangi hodisa qabul qilindi.";
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'synced_count' => $eventCount,
+                'students_count' => $studentCount,
+            ]);
         }
 
-        return back()->with('error', $result['message'] ?? 'Sinxronizatsiyada xatolik yuz berdi.');
+        return back()->with('success', $msg);
     }
 }

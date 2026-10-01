@@ -23,6 +23,20 @@ class BranchDeviceObserver
     }
 
     /**
+     * Handle the BranchDevice "created" event.
+     */
+    public function created(BranchDevice $branchDevice): void
+    {
+        if ($branchDevice->status && $branchDevice->connection_type === 'isup' && ! empty($branchDevice->device_id)) {
+            try {
+                app(\App\Services\Hikvision\HikvisionSyncService::class)->syncAllStudentsToDevice($branchDevice);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('BranchDeviceObserver initial sync failed: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
      * Handle the BranchDevice "updating" event.
      */
     public function updating(BranchDevice $branchDevice): void

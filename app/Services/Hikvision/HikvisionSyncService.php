@@ -19,6 +19,219 @@ class HikvisionSyncService
     }
 
     /**
+     * Sync single student (and face photo) to all devices in student's branch
+     */
+    public function syncStudent(Student $student): array
+    {
+        $results = [];
+
+        $branch = $student->schoolClass?->shift?->branch;
+        if (! $branch) {
+            $student->load('schoolClass.shift.branch.devices');
+            $branch = $student->schoolClass?->shift?->branch;
+        }
+
+        if (! $branch) {
+            return ['success' => false, 'message' => 'Student has no assigned branch'];
+        }
+
+        $devices = $branch->devices ?? $branch->branch_devices ?? [];
+
+        foreach ($devices as $device) {
+            $results[$device->id] = $this->syncStudentToDevice($student, $device);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Sync single student to a specific branch device via ISAPI/ISUP
+     */
+    public function syncStudentToDevice(Student $student, BranchDevice $device): array
+    {
+        if (! $device->status) {
+            return ['success' => false, 'message' => 'Device is disabled'];
+        }
+
+        try {
+            $employeeNo = (string) ($student->employeeNoString ?: $student->id);
+            $name = $student->name ?: 'Student ' . $employeeNo;
+
+            $validBegin = $student->valid_begin
+                ? $student->valid_begin->format('Y-m-d\TH:i:s')
+                : Carbon::now()->format('Y-m-d\T00:00:00');
+            $validEnd = $student->valid_end
+                ? $student->valid_end->format('Y-m-d\TH:i:s')
+                : Carbon::now()->addYears(10)->format('Y-m-d\T23:59:59');
+
+            $userData = [
+                'UserInfo' => [
+                    'employeeNo' => $employeeNo,
+                    'name' => $name,
+                    'userType' => 'normal',
+                    'closeDelayEnabled' => false,
+                    'Valid' => [
+                        'enable' => (bool) $student->valid_enabled,
+                        'beginTime' => $validBegin,
+                        'endTime' => $validEnd,
+                        'timeType' => 'local',
+                    ],
+                    'doorRight' => (string) ($student->door_right ?: '1'),
+                    'RightPlan' => [
+                        [
+                            'doorNo' => 1,
+                            'planTemplateNo' => (string) ($student->plan_template_no ?: '1'),
+                        ],
+                    ],
+                    'gender' => $student->gender ?: 'unknown',
+                    'localUIRight' => (bool) $student->local_ui_right,
+                    'userVerifyMode' => $student->user_verify_mode ?: 'cardOrFace',
+                ],
+            ];
+
+            // Route through ISUP Gateway
+            if ($device->connection_type === 'isup' && ! empty($device->device_id)) {
+                $isupRes = Http::timeout(config('hikvision.timeout', 10))->post($this->gatewayUrl(), [
+                    'device_id' => $device->device_id,
+                    'method' => 'POST',
+                    'url' => 'POST /ISAPI/AccessControl/UserInfo/Record?format=json',
+                    'body' => json_encode($userData),
+                ]);
+
+                $status = $isupRes->json();
+
+                // Upload face picture via ISUP using public FaceURL
+                if (! empty($student->face_image)) {
+                    $faceUrl = null;
+                    if (str_starts_with($student->face_image, 'http://') || str_starts_with($student->face_image, 'https://')) {
+                        $faceUrl = $student->face_image;
+                    } else {
+                        $storagePath = str_replace('/storage/', '', $student->face_image);
+                        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storagePath)) {
+                            $faceUrl = url('storage/' . ltrim($storagePath, '/'));
+                        }
+                    }
+
+                    if ($faceUrl) {
+                        $facePayload = [
+                            'faceLibType' => 'blackFD',
+                            'FDID' => '1',
+                            'FPID' => $employeeNo,
+                            'faceURL' => $faceUrl,
+                        ];
+
+                        $faceRes = Http::timeout(config('hikvision.timeout', 10))->post($this->gatewayUrl(), [
+                            'device_id' => $device->device_id,
+                            'method' => 'POST',
+                            'url' => 'POST /ISAPI/Intelligent/FDLib/FaceDataRecord?format=json',
+                            'body' => json_encode($facePayload),
+                        ]);
+
+                        Log::info("HikvisionSync [ISUP Face]: Student {$employeeNo} face uploaded", [
+                            'faceUrl' => $faceUrl,
+                            'response' => $faceRes->json(),
+                        ]);
+                    }
+                }
+
+                Log::info("HikvisionSync [ISUP]: Student {$employeeNo} synced to device {$device->device_id}", [
+                    'status' => $status,
+                ]);
+
+                return ['success' => true, 'response' => $status];
+            }
+
+            return ['success' => false, 'message' => 'Device connection_type is not ISUP or device_id is missing'];
+
+        } catch (Exception $e) {
+            Log::warning("HikvisionSync: Failed to sync student {$student->id} to device {$device->id}: " . $e->getMessage());
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete student from all devices in student's branch
+     */
+    public function deleteStudent(Student $student): array
+    {
+        $results = [];
+
+        $branch = $student->schoolClass?->shift?->branch;
+        if (! $branch) {
+            $student->load('schoolClass.shift.branch.devices');
+            $branch = $student->schoolClass?->shift?->branch;
+        }
+
+        $devices = $branch->devices ?? $branch->branch_devices ?? [];
+        $employeeNo = (string) ($student->employeeNoString ?: $student->id);
+
+        foreach ($devices as $device) {
+            try {
+                if ($device->connection_type === 'isup' && ! empty($device->device_id)) {
+                    $delRes = Http::timeout(config('hikvision.timeout', 10))->post($this->gatewayUrl(), [
+                        'device_id' => $device->device_id,
+                        'method' => 'PUT',
+                        'url' => 'PUT /ISAPI/AccessControl/UserInfo/Delete?format=json',
+                        'body' => json_encode([
+                            'UserInfoDelCond' => [
+                                'EmployeeNoList' => [
+                                    ['employeeNo' => $employeeNo],
+                                ],
+                            ],
+                        ]),
+                    ]);
+                    $results[$device->id] = $delRes->json();
+                    continue;
+                }
+            } catch (Exception $e) {
+                Log::warning("HikvisionSync: Failed to delete student {$employeeNo} from device {$device->id}: " . $e->getMessage());
+                $results[$device->id] = ['error' => $e->getMessage()];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Sync ALL active students in branch to a specific device (e.g. when newly connected)
+     */
+    public function syncAllStudentsToDevice(BranchDevice $device): array
+    {
+        if (! $device->status) {
+            return ['success' => false, 'message' => 'Qurilma nofaol holatda'];
+        }
+
+        $students = Student::whereHas('schoolClass.shift', function ($q) use ($device) {
+            $q->where('branch_id', $device->branch_id);
+        })
+            ->where('status', 'active')
+            ->get();
+
+        $syncedCount = 0;
+        $failedCount = 0;
+
+        foreach ($students as $student) {
+            $res = $this->syncStudentToDevice($student, $device);
+            if ($res['success'] ?? false) {
+                $syncedCount++;
+            } else {
+                $failedCount++;
+            }
+        }
+
+        Log::info("HikvisionSync: Synced {$syncedCount} students to device {$device->device_id} (Failed: {$failedCount})");
+
+        return [
+            'success' => true,
+            'synced_count' => $syncedCount,
+            'failed_count' => $failedCount,
+            'total' => $students->count(),
+            'message' => "{$syncedCount} ta o‘quvchi qurilmaga sinxronlandi.",
+        ];
+    }
+
+    /**
      * Query and sync attendance event logs from an ISUP device via C++ Gateway
      */
     public function syncEventsFromDevice(BranchDevice $device, ?string $startTime = null, ?string $endTime = null): array
