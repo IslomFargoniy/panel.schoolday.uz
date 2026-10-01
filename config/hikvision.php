@@ -15,6 +15,10 @@ return [
 
     'gateway_secret' => env('HIKVISION_GATEWAY_SECRET'),
 
+    // Trust requests coming from 127.0.0.1/::1 without X-Gateway-Secret.
+    // Set to false when a reverse proxy sits in front of the app (all clients then look like localhost).
+    'trust_localhost' => (bool) env('HIKVISION_TRUST_LOCALHOST', true),
+
     'default_encryption_key' => env('HIKVISION_DEFAULT_KEY', null),
 
     'das_address' => env('HIKVISION_DAS_ADDRESS', '193.180.213.188'),

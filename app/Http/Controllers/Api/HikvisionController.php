@@ -43,7 +43,7 @@ class HikvisionController extends Controller
     private function isGatewayAuthorized(Request $request): bool
     {
         $ip = $request->ip();
-        if ($ip === '127.0.0.1' || $ip === '::1') {
+        if (config('hikvision.trust_localhost', true) && ($ip === '127.0.0.1' || $ip === '::1')) {
             return true;
         }
 
@@ -78,7 +78,13 @@ class HikvisionController extends Controller
             // --- 2. Device whitelist check & status update -------------------
             $incomingMac = strtoupper(trim($eventData->macAddress ?? ''));
             $shortSerial = $eventData->shortSerialNumber ?? null;
-            $deviceId = $eventData->device_id ?? null;
+            $deviceId = $eventData->device_id
+                ?? $eventData->deviceId
+                ?? $eventData->deviceID
+                ?? $request->query('device_id')
+                ?? $request->query('deviceId')
+                ?? $request->query('deviceID');
+            $deviceId = $deviceId !== null ? (string) $deviceId : null;
 
             $branchDevice = null;
             if ($incomingMac || $shortSerial || $deviceId) {
@@ -99,7 +105,9 @@ class HikvisionController extends Controller
             }
 
             if (! $branchDevice) {
-                Log::info("Hikvision: rejected event from unregistered or inactive device [MAC: {$incomingMac}, Serial: {$shortSerial}, DeviceId: {$deviceId}]");
+                Log::info("Hikvision: rejected event from unregistered or inactive device [MAC: {$incomingMac}, Serial: {$shortSerial}, DeviceId: {$deviceId}]", [
+                    'payload_keys' => array_keys((array) $eventData),
+                ]);
 
                 return response()->json(['success' => false, 'reason' => 'device_not_allowed'], 200);
             }
@@ -149,7 +157,7 @@ class HikvisionController extends Controller
 
             // Student must belong to this device's branch
             $studentBranchId = $checkStudent->schoolClass?->shift?->branch_id;
-            if ($studentBranchId !== $branchDevice->branch_id) {
+            if ($studentBranchId === null || (int) $studentBranchId !== (int) $branchDevice->branch_id) {
                 Log::warning("Hikvision: student [{$checkStudent->id}] branch [{$studentBranchId}] does not match device branch [{$branchDevice->branch_id}]");
 
                 return response()->json(['success' => false, 'reason' => 'student_branch_mismatch'], 200);
@@ -285,7 +293,6 @@ class HikvisionController extends Controller
                 $isOnline = in_array($status, ['online', true, 1, '1'], true);
                 $device->update([
                     'is_online' => $isOnline,
-                    'status' => true,
                     'last_seen_at' => now(),
                 ]);
             }
