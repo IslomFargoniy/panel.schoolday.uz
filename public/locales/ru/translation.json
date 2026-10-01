@@ -711,7 +711,7 @@
   "telegram_group": "TG группа",
   "enlarge_terminal_photo": "Увеличить снимок с терминала",
   "toggle_theme": "Переключить тему",
-  "port_isup": "Порт 7660 (ISUP)",
+  "port_isup": "Порт 7670 (ISUP)",
   "port_http": "Порт 80/443 (HTTP)",
   "camera": {
     "modal_title": "Сделать фото с камеры",

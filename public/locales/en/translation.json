@@ -711,7 +711,7 @@
   "telegram_group": "TG group",
   "enlarge_terminal_photo": "Enlarge terminal photo",
   "toggle_theme": "Toggle theme",
-  "port_isup": "Port 7660 (ISUP)",
+  "port_isup": "Port 7670 (ISUP)",
   "port_http": "Port 80/443 (HTTP)",
   "camera": {
     "modal_title": "Take photo with camera",

@@ -216,7 +216,7 @@ export default function DeviceConnectionGuideModal({
                                             Server Port:
                                         </div>
                                         <div className="font-mono font-semibold">
-                                            7660
+                                            7670
                                         </div>
                                     </div>
                                     <Button
@@ -224,7 +224,7 @@ export default function DeviceConnectionGuideModal({
                                         variant="ghost"
                                         onClick={() =>
                                             copyToClipboard(
-                                                '7660',
+                                                '7670',
                                                 'Server Port',
                                                 'serverPort',
                                             )

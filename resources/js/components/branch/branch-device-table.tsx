@@ -7,7 +7,6 @@ import {
     ScanFace,
     Radio,
     Network,
-    RefreshCw,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +29,6 @@ export default function BranchDeviceTable({
 }: BranchDeviceTableProps) {
     const { t } = useTranslation();
     const [copiedId, setCopiedId] = useState<number | null>(null);
-    const [syncingId, setSyncingId] = useState<number | null>(null);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
     const [deviceToEdit, setDeviceToEdit] = useState<BranchDevice | null>(null);
     const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
@@ -62,52 +60,6 @@ export default function BranchDeviceTable({
                 toast.error(errorMessage);
             },
         });
-    };
-
-    const handleSync = async (device: BranchDevice) => {
-        setSyncingId(device.id);
-        try {
-            const xsrfToken = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
-
-            const response = await fetch(`/branch_device/${device.id}/sync`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-XSRF-TOKEN': xsrfToken
-                        ? decodeURIComponent(xsrfToken)
-                        : '',
-                },
-            });
-
-            const data = await response.json();
-            if (response.ok && data.success !== false) {
-                toast.success(
-                    data.message ||
-                        t(
-                            'sync_success',
-                            'Muvaffaqiyatli sinxronlandi!',
-                        ),
-                );
-                router.reload({ only: ['branch'] });
-            } else {
-                toast.error(
-                    data.message ||
-                        t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
-                );
-            }
-        } catch (err: any) {
-            toast.error(
-                err?.message ||
-                    t('sync_failed', 'Sinxronizatsiyada xatolik yuz berdi'),
-            );
-        } finally {
-            setSyncingId(null);
-        }
     };
 
     const copyToClipboard = (text: string, deviceId: number) => {
@@ -307,81 +259,63 @@ export default function BranchDeviceTable({
                                             </span>
                                             <span className="font-sans text-[11px] text-foreground">
                                                 {isIsup
-                                                    ? t('port_isup', 'Port 7660 (ISUP)')
+                                                    ? t('port_isup', 'Port 7670 (ISUP)')
                                                     : t('port_http', 'Port 80/443 (HTTP)')}
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* Terminal Bottom Status Bar */}
-                                    <div className="flex flex-col gap-2 border-t border-border/60 pt-1">
-                                        <div className="flex items-center justify-between text-[11px]">
-                                            <div className="flex items-center gap-1.5">
-                                                {isOnline ? (
-                                                    <>
-                                                        <span className="relative flex h-2 w-2">
-                                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                                                        </span>
-                                                        <span className="font-sans font-semibold text-emerald-600 dark:text-emerald-400">
-                                                            {t(
-                                                                'online_active',
-                                                                'Online • Faol',
-                                                            )}
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span className="relative flex h-2 w-2">
-                                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
-                                                        </span>
-                                                        <span className="font-sans font-medium text-rose-500">
-                                                            {t(
-                                                                'offline_inactive',
-                                                                'Offline • Aloqada emas',
-                                                            )}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
-
-                                            {isIsup && (
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    disabled={
-                                                        syncingId === item.id
-                                                    }
-                                                    onClick={() =>
-                                                        handleSync(item)
-                                                    }
-                                                    className="h-6 gap-1 px-2.5 text-[11px] font-medium"
-                                                    title={t(
-                                                        'sync_now',
-                                                        'ISUP orqali hodisalarni tortib olish',
-                                                    )}
-                                                >
-                                                    <RefreshCw
-                                                        className={`h-3 w-3 ${syncingId === item.id ? 'animate-spin' : ''}`}
-                                                    />
-                                                    <span>
+                                    <div className="flex items-center justify-between border-t border-border/60 pt-1 text-[11px] text-muted-foreground">
+                                        <div className="flex items-center gap-1.5">
+                                            {isOnline ? (
+                                                <>
+                                                    <span className="relative flex h-2 w-2">
+                                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                                                    </span>
+                                                    <span className="font-sans font-semibold text-emerald-600 dark:text-emerald-400">
                                                         {t(
-                                                            'sync',
-                                                            'Sinxronlash',
+                                                            'online_active',
+                                                            'Online • Faol',
                                                         )}
                                                     </span>
-                                                </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="relative flex h-2 w-2">
+                                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                                                    </span>
+                                                    <span className="font-sans font-medium text-rose-500">
+                                                        {t(
+                                                            'offline_inactive',
+                                                            'Offline • Aloqada emas',
+                                                        )}
+                                                    </span>
+                                                </>
                                             )}
                                         </div>
 
-                                        {item.last_seen_at && (
-                                            <div className="font-mono text-[10px] text-muted-foreground">
-                                                {t('last_seen', 'Oxirgi aloqa')}
-                                                :{' '}
+                                        {item.last_seen_at ? (
+                                            <span
+                                                className="font-mono text-[10px] text-muted-foreground"
+                                                title={t(
+                                                    'last_seen',
+                                                    'Oxirgi aloqa vaqti',
+                                                )}
+                                            >
+                                                {t('last_seen', 'Oxirgi aloqa')}:{' '}
                                                 {formatLastSeen(
                                                     item.last_seen_at,
                                                 )}
-                                            </div>
+                                            </span>
+                                        ) : (
+                                            <span className="font-mono text-[10px] text-muted-foreground">
+                                                {t(
+                                                    'biometric_sync',
+                                                    'Biometric Sync',
+                                                )}
+                                            </span>
                                         )}
                                     </div>
                                 </div>
