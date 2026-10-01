@@ -48,7 +48,16 @@ class ReportController extends Controller
         $classes = $classesQuery->select('id', 'name', 'shift_id')->orderBy('name')->get();
         $students = $studentsQuery->select('id', 'name', 'class_id')->orderBy('name')->get();
 
+        $rangeTruncated = false;
+        $effectiveEndDate = null;
+        if ($filters['status'] === 'absent') {
+            [, $effectiveEnd, $rangeTruncated] = $this->resolveAbsentRange($filters['start_date'], $filters['end_date']);
+            $effectiveEndDate = $effectiveEnd->toDateString();
+        }
+
         return Inertia::render('reports/index', [
+            'range_truncated' => $rangeTruncated,
+            'effective_end_date' => $rangeTruncated ? $effectiveEndDate : null,
             'attendances' => $paginated,
             'schools' => $schools,
             'branches' => $branches,
@@ -85,6 +94,31 @@ class ReportController extends Controller
         ];
     }
 
+    private const ABSENT_MAX_DAYS = 31;
+
+    /**
+     * Normalise the date range of the "absent" report and cap it to ABSENT_MAX_DAYS.
+     *
+     * @return array{0: Carbon, 1: Carbon, 2: bool} start, end and whether the end was truncated
+     */
+    private function resolveAbsentRange(string $startDate, string $endDate): array
+    {
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        if ($start->greaterThan($end)) {
+            [$start, $end] = [$end->copy()->startOfDay(), $start->copy()->endOfDay()];
+        }
+
+        $truncated = false;
+        if ($start->diffInDays($end) > self::ABSENT_MAX_DAYS) {
+            $end = $start->copy()->addDays(self::ABSENT_MAX_DAYS)->endOfDay();
+            $truncated = true;
+        }
+
+        return [$start, $end, $truncated];
+    }
+
     private function getAttendanceData(array $filters, $paginate = true)
     {
         $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
@@ -100,16 +134,7 @@ class ReportController extends Controller
         $status = $filters['status'];
 
         if ($status === 'absent') {
-            $start = Carbon::parse($startDate)->startOfDay();
-            $end = Carbon::parse($endDate)->endOfDay();
-            if ($start->greaterThan($end)) {
-                $temp = clone $start;
-                $start = clone $end;
-                $end = $temp;
-            }
-            if ($start->diffInDays($end) > 31) {
-                $end = (clone $start)->addDays(31)->endOfDay();
-            }
+            [$start, $end] = $this->resolveAbsentRange($startDate, $endDate);
 
             // Determine active school days per branch (only dates where at least 1 attendance occurred in that branch)
             $activeDatesQuery = DailyAttendance::query()

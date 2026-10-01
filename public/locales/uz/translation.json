@@ -308,6 +308,7 @@
     "delete_title": "Filialni o‘chirish"
   },
   "reports": {
+    "range_truncated": "Kelmaganlar hisoboti bir martada ko‘pi bilan 31 kunni qamrab oladi. Natijalar {{date}} sanasigacha ko‘rsatilmoqda.",
     "title": "Kunlik davomat hisoboti",
     "start_date": "Boshlanish sanasi",
     "end_date": "Tugash sanasi",

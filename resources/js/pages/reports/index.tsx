@@ -1,9 +1,11 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { AttendanceTable } from '@/components/reports/AttendanceTable';
 import { ReportFilters } from '@/components/reports/ReportFilters';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import AppLayout from '@/layouts/app-layout';
 import type {
     BreadcrumbItem,
@@ -35,6 +37,8 @@ interface ReportsPageProps {
     classes: (SchoolClass & { shift_id?: number })[];
     students: (Student & { class_id?: number })[];
     filters: ReportPageFilters;
+    range_truncated?: boolean;
+    effective_end_date?: string | null;
 }
 
 export default function ReportsPage({
@@ -45,6 +49,8 @@ export default function ReportsPage({
     classes,
     students,
     filters,
+    range_truncated = false,
+    effective_end_date = null,
 }: ReportsPageProps) {
     const { t } = useTranslation();
 
@@ -114,6 +120,18 @@ export default function ReportsPage({
                     onSubmit={handleFilter}
                     onReset={handleReset}
                 />
+                {range_truncated && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                            {t(
+                                'reports.range_truncated',
+                                'Kelmaganlar hisoboti bir martada ko‘pi bilan 31 kunni qamrab oladi. Natijalar {{date}} sanasigacha ko‘rsatilmoqda.',
+                                { date: effective_end_date },
+                            )}
+                        </AlertDescription>
+                    </Alert>
+                )}
                 <AttendanceTable
                     attendances={attendances}
                     filters={filterData}

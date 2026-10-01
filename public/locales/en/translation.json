@@ -308,6 +308,7 @@
     "delete_title": "Delete branch"
   },
   "reports": {
+    "range_truncated": "The absent report covers at most 31 days at a time. Results are shown up to {{date}}.",
     "title": "Daily Attendance Report",
     "start_date": "Start Date",
     "end_date": "End Date",
