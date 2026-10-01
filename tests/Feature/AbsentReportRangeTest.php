@@ -62,3 +62,15 @@ test('reversed absent range is normalised before the cap is applied', function (
             ->where('effective_end_date', '2026-02-01')
         );
 });
+
+test('empty date filters fall back to today instead of failing', function () {
+    foreach (['absent', 'all'] as $status) {
+        $this->actingAs($this->admin)
+            ->get("/reports?status={$status}&start_date=&end_date=")
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('filters.start_date', now()->toDateString())
+                ->where('filters.end_date', now()->toDateString())
+            );
+    }
+});

@@ -175,3 +175,47 @@ test('last_event_synced_at is not advanced when a later page fails', function ()
     expect($result['success'])->toBeFalse()
         ->and($device->fresh()->last_event_synced_at->equalTo($before))->toBeTrue();
 });
+
+test('scheduled sync continues from last_event_synced_at when --days is not given', function () {
+    $this->freezeTime();
+    ['deviceA' => $device] = syncFixture();
+    $device->update(['last_event_synced_at' => now()->subMinutes(30)]);
+
+    $sentStart = [];
+    Http::fake(function ($request) use (&$sentStart) {
+        $sentStart[$request['device_id']] = json_decode($request['body'], true)['AcsEventCond']['startTime'];
+
+        return Http::response(acsResponse([]));
+    });
+
+    $this->artisan('hikvision:sync-events')->assertSuccessful();
+
+    expect($sentStart[$device->device_id])->toBe(now()->subMinutes(35)->format('Y-m-d\TH:i:s+05:00'))
+        // a device that never synced starts from yesterday
+        ->and($sentStart['DEV_B'])->toBe(now()->subDays(1)->format('Y-m-d\T00:00:00+05:00'));
+});
+
+test('--days forces a full re-read window', function () {
+    $this->freezeTime();
+    ['deviceA' => $device] = syncFixture();
+    $device->update(['last_event_synced_at' => now()->subMinutes(30)]);
+
+    $sentStart = [];
+    Http::fake(function ($request) use (&$sentStart) {
+        $sentStart[$request['device_id']] = json_decode($request['body'], true)['AcsEventCond']['startTime'];
+
+        return Http::response(acsResponse([]));
+    });
+
+    $this->artisan('hikvision:sync-events', ['--days' => 2])->assertSuccessful();
+
+    expect($sentStart[$device->device_id])->toBe(now()->subDays(2)->format('Y-m-d\T00:00:00+05:00'));
+});
+
+test('scheduled event sync does not overlap', function () {
+    $event = collect(app(Illuminate\Console\Scheduling\Schedule::class)->events())
+        ->first(fn ($e) => str_contains($e->command ?? '', 'hikvision:sync-events'));
+
+    expect($event)->not->toBeNull()
+        ->and($event->withoutOverlapping)->toBeTrue();
+});

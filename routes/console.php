@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('hikvision:sync-events')->everyMinute()->runInBackground();
+Schedule::command('hikvision:sync-events')->everyMinute()->withoutOverlapping(10)->runInBackground();
 Schedule::command('hikvision:healthcheck')->everyMinute()->runInBackground();

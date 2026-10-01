@@ -82,8 +82,8 @@ class ReportController extends Controller
     private function getFilters(Request $request)
     {
         return [
-            'start_date' => $request->input('start_date', Carbon::today()->toDateString()),
-            'end_date' => $request->input('end_date', Carbon::today()->toDateString()),
+            'start_date' => $request->input('start_date') ?: Carbon::today()->toDateString(),
+            'end_date' => $request->input('end_date') ?: Carbon::today()->toDateString(),
             'school_id' => $request->input('school_id'),
             'branch_id' => $request->input('branch_id'),
             'shift_id' => $request->input('shift_id'),
