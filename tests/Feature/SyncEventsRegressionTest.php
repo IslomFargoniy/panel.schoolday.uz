@@ -176,7 +176,7 @@ test('last_event_synced_at is not advanced when a later page fails', function ()
         ->and($device->fresh()->last_event_synced_at->equalTo($before))->toBeTrue();
 });
 
-test('scheduled sync continues from last_event_synced_at when --days is not given', function () {
+test('scheduled sync always re-reads from yesterday regardless of last_event_synced_at', function () {
     $this->freezeTime();
     ['deviceA' => $device] = syncFixture();
     $device->update(['last_event_synced_at' => now()->subMinutes(30)]);
@@ -190,9 +190,9 @@ test('scheduled sync continues from last_event_synced_at when --days is not give
 
     $this->artisan('hikvision:sync-events')->assertSuccessful();
 
-    expect($sentStart[$device->device_id])->toBe(now()->subMinutes(35)->format('Y-m-d\TH:i:s+05:00'))
-        // a device that never synced starts from yesterday
-        ->and($sentStart['DEV_B'])->toBe(now()->subDays(1)->format('Y-m-d\T00:00:00+05:00'));
+    $expected = now()->subDays(1)->format('Y-m-d\T00:00:00+05:00');
+    expect($sentStart[$device->device_id])->toBe($expected)
+        ->and($sentStart['DEV_B'])->toBe($expected);
 });
 
 test('--days forces a full re-read window', function () {
@@ -218,4 +218,45 @@ test('scheduled event sync does not overlap', function () {
 
     expect($event)->not->toBeNull()
         ->and($event->withoutOverlapping)->toBeTrue();
+});
+
+test('device time with its own timezone offset is stored in Asia/Tashkent', function () {
+    Queue::fake();
+    ['studentA' => $a, 'deviceA' => $device] = syncFixture();
+
+    Http::fake(['*' => Http::response(acsResponse([[
+        'employeeNoString' => $a->employeeNoString,
+        'serialNo' => 11,
+        'time' => '2026-10-01T10:00:00+08:00',
+        'attendanceStatus' => 'checkIn',
+    ]]))]);
+
+    app(HikvisionSyncService::class)->syncEventsFromDevice($device);
+
+    $event = HikvisionAccessEvent::with('access')->where('employeeNoString', $a->employeeNoString)->firstOrFail();
+    expect($event->access->dateTime->format('Y-m-d H:i:s'))->toBe('2026-10-01 07:00:00');
+});
+
+test('realtime callback and sync of the same event are not stored twice', function () {
+    Queue::fake();
+    ['studentA' => $a, 'deviceA' => $device] = syncFixture();
+    $deviceTime = now()->subMinutes(20)->setTimezone('+05:00')->format('Y-m-d\TH:i:sP');
+
+    $this->postJson('/api/hikvision/events', [
+        'device_id' => $device->device_id,
+        'dateTime' => $deviceTime,
+        'AccessControllerEvent' => ['employeeNoString' => $a->employeeNoString, 'serialNo' => 21],
+    ])->assertJson(['success' => true]);
+
+    Http::fake(['*' => Http::response(acsResponse([[
+        'employeeNoString' => $a->employeeNoString,
+        'serialNo' => 21,
+        'time' => $deviceTime,
+        'attendanceStatus' => 'checkIn',
+    ]]))]);
+
+    $result = app(HikvisionSyncService::class)->syncEventsFromDevice($device);
+
+    expect($result['synced_count'])->toBe(0)
+        ->and(HikvisionAccessEvent::where('employeeNoString', $a->employeeNoString)->count())->toBe(1);
 });

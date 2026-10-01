@@ -229,7 +229,7 @@ Buyruq global bot tokeni va `TELEGRAM_WEBHOOK_SECRET` bilan webhook'ni `APP_URL/
 - Superadmin bo'lmagan foydalanuvchi `/settings/system` ga kira olmaydi (403).
 - Terminal oldida yuzni skanerlang: davomat yoziladi va `storage/logs/laravel.log` da `device_not_allowed` yo'q.
 - `php artisan hikvision:sync-events` xatosiz tugaydi.
-- Scheduler har daqiqada hodisalarni har bir qurilmaning oxirgi muvaffaqiyatli sinxronlashidan davom ettiradi. Uzoq uzilishdan keyin o'tgan kunlarni qayta o'qish uchun: `php artisan hikvision:sync-events --days=3`.
+- Scheduler har daqiqada kechagi 00:00 dan hozirgacha bo'lgan hodisalarni qayta o'qiydi (panel.payday.uz bilan bir xil), dublikatlar tashlab ketiladi. Bir kundan uzoq uzilishdan keyin: `php artisan hikvision:sync-events --days=3`.
 
 ---
 

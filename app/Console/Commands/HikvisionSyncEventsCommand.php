@@ -13,7 +13,7 @@ class HikvisionSyncEventsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'hikvision:sync-events {--device_id= : Specific ISUP device ID to sync} {--days= : Re-read this many past days instead of continuing from the last successful sync}';
+    protected $signature = 'hikvision:sync-events {--device_id= : Specific ISUP device ID to sync} {--days=1 : Number of past days to query}';
 
     /**
      * The console command description.
@@ -28,15 +28,12 @@ class HikvisionSyncEventsCommand extends Command
     public function handle(HikvisionSyncService $syncService): int
     {
         $deviceId = $this->option('device_id');
-        $days = $this->option('days');
+        $days = max(1, (int) ($this->option('days') ?: 1));
 
-        // Without --days the service continues from each device's last_event_synced_at
-        $startTime = null;
-        $endTime = null;
-        if ($days !== null && $days !== '') {
-            $startTime = now()->subDays(max(1, (int) $days))->format('Y-m-d\T00:00:00+05:00');
-            $endTime = now()->addHours(1)->format('Y-m-d\T23:59:59+05:00');
-        }
+        // Same as panel.payday.uz: always re-read the whole window and rely on
+        // duplicate detection, so late or offline-buffered events are never missed.
+        $startTime = now()->subDays($days)->format('Y-m-d\T00:00:00+05:00');
+        $endTime = now()->addHours(1)->format('Y-m-d\T23:59:59+05:00');
 
         $query = BranchDevice::where('connection_type', 'isup')
             ->where('status', 1)
