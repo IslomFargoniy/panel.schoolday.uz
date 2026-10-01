@@ -47,22 +47,29 @@ class SendTelegramNotificationJob implements ShouldQueue
      */
     public function handle(TelegramService $telegramService): void
     {
+        $this->student->loadMissing(['schoolClass.shift.branch.school.school_setting']);
+
+        $schoolToken = $this->student->schoolClass?->shift?->branch?->school?->school_setting?->telegram_bot_token;
+        if (! empty($schoolToken)) {
+            $telegramService = new TelegramService($schoolToken);
+        }
+
         if (! $telegramService->hasToken()) {
             return;
         }
 
-        $this->student->loadMissing(['schoolClass.shift.branch']);
-
-        $groupId = $this->student->schoolClass->telegram_group_id ?? null;
+        $groupId = $this->student->schoolClass?->telegram_group_id ?? null;
         if (! $this->student->telegram_id && ! $groupId) {
             return;
         }
 
-        $className = $this->student->schoolClass->name ?? '-';
-        $shiftName = $this->student->schoolClass->shift->name ?? '-';
-        $branchName = $this->student->schoolClass->shift->branch->name ?? '-';
+        $studentName = e($this->student->name);
+        $className = e($this->student->schoolClass?->name ?? '-');
+        $shiftName = e($this->student->schoolClass?->shift?->name ?? '-');
+        $branchName = e($this->student->schoolClass?->shift?->branch?->name ?? '-');
+        $datetime = e($this->datetime);
 
-        $message = "👤 <b>O'quvchi:</b> {$this->student->name}\n🏫 <b>Sinf:</b> {$className}\n🕗 <b>Smena:</b> {$shiftName}\n🏢 <b>Filial:</b> {$branchName}\n——\n{$this->statusLine}\n📅 <b>Sana:</b> {$this->datetime}";
+        $message = "👤 <b>O'quvchi:</b> {$studentName}\n🏫 <b>Sinf:</b> {$className}\n🕗 <b>Smena:</b> {$shiftName}\n🏢 <b>Filial:</b> {$branchName}\n——\n{$this->statusLine}\n📅 <b>Sana:</b> {$datetime}";
 
         $targets = [];
         if ($this->student->telegram_id) {

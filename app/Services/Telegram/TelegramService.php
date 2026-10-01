@@ -47,7 +47,13 @@ class TelegramService
         }
 
         try {
-            $this->telegram->setWebhook(['url' => $url]);
+            $params = ['url' => $url];
+            $secret = config('services.telegram.webhook_secret');
+            if (! empty($secret)) {
+                $params['secret_token'] = $secret;
+            }
+
+            $this->telegram->setWebhook($params);
         } catch (Exception $e) {
             Log::error('Telegram setWebhook error: ' . $e->getMessage());
         }
@@ -64,6 +70,7 @@ class TelegramService
         }
 
         $chatId = $message['chat']['id'];
+        $fromId = $message['from']['id'] ?? null;
         $text = $message['text'] ?? null;
         $contact = $message['contact'] ?? null;
         $newChatMembers = $message['new_chat_members'] ?? null;
@@ -80,7 +87,7 @@ class TelegramService
         if ($text === '/start') {
             $this->askPhoneNumber($chatId);
         } elseif ($contact) {
-            $this->savePhoneNumber($chatId, $contact);
+            $this->savePhoneNumber($chatId, $contact, $fromId);
         } else {
             $this->sendUnknownCommand($chatId);
         }
@@ -95,15 +102,16 @@ class TelegramService
             $schoolClass = \App\Models\SchoolClass::with(['shift.branch'])->withCount('students')->where('telegram_group_id', $chatId)->first();
 
             if ($schoolClass) {
-                $className = $schoolClass->name;
-                $shiftName = $schoolClass->shift?->name ?? '-';
-                $branchName = $schoolClass->shift?->branch?->name ?? '-';
-                $studentsCount = $schoolClass->students_count ?? 0;
+                $className = e($schoolClass->name);
+                $shiftName = e($schoolClass->shift?->name ?? '-');
+                $branchName = e($schoolClass->shift?->branch?->name ?? '-');
+                $studentsCount = (int) ($schoolClass->students_count ?? 0);
 
                 $message = "🏫 <b>Sinf:</b> {$className}\n🕗 <b>Smena:</b> {$shiftName}\n🏢 <b>Filial:</b> {$branchName}\n👥 <b>O'quvchilar soni:</b> {$studentsCount} ta\n\n✅ <i>Ushbu guruh tizimga muvaffaqiyatli ulangan.</i>";
                 $this->sendSafeMessage($chatId, $message);
             } else {
-                $message = "⚠️ Ushbu guruh tizimga ulanmagan.\n\nIltimos, ushbu ID ni admin panelda tegishli sinf sozlamalariga kiriting.\n👇 <b>Nusxalash uchun ID ustiga bosing:</b>\n\n<code>{$chatId}</code>";
+                $escapedChatId = e((string) $chatId);
+                $message = "⚠️ Ushbu guruh tizimga ulanmagan.\n\nIltimos, ushbu ID ni admin panelda tegishli sinf sozlamalariga kiriting.\n👇 <b>Nusxalash uchun ID ustiga bosing:</b>\n\n<code>{$escapedChatId}</code>";
                 $this->sendSafeMessage($chatId, $message);
             }
         } catch (Exception $e) {
@@ -139,37 +147,60 @@ class TelegramService
     /**
      * Step 2 — Save phone number to DB
      */
-    protected function savePhoneNumber(int|string $chatId, array $contact): void
+    protected function savePhoneNumber(int|string $chatId, array $contact, ?int $fromId = null): void
     {
         try {
-            $phone = trim($contact['phone_number'], '+');
+            $contactUserId = $contact['user_id'] ?? null;
+            if (! $contactUserId || (string) $contactUserId !== (string) $fromId) {
+                $this->sendSafeMessage(
+                    $chatId,
+                    "❌ Iltimos, faqat o'z raqamingizni yuboring.",
+                    Keyboard::remove()
+                );
 
-            $userUpdated = User::where(function ($q) use ($phone) {
-                $q->where('phone', $phone)
-                    ->orWhere('phone', '+' . $phone);
-            })
+                return;
+            }
+
+            $rawContactPhone = (string) ($contact['phone_number'] ?? '');
+            $normalizedPhone = preg_replace('/\D+/', '', $rawContactPhone);
+
+            if (empty($normalizedPhone)) {
+                $this->sendSafeMessage(
+                    $chatId,
+                    '❌ Telefon raqami yaroqsiz formatda.',
+                    Keyboard::remove()
+                );
+
+                return;
+            }
+
+            $possiblePhones = [$normalizedPhone];
+            if (str_starts_with($normalizedPhone, '998') && strlen($normalizedPhone) === 12) {
+                $possiblePhones[] = substr($normalizedPhone, 3);
+            }
+
+            $cleanPhoneSql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(phone, ''), '+', ''), ' ', ''), '-', ''), '(', ''), ')', '')";
+
+            $userUpdated = User::whereIn(\Illuminate\Support\Facades\DB::raw($cleanPhoneSql), $possiblePhones)
                 ->update(['telegram_id' => $chatId]);
 
-            $studentUpdated = Student::where(function ($q) use ($phone) {
-                $q->where('phone', $phone)
-                    ->orWhere('phone', '+' . $phone);
-            })
+            $studentUpdated = Student::whereIn(\Illuminate\Support\Facades\DB::raw($cleanPhoneSql), $possiblePhones)
                 ->update(['telegram_id' => $chatId]);
 
             if ($userUpdated || $studentUpdated) {
                 $linkedNames = collect();
 
                 if ($userUpdated) {
-                    $users = User::where('telegram_id', $chatId)->get();
+                    $users = User::whereIn(\Illuminate\Support\Facades\DB::raw($cleanPhoneSql), $possiblePhones)->get();
                     foreach ($users as $u) {
-                        $linkedNames->push('👤 <b>' . $u->name . "</b> (Xodim/O'qituvchi)");
+                        $linkedNames->push('👤 <b>' . e($u->name) . "</b> (Xodim/O'qituvchi)");
                     }
                 }
 
                 if ($studentUpdated) {
-                    $students = Student::where('telegram_id', $chatId)->get();
+                    $students = Student::whereIn(\Illuminate\Support\Facades\DB::raw($cleanPhoneSql), $possiblePhones)->get();
                     foreach ($students as $s) {
-                        $linkedNames->push('🎓 <b>' . $s->name . "</b> (O'quvchi)");
+                        $linkedNames->push('🎓 <b>' . e($s->name) . "</b> (O'quvchi)");
                     }
                 }
 
