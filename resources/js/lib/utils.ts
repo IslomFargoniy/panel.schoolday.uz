@@ -11,6 +11,17 @@ export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
 }
 
 /**
+ * Build a public URL for a file on the "public" disk.
+ * Accepts absolute URLs, already-prefixed paths ("/storage/faces/a.jpg")
+ * and bare disk paths ("hikvision/DEV/a.jpg").
+ */
+export function storageUrl(path?: string | null): string {
+    if (!path) return '';
+    if (/^(https?:)?\/\//.test(path) || path.startsWith('/')) return path;
+    return `/storage/${path}`;
+}
+
+/**
  * Format date as YYYY-MM-DD
  */
 export function formatDate(dateInput?: string | Date | null): string {

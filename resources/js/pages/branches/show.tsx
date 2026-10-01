@@ -37,6 +37,7 @@ import { Button } from '@/components/ui/button';
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
+import { storageUrl } from '@/lib/utils';
 import type {
     Branch,
     BreadcrumbItem,
@@ -959,13 +960,13 @@ export default function BranchShowPage({
                                                                 <div className="flex items-center gap-2.5">
                                                                     {student.face_image ? (
                                                                         <img
-                                                                            src={`/storage/${student.face_image}`}
+                                                                            src={storageUrl(student.face_image)}
                                                                             alt={
                                                                                 student.name
                                                                             }
                                                                             onClick={() =>
                                                                                 setPreviewImage(
-                                                                                    `/storage/${student.face_image}`,
+                                                                                    storageUrl(student.face_image),
                                                                                 )
                                                                             }
                                                                             className="h-8 w-8 shrink-0 cursor-pointer rounded-full border border-border object-cover hover:opacity-80"
