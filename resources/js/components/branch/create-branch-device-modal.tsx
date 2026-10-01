@@ -286,7 +286,13 @@ export default function CreateBranchDeviceModal({
                             className="text-xs font-medium"
                         >
                             {t('mac_address', 'MAC manzil')}{' '}
-                            <span className="text-rose-500">*</span>
+                            {data.connection_type === 'http_listening' ? (
+                                <span className="text-rose-500">*</span>
+                            ) : (
+                                <span className="text-[11px] font-normal text-muted-foreground">
+                                    ({t('optional', 'ixtiyoriy')})
+                                </span>
+                            )}
                         </Label>
                         <Input
                             id="mac_address"
@@ -296,7 +302,7 @@ export default function CreateBranchDeviceModal({
                                 setData('mac_address', e.target.value)
                             }
                             className="h-9 rounded-lg border-input font-mono text-xs sm:text-sm"
-                            required
+                            required={data.connection_type === 'http_listening'}
                         />
                         <InputError message={errors.mac_address} />
                     </div>
