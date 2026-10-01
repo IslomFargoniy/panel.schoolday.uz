@@ -103,7 +103,7 @@ export default function CreateBranchStudentModal({
             if (defaultClassId) setData('class_id', String(defaultClassId));
             setFormImagePreview(null);
         }
-    }, [studentToEdit, open]);
+    }, [studentToEdit, open, defaultClassId, initialClassId, reset, setData]);
 
     const handleImageChange = (file: File | null) => {
         setData('face_image', file);

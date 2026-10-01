@@ -256,9 +256,9 @@ Terminalning veb paneliga kiring (`http://192.168.1.64` yoki mahalliy IP):
    - **Enable:** `[x]` Belgilang
    - **Server Address Type:** `IPv4`
    - **Server Address:** `193.180.213.188` (Serveringizning tashqi statik IP manzili)
-   - **Server Port:** `7660`
+   - **Server Port:** `7670` (SchoolDay uchun `7670`, PayDay uchun `7660`)
    - **Device ID:** SchoolDay admin panelida filial qurilmasi uchun kiritilgan ID (Masalan: `TERM_SCH_01`)
-   - **Device Key (Register Password):** Admin panelda kiritilgan kalit (Masalan: `Hik12345678`)
+   - **Device Key (Register Password):** Admin panelda kiritilgan kalit (yoki `.env` dagi `HIKVISION_DEFAULT_KEY`)
 3. **Save** tugmasini bosing.
 4. 10–20 soniya ichida terminal ekranida va panelda:
    - **Register Status:** `🟢 Online` holatiga o‘tadi.
@@ -269,12 +269,12 @@ Terminalning veb paneliga kiring (`http://192.168.1.64` yoki mahalliy IP):
 
 | Belgi | Ehtimoliy sabab | Qanday tuzatiladi |
 |---|---|---|
-| Terminalda Register Status: `Offline` | 7660 porti yopiq yoki router/provayderda bloklangan | `telnet SERVER_IP 7660` orqali terminal joylashgan tarmoqdan tekshiring. UFW da `ufw allow 7660/tcp` qilinganiga ishonch hosil qiling. |
-| Terminal `Offline`, serverda `Connection refused` | Daemon ishlamayapti | `sudo supervisorctl status hikvision-gateway` ni tekshiring, `/opt/hikvision-gateway/logs/supervisor_err.log` ni o‘qing. |
+| Terminalda Register Status: `Offline` | 7670 porti yopiq yoki router/provayderda bloklangan | `telnet SERVER_IP 7670` orqali terminal joylashgan tarmoqdan tekshiring. UFW da `ufw allow 7670/tcp` qilinganiga ishonch hosil qiling. |
+| Terminal `Offline`, serverda `Connection refused` | Daemon ishlamayapti | `sudo systemctl status hikvision-isup-schoolday` ni tekshiring, jurnalni o‘qing (`journalctl -u hikvision-isup-schoolday -f`). |
 | `Device ID invalid` xatosi | Terminaldagi Device ID panel bilan bir xil emas | Terminaldagi Device ID SchoolDay panelidagi filial qurilmasi `device_id` maydoni bilan harfma-harf bir xil bo‘lishi lozim. |
-| `Key error / 401 Unauthorized` | Shifrlash kaliti noto‘g‘ri | Terminaldagi Device Key panelda kiritilgan kalit bilan bir xil bo‘lishi kerak (standart: `SchoolDay142026`). |
+| `Key error / 401 Unauthorized` | Shifrlash kaliti noto‘g‘ri | Terminaldagi Device Key panelda kiritilgan kalit bilan bir xil bo‘lishi kerak (yoki `HIKVISION_DEFAULT_KEY`). |
 | Davomat kelyapti, lekin rasmlar ko‘rinmayapti | Rasmlar papkasiga ruxsat yetarli emas | `chmod -R 775 storage/app/public/hikvision` buyrug‘ini bering. |
-| Telegram xabarnomalari bormayapti | Queue worker ishlamayapti | `php artisan queue:work` ishga tushirilganligini yoki Supervisor workerini tekshiring (`sudo supervisorctl status schoolday-worker:*`). |
+| Telegram xabarnomalari bormayapti | Queue worker ishlamayapti | `php artisan queue:work` ishga tushirilganligini yoki systemd/Supervisor workerini tekshiring (`sudo systemctl status schoolday-worker`). |
 
 ---
 

@@ -53,7 +53,7 @@ export default function SchoolSettingModal({
                 timezone: school.school_setting?.timezone || 'Asia/Tashkent',
             });
         }
-    }, [school]);
+    }, [school, setData]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();

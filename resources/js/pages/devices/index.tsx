@@ -8,7 +8,6 @@ import {
     Building,
     BookOpen,
     Search,
-    RefreshCw,
     Pencil,
     Trash2,
     Check,
@@ -65,7 +64,6 @@ export default function DevicesPage({
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [copiedId, setCopiedId] = useState<number | null>(null);
-    const [syncingId, setSyncingId] = useState<number | null>(null);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
     const [deviceToEdit, setDeviceToEdit] = useState<BranchDevice | null>(null);
     const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
@@ -117,50 +115,6 @@ export default function DevicesPage({
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-    const handleSync = async (device: BranchDevice) => {
-        setSyncingId(device.id);
-        try {
-            const xsrfToken = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
-
-            const response = await fetch(`/branch_device/${device.id}/sync`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-XSRF-TOKEN': xsrfToken
-                        ? decodeURIComponent(xsrfToken)
-                        : '',
-                },
-            });
-
-            const data = await response.json();
-            if (response.ok && data.success !== false) {
-                const count = data.synced_count ?? 0;
-                toast.success(
-                    t(
-                        'sync_success',
-                        `ISUP hodisalar muvaffaqiyatli sinxronlandi (${count} ta)`,
-                    ),
-                );
-                router.reload({ only: ['devices'] });
-            } else {
-                toast.error(
-                    data.message ||
-                        t('sync_failed', 'Sinxronizatsiyada xatolik'),
-                );
-            }
-        } catch (err: any) {
-            toast.error(
-                err?.message || t('sync_failed', 'Sinxronizatsiyada xatolik'),
-            );
-        } finally {
-            setSyncingId(null);
-        }
-    };
 
     const handleDelete = (id: number) => {
         setDeleteDeviceId(id);
@@ -646,36 +600,6 @@ export default function DevicesPage({
 
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex items-center justify-end gap-1.5">
-                                                        {isIsup && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                disabled={
-                                                                    syncingId ===
-                                                                    item.id
-                                                                }
-                                                                onClick={() =>
-                                                                    handleSync(
-                                                                        item,
-                                                                    )
-                                                                }
-                                                                className="h-8 gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-foreground"
-                                                                title={t(
-                                                                    'sync_now',
-                                                                    'ISUP hodisalarini sinxronlash',
-                                                                )}
-                                                            >
-                                                                <RefreshCw
-                                                                    className={`h-3.5 w-3.5 ${syncingId === item.id ? 'animate-spin text-indigo-600' : ''}`}
-                                                                />
-                                                                <span className="hidden sm:inline">
-                                                                    {t(
-                                                                        'sync',
-                                                                        'Sinxron',
-                                                                    )}
-                                                                </span>
-                                                            </Button>
-                                                        )}
 
                                                         <Button
                                                             variant="ghost"

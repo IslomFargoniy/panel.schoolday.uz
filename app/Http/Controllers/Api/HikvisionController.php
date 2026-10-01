@@ -7,7 +7,6 @@ use App\Models\BranchDevice;
 use App\Models\HikvisionAccess;
 use App\Models\HikvisionAccessEvent;
 use App\Models\Student;
-use App\Services\Hikvision\HikvisionSyncService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -293,21 +292,5 @@ class HikvisionController extends Controller
         }
 
         return response()->json(['success' => true]);
-    }
-
-    /**
-     * Manually trigger ISUP event sync for a device
-     */
-    public function syncDeviceEvents(Request $request, BranchDevice $device, HikvisionSyncService $syncService)
-    {
-        $res = $syncService->syncEventsFromDevice($device);
-
-        if ($request->header('X-Inertia')) {
-            $count = $res['synced_count'] ?? 0;
-
-            return back()->with('success', "ISUP hodisalar muvaffaqiyatli sinxronlandi ({$count} ta)");
-        }
-
-        return response()->json($res);
     }
 }

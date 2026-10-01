@@ -77,7 +77,7 @@ export default function CreateBranchClassModal({
                 telegram_group_id: '',
             });
         }
-    }, [classToEdit, defaultShiftId, open]);
+    }, [classToEdit, defaultShiftId, open, initialShiftId, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

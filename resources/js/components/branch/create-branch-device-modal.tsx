@@ -106,7 +106,7 @@ export default function CreateBranchDeviceModal({
                 encryption_key: `SchoolDay${bId}2026`,
             });
         }
-    }, [deviceToEdit, open, branch?.id]);
+    }, [deviceToEdit, open, branch?.id, branches, setData]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

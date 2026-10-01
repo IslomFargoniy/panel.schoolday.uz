@@ -58,7 +58,7 @@ export default function UpdateSchoolModal({
                 status: school.status ?? 1,
             });
         }
-    }, [school]);
+    }, [school, setData]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();

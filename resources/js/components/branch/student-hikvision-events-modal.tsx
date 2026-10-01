@@ -55,7 +55,7 @@ export default function StudentHikvisionEventsModal({
     const [events, setEvents] = useState<HikvisionEventItem[]>([]);
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
-    const loadEvents = async () => {
+    const loadEvents = React.useCallback(async () => {
         if (!student) return;
         setLoading(true);
         try {
@@ -74,12 +74,12 @@ export default function StudentHikvisionEventsModal({
             } else {
                 setEvents([]);
             }
-        } catch (e) {
+        } catch {
             setEvents([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [student]);
 
     React.useEffect(() => {
         if (open && student) {
@@ -87,7 +87,7 @@ export default function StudentHikvisionEventsModal({
         } else {
             setEvents([]);
         }
-    }, [open, student?.id]);
+    }, [open, student, loadEvents]);
 
     if (!student) return null;
 

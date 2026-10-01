@@ -66,7 +66,7 @@ export default function CreateBranchShiftModal({
                 branch_id: String(branch.id),
             });
         }
-    }, [shiftToEdit, open, branch.id]);
+    }, [shiftToEdit, open, branch.id, setData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
