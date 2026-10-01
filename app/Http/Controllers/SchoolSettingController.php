@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSchoolSettingRequest;
 use App\Models\SchoolSetting;
 use Exception;
-use Illuminate\Validation\ValidationException;
 
 class SchoolSettingController extends Controller
 {
@@ -26,9 +25,7 @@ class SchoolSettingController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('SchoolSetting save error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('crud.error')],
-            ]);
+            return back()->with('error', ['key' => 'crud.school_settings_error']);
         }
     }
 }

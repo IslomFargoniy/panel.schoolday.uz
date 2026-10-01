@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserSchoolRequest;
 use App\Models\UserSchool;
 use Exception;
-use Illuminate\Validation\ValidationException;
 
 class UserSchoolController extends Controller
 {
@@ -21,9 +20,7 @@ class UserSchoolController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('UserSchool store error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('crud.error')],
-            ]);
+            return back()->with('error', ['key' => 'crud.user_school_attach_error']);
         }
     }
 
@@ -43,9 +40,7 @@ class UserSchoolController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('UserSchool destroy error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('Foydalanuvchini maktabdan ajratishda xatolik yuz berdi.')],
-            ]);
+            return back()->with('error', ['key' => 'crud.user_school_detach_error']);
         }
     }
 }

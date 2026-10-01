@@ -9,7 +9,6 @@ use App\Support\Tenant;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class SchoolController extends Controller
@@ -75,9 +74,7 @@ class SchoolController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('School create error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('crud.error')],
-            ]);
+            return back()->with('error', ['key' => 'crud.school_create_error']);
         }
     }
 
@@ -111,9 +108,7 @@ class SchoolController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('School update error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('crud.error')],
-            ]);
+            return back()->with('error', ['key' => 'crud.school_update_error']);
         }
     }
 

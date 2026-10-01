@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateBranchDeviceRequest;
 use App\Models\BranchDevice;
 use App\Support\Tenant;
 use Exception;
-use Illuminate\Validation\ValidationException;
 
 class BranchDeviceController extends Controller
 {
@@ -133,9 +132,7 @@ class BranchDeviceController extends Controller
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('BranchDevice destroy error: ' . $e->getMessage());
 
-            throw ValidationException::withMessages([
-                'error' => [__('crud.device_delete_error')],
-            ]);
+            return back()->with('error', ['key' => 'crud.device_delete_error']);
         }
     }
 }

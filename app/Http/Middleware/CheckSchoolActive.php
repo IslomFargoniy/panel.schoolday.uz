@@ -49,7 +49,8 @@ class CheckSchoolActive
             if (! $hasActive) {
                 if ($request->expectsJson() && ! $request->header('X-Inertia')) {
                     return response()->json([
-                        'message' => __('school_inactive_or_expired', 'Siz biriktirilgan maktablarning faoliyati to‘xtatilgan yoki muddati tugagan.'),
+                        'error' => 'school_inactive',
+                        'message' => 'school_inactive_or_expired',
                     ], 403);
                 }
 
