@@ -40,10 +40,10 @@ class TelegramService
         return ! empty($this->token) && $this->telegram !== null;
     }
 
-    public function setWebhook(string $url): void
+    public function setWebhook(string $url): bool
     {
-        if (empty($this->token)) {
-            return;
+        if (empty($this->token) || $this->telegram === null) {
+            return false;
         }
 
         try {
@@ -53,9 +53,11 @@ class TelegramService
                 $params['secret_token'] = $secret;
             }
 
-            $this->telegram->setWebhook($params);
+            return (bool) $this->telegram->setWebhook($params);
         } catch (Exception $e) {
             Log::error('Telegram setWebhook error: ' . $e->getMessage());
+
+            return false;
         }
     }
 

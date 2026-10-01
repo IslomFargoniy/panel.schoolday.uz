@@ -50,6 +50,8 @@
     "close": "Close"
   },
   "settings": {
+    "telegram_secret_missing": "Bot token saved, but TELEGRAM_WEBHOOK_SECRET is not set in .env. The webhook was not registered.",
+    "telegram_webhook_failed": "Bot token saved, but registering the Telegram webhook failed. Check the token and the server's HTTPS URL.",
     "profile": "Profile",
     "password": "Password",
     "system": "System Settings",

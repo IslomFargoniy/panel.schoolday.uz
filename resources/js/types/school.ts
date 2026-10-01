@@ -6,7 +6,6 @@ export interface SchoolSetting {
     school_id: number;
     webhook_url?: string | null;
     sms_sender?: string | null;
-    telegram_bot_token?: string | null;
     telegram_channel_id?: string | null;
     timezone?: string;
     created_at?: string;

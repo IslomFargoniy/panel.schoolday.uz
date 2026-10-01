@@ -50,6 +50,8 @@
     "close": "Yopish"
   },
   "settings": {
+    "telegram_secret_missing": "Bot tokeni saqlandi, lekin TELEGRAM_WEBHOOK_SECRET .env faylida sozlanmagan. Webhook o‘rnatilmadi.",
+    "telegram_webhook_failed": "Bot tokeni saqlandi, lekin Telegram webhook o‘rnatilmadi. Tokenni va serverning HTTPS manzilini tekshiring.",
     "profile": "Profil",
     "password": "Parol",
     "system": "Tizim sozlamalari",

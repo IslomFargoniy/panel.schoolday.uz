@@ -35,7 +35,6 @@ export default function SchoolSettingModal({
         school_id: 0,
         webhook_url: '',
         sms_sender: '',
-        telegram_bot_token: '',
         telegram_channel_id: '',
         timezone: 'Asia/Tashkent',
     });
@@ -46,8 +45,6 @@ export default function SchoolSettingModal({
                 school_id: school.id,
                 webhook_url: school.school_setting?.webhook_url || '',
                 sms_sender: school.school_setting?.sms_sender || '',
-                telegram_bot_token:
-                    school.school_setting?.telegram_bot_token || '',
                 telegram_channel_id:
                     school.school_setting?.telegram_channel_id || '',
                 timezone: school.school_setting?.timezone || 'Asia/Tashkent',
@@ -120,25 +117,6 @@ export default function SchoolSettingModal({
                             className="h-9.5 rounded-xl text-xs sm:text-sm"
                         />
                         <InputError message={errors.sms_sender} />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label
-                            htmlFor="telegram_bot_token"
-                            className="text-xs font-medium text-foreground"
-                        >
-                            {t('telegram_bot_token', 'Telegram Bot Token')}
-                        </Label>
-                        <Input
-                            id="telegram_bot_token"
-                            value={data.telegram_bot_token}
-                            onChange={(e) =>
-                                setData('telegram_bot_token', e.target.value)
-                            }
-                            placeholder="123456789:ABCdefGhIJKlmNoP..."
-                            className="h-9.5 rounded-xl font-mono text-xs sm:text-sm"
-                        />
-                        <InputError message={errors.telegram_bot_token} />
                     </div>
 
                     <div className="space-y-1.5">

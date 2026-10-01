@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Services\Telegram\TelegramService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -33,11 +34,16 @@ class SettingController extends Controller
         }
 
         if (! empty($validated['telegram_bot_token'])) {
-            $service = new \App\Services\Telegram\TelegramService;
-            // Assuming your application uses https
+            if (empty(config('services.telegram.webhook_secret'))) {
+                // The webhook endpoint rejects every request without a secret, so do not register it
+                return redirect()->back()->with('error', ['key' => 'settings.telegram_secret_missing']);
+            }
+
             $url = url('/api/telegram/webhook');
             if (str_starts_with($url, 'https')) {
-                $service->setWebhook($url);
+                if (! app(TelegramService::class)->setWebhook($url)) {
+                    return redirect()->back()->with('error', ['key' => 'settings.telegram_webhook_failed']);
+                }
             }
         }
 

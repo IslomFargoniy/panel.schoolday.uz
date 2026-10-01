@@ -191,7 +191,7 @@ test('SendTelegramNotificationJob escapes HTML characters in student, class, bra
     expect($capturedMessage)->toContain('9-&quot;B&quot; &lt;Maxsus&gt;');
 });
 
-test('SendTelegramNotificationJob uses school bot token if configured on school_settings', function () {
+test('SendTelegramNotificationJob always uses the injected global bot even if a school token is stored', function () {
     SchoolSetting::create([
         'school_id' => $this->school->id,
         'telegram_bot_token' => 'school-custom-bot-token-12345',
@@ -215,7 +215,8 @@ test('SendTelegramNotificationJob uses school bot token if configured on school_
     ]);
 
     $defaultMock = Mockery::mock(TelegramService::class);
-    $defaultMock->shouldNotReceive('hasToken'); // Should NOT use the default service
+    // The global bot is the only one parents are linked to, so it must always be used
+    $defaultMock->shouldReceive('hasToken')->once()->andReturn(false);
 
     $job = new SendTelegramNotificationJob(
         $student,
@@ -224,8 +225,5 @@ test('SendTelegramNotificationJob uses school bot token if configured on school_
         '2026-09-29 08:30:00'
     );
 
-    // The job creates a new TelegramService with 'school-custom-bot-token-12345'
-    // Since mock token can't connect to telegram, it fails gracefully without throwing
     $job->handle($defaultMock);
-    expect(true)->toBeTrue();
 });

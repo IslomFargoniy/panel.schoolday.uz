@@ -50,6 +50,8 @@
     "close": "Закрыть"
   },
   "settings": {
+    "telegram_secret_missing": "Токен бота сохранён, но TELEGRAM_WEBHOOK_SECRET не задан в .env. Webhook не установлен.",
+    "telegram_webhook_failed": "Токен бота сохранён, но установить Telegram webhook не удалось. Проверьте токен и HTTPS-адрес сервера.",
     "profile": "Профиль",
     "password": "Пароль",
     "system": "Настройки системы",

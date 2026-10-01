@@ -47,16 +47,11 @@ class SendTelegramNotificationJob implements ShouldQueue
      */
     public function handle(TelegramService $telegramService): void
     {
-        $this->student->loadMissing(['schoolClass.shift.branch.school.school_setting']);
-
-        $schoolToken = $this->student->schoolClass?->shift?->branch?->school?->school_setting?->telegram_bot_token;
-        if (! empty($schoolToken)) {
-            $telegramService = new TelegramService($schoolToken);
-        }
-
         if (! $telegramService->hasToken()) {
             return;
         }
+
+        $this->student->loadMissing(['schoolClass.shift.branch']);
 
         $groupId = $this->student->schoolClass?->telegram_group_id ?? null;
         if (! $this->student->telegram_id && ! $groupId) {
