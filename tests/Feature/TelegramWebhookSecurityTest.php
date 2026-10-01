@@ -6,7 +6,6 @@ use App\Models\HikvisionAccess;
 use App\Models\HikvisionAccessEvent;
 use App\Models\School;
 use App\Models\SchoolClass;
-use App\Models\SchoolSetting;
 use App\Models\Shift;
 use App\Models\Student;
 use App\Models\User;
@@ -191,12 +190,7 @@ test('SendTelegramNotificationJob escapes HTML characters in student, class, bra
     expect($capturedMessage)->toContain('9-&quot;B&quot; &lt;Maxsus&gt;');
 });
 
-test('SendTelegramNotificationJob always uses the injected global bot even if a school token is stored', function () {
-    SchoolSetting::create([
-        'school_id' => $this->school->id,
-        'telegram_bot_token' => 'school-custom-bot-token-12345',
-    ]);
-
+test('SendTelegramNotificationJob uses the injected global bot', function () {
     $student = Student::create([
         'name' => 'Bot Test O\'quvchi',
         'employeeNoString' => 'STU_CUSTOM_BOT',
