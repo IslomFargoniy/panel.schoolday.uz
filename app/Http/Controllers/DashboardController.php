@@ -16,6 +16,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $today = Carbon::today()->toDateString();
         $schoolId = $request->input('school_id');
         $branchId = $request->input('branch_id');
@@ -26,14 +27,14 @@ class DashboardController extends Controller
 
         // Multi-tenant check
         if (! Tenant::isGlobalAdmin()) {
-            $studentQuery->whereHas('schoolClass.shift.branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $studentQuery->whereHas('schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
-            $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $attendanceQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
-            $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $eventQuery->whereHas('student.schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
         }
 
@@ -109,8 +110,8 @@ class DashboardController extends Controller
         $branchesQuery = Branch::query();
 
         if (! Tenant::isGlobalAdmin()) {
-            $schoolsQuery->whereIn('id', Tenant::schoolIds());
-            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $schoolsQuery->whereIn('id', $schoolIds);
+            $branchesQuery->whereIn('school_id', $schoolIds);
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();

@@ -18,6 +18,7 @@ class SchoolController extends Controller
      */
     public function index(Request $request)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $per_page = $request->input('per_page', 15);
 
         $query = School::with([
@@ -40,7 +41,7 @@ class SchoolController extends Controller
         }
 
         if (! Tenant::isGlobalAdmin()) {
-            $query->whereIn('id', Tenant::schoolIds());
+            $query->whereIn('id', $schoolIds);
         }
 
         $schools = $query->paginate($per_page);

@@ -13,6 +13,7 @@ class BranchController extends Controller
 {
     public function index(Request $request)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $perPage = $request->input('per_page', '20');
         $limit = $perPage === 'all' ? 100000 : (int) $perPage;
 
@@ -61,7 +62,7 @@ class BranchController extends Controller
 
         // Multi-tenant check: non-admins only see branches of their schools
         if (! Tenant::isGlobalAdmin()) {
-            $query->whereIn('school_id', Tenant::schoolIds());
+            $query->whereIn('school_id', $schoolIds);
         }
 
         $branches = $query->latest()
@@ -81,7 +82,7 @@ class BranchController extends Controller
         // List schools accessible to user
         $schoolsQuery = School::query();
         if (! Tenant::isGlobalAdmin()) {
-            $schoolsQuery->whereIn('id', Tenant::schoolIds());
+            $schoolsQuery->whereIn('id', $schoolIds);
         }
         $schools = $schoolsQuery->select('id', 'name', 'branch_limit')->get();
 

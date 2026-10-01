@@ -14,12 +14,13 @@ class MonitoringController extends Controller
 {
     public function index()
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $schoolsQuery = School::select('id', 'name');
         $branchesQuery = Branch::select('id', 'name', 'school_id');
 
         if (! Tenant::isGlobalAdmin()) {
-            $schoolsQuery->whereIn('id', Tenant::schoolIds());
-            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $schoolsQuery->whereIn('id', $schoolIds);
+            $branchesQuery->whereIn('school_id', $schoolIds);
         }
 
         return Inertia::render('monitoring', [
@@ -30,6 +31,7 @@ class MonitoringController extends Controller
 
     public function data(): JsonResponse
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $today = Carbon::today()->toDateString();
 
         // Get all student IDs that have attendance today
@@ -40,7 +42,7 @@ class MonitoringController extends Controller
         $branchesQuery = Branch::query();
 
         if (! Tenant::isGlobalAdmin()) {
-            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $branchesQuery->whereIn('school_id', $schoolIds);
         }
 
         if (request()->filled('school_id')) {

@@ -15,6 +15,7 @@ class BranchDeviceController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $perPage = $request->input('per_page', '20');
         $limit = $perPage === 'all' ? 100000 : (int) $perPage;
 
@@ -22,8 +23,8 @@ class BranchDeviceController extends Controller
 
         // Multi-tenant check
         if (! Tenant::isGlobalAdmin()) {
-            $query->whereHas('branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $query->whereHas('branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
         }
 
@@ -62,8 +63,8 @@ class BranchDeviceController extends Controller
         $branchesQuery = \App\Models\Branch::with('school');
 
         if (! Tenant::isGlobalAdmin()) {
-            $schoolsQuery->whereIn('id', Tenant::schoolIds());
-            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
+            $schoolsQuery->whereIn('id', $schoolIds);
+            $branchesQuery->whereIn('school_id', $schoolIds);
         }
 
         $schools = $schoolsQuery->select('id', 'name')->get();

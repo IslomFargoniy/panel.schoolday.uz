@@ -17,6 +17,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $filters = $this->getFilters($request);
         $paginated = $this->getAttendanceData($filters, true);
 
@@ -28,16 +29,16 @@ class ReportController extends Controller
         $studentsQuery = Student::where('status', 'active');
 
         if (! Tenant::isGlobalAdmin()) {
-            $schoolsQuery->whereIn('id', Tenant::schoolIds());
-            $branchesQuery->whereIn('school_id', Tenant::schoolIds());
-            $shiftsQuery->whereHas('branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $schoolsQuery->whereIn('id', $schoolIds);
+            $branchesQuery->whereIn('school_id', $schoolIds);
+            $shiftsQuery->whereHas('branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
-            $classesQuery->whereHas('shift.branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $classesQuery->whereHas('shift.branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
-            $studentsQuery->whereHas('schoolClass.shift.branch', function ($b) {
-                $b->whereIn('school_id', Tenant::schoolIds());
+            $studentsQuery->whereHas('schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                $b->whereIn('school_id', $schoolIds);
             });
         }
 
@@ -86,6 +87,7 @@ class ReportController extends Controller
 
     private function getAttendanceData(array $filters, $paginate = true)
     {
+        $schoolIds = Tenant::isGlobalAdmin() ? collect() : Tenant::schoolIds();
         $perPage = $filters['per_page'];
         $limit = $perPage === 'all' ? 100000 : (int) $perPage;
         $startDate = $filters['start_date'];
@@ -118,7 +120,7 @@ class ReportController extends Controller
 
             if (! Tenant::isGlobalAdmin()) {
                 $activeDatesQuery->join('branches', 'shifts.branch_id', '=', 'branches.id')
-                    ->whereIn('branches.school_id', Tenant::schoolIds());
+                    ->whereIn('branches.school_id', $schoolIds);
             }
 
             if ($schoolId) {
@@ -147,8 +149,8 @@ class ReportController extends Controller
                 ->with(['schoolClass.shift.branch.school']);
 
             if (! Tenant::isGlobalAdmin()) {
-                $studentQuery->whereHas('schoolClass.shift.branch', function ($b) {
-                    $b->whereIn('school_id', Tenant::schoolIds());
+                $studentQuery->whereHas('schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                    $b->whereIn('school_id', $schoolIds);
                 });
             }
 
@@ -249,8 +251,8 @@ class ReportController extends Controller
 
             // Multi-tenant check
             if (! Tenant::isGlobalAdmin()) {
-                $query->whereHas('student.schoolClass.shift.branch', function ($b) {
-                    $b->whereIn('school_id', Tenant::schoolIds());
+                $query->whereHas('student.schoolClass.shift.branch', function ($b) use ($schoolIds) {
+                    $b->whereIn('school_id', $schoolIds);
                 });
             }
 
