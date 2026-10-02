@@ -135,8 +135,18 @@ class HikvisionController extends Controller
             // --- 4. Find the matching student --------------------------------
             $employeeNo = $accessEventData->employeeNoString ?? null;
 
+            // Hodisa vaqti (qurilma vaqti). Debounce va dublikat tekshiruvi shu vaqtga bog'liq.
+            $payloadHasDateTime = isset($eventData->dateTime);
+            $eventDateTime = $payloadHasDateTime
+                ? Carbon::parse($eventData->dateTime)->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s')
+                : now()->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s');
+
             if ($employeeNo) {
-                $lockKey = 'hikvision_debounce_' . $employeeNo;
+                // Debounce faqat BIR XIL hodisaning qayta yuborilishini (retry) to'sadi.
+                // Internet tiklanganda qurilma bir o'quvchining turli vaqtdagi hodisalarini 1-2 soniya oralig'ida yuboradi,
+                // ular yo'qolmasligi kerak. Payloadda vaqt bo'lmasa eski xatti-harakat (o'quvchi bo'yicha 10 soniya) saqlanadi.
+                $lockKey = 'hikvision_debounce_' . $branchDevice->id . '_' . $employeeNo
+                    . ($payloadHasDateTime ? '_' . $eventDateTime : '');
                 if (! Cache::add($lockKey, true, 10)) {
                     Log::info("Hikvision: ignored duplicate event for employee {$employeeNo}");
 
@@ -163,6 +173,29 @@ class HikvisionController extends Controller
                 return response()->json(['success' => false, 'reason' => 'student_branch_mismatch'], 200);
             }
 
+            // --- 4b. Persistent duplicate check (employeeNo + dateTime) ------
+            // Hodisa bazada allaqachon bor (masalan ISUP sync yozgan yoki qurilma qayta yuborgan): ikkinchi marta yozilmaydi,
+            // davomat va Telegram xabari takrorlanmaydi.
+            if ($payloadHasDateTime) {
+                $existingEvent = HikvisionAccessEvent::where('employeeNoString', $employeeNo)
+                    ->whereHas('access', fn ($q) => $q->where('dateTime', $eventDateTime))
+                    ->first();
+
+                if ($existingEvent) {
+                    // Mavjud hodisada rasm yo'q bo'lsa, callback olib kelgan rasmni biriktiramiz
+                    if (empty($existingEvent->picture) && $request->hasFile('Picture')) {
+                        $picture = $request->file('Picture');
+                        $rawSerial = (string) ($eventData->shortSerialNumber ?? $branchDevice->device_id ?? 'unknown');
+                        $folder = preg_replace('/[^A-Za-z0-9_-]/', '', $rawSerial) ?: 'unknown';
+                        $extension = $picture->guessExtension() ?: 'jpg';
+                        $existingEvent->picture = $picture->storeAs("hikvision/{$folder}", Str::uuid() . '.' . $extension, 'public');
+                        $existingEvent->saveQuietly();
+                    }
+
+                    return response()->json(['success' => true, 'reason' => 'duplicate_existing']);
+                }
+            }
+
             // --- 5. Save uploaded face photo (ONLY after student is verified) -
             $filename = '';
             if ($request->hasFile('Picture')) {
@@ -177,10 +210,6 @@ class HikvisionController extends Controller
             }
 
             // --- 6. Persist HikvisionAccess (device-level row) ---------------
-            $eventDateTime = isset($eventData->dateTime)
-                ? Carbon::parse($eventData->dateTime)->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s')
-                : now()->setTimezone(config('app.timezone', 'Asia/Tashkent'))->format('Y-m-d H:i:s');
-
             $hikvisionAccess = HikvisionAccess::create([
                 'ipAddress' => $eventData->ipAddress ?? null,
                 'portNo' => $eventData->portNo ?? null,
