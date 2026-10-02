@@ -216,52 +216,52 @@ test('check-out only record gets its arrival from an earlier status-less event',
 
 test('stale event arriving via callback updates attendance but does not notify parents', function () {
     Queue::fake();
-    \Carbon\Carbon::setTestNow('2026-09-30 09:00:00');
+    Carbon\Carbon::setTestNow('2026-09-30 09:00:00');
 
     postHikvisionEvent($this, '2026-09-29T08:10:00+05:00', 'checkIn')->assertOk()->assertJson(['success' => true]);
 
     expect(attendanceFor($this->student, '2026-09-29'))->not->toBeNull();
     Queue::assertNotPushed(SendTelegramNotificationJob::class);
 
-    \Carbon\Carbon::setTestNow();
+    Carbon\Carbon::setTestNow();
 });
 
 test('fresh event via callback still notifies parents', function () {
     Queue::fake();
-    \Carbon\Carbon::setTestNow('2026-09-29 08:12:00');
+    Carbon\Carbon::setTestNow('2026-09-29 08:12:00');
 
     postHikvisionEvent($this, '2026-09-29T08:10:00+05:00', 'checkIn')->assertOk();
 
     Queue::assertPushed(SendTelegramNotificationJob::class, 1);
-    \Carbon\Carbon::setTestNow();
+    Carbon\Carbon::setTestNow();
 });
 
 test('notify_max_delay_minutes = 0 disables the stale-event filter', function () {
     Queue::fake();
     config(['hikvision.notify_max_delay_minutes' => 0]);
-    \Carbon\Carbon::setTestNow('2026-09-30 09:00:00');
+    Carbon\Carbon::setTestNow('2026-09-30 09:00:00');
 
     postHikvisionEvent($this, '2026-09-29T08:10:00+05:00', 'checkIn')->assertOk();
 
     Queue::assertPushed(SendTelegramNotificationJob::class, 1);
-    \Carbon\Carbon::setTestNow();
+    Carbon\Carbon::setTestNow();
 });
 
 test('unchanged record (re-scan, older check-out) does not send a notification', function () {
     Queue::fake();
 
-    \Carbon\Carbon::setTestNow('2026-09-29 08:06:00');
+    Carbon\Carbon::setTestNow('2026-09-29 08:06:00');
     scanEvent($this->student, '2026-09-29 08:05:00', 'checkIn');
-    \Carbon\Carbon::setTestNow('2026-09-29 13:11:00');
+    Carbon\Carbon::setTestNow('2026-09-29 13:11:00');
     scanEvent($this->student, '2026-09-29 13:10:00', 'checkOut');
     Queue::assertPushed(SendTelegramNotificationJob::class, 2);
 
     Queue::fake();
-    \Carbon\Carbon::setTestNow('2026-09-29 13:12:00');
+    Carbon\Carbon::setTestNow('2026-09-29 13:12:00');
     scanEvent($this->student, '2026-09-29 13:11:30', 'checkOut'); // 15 daqiqa ichida takroriy chiqish
     scanEvent($this->student, '2026-09-29 11:00:00', 'checkOut'); // eski chiqish: yozuv o'zgarmaydi
     scanEvent($this->student, '2026-09-29 09:00:00', 'checkIn');  // qayta skan: o'zgarmaydi
     Queue::assertNotPushed(SendTelegramNotificationJob::class);
 
-    \Carbon\Carbon::setTestNow();
+    Carbon\Carbon::setTestNow();
 });

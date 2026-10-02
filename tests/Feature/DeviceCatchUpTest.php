@@ -143,7 +143,7 @@ test('catch-up syncs events but never notifies parents about stale events', func
 
     expect(HikvisionAccessEvent::where('employeeNoString', 'E-1')->count())->toBe(1);
     Queue::assertNotPushed(SendTelegramNotificationJob::class);
-    expect(\App\Models\DailyAttendance::where('student_id', $this->student->id)->where('date', '2026-10-01')->exists())->toBeTrue();
+    expect(App\Models\DailyAttendance::where('student_id', $this->student->id)->where('date', '2026-10-01')->exists())->toBeTrue();
 });
 
 test('catch-up job splits a long gap into day windows and keeps timeout below queue retry_after', function () {

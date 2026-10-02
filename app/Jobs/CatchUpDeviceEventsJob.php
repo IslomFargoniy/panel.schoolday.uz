@@ -36,8 +36,7 @@ class CatchUpDeviceEventsJob implements ShouldQueue
         public string $offlineSince,
         public ?string $resumeFrom = null,
         public int $syncedSoFar = 0,
-    ) {
-    }
+    ) {}
 
     /**
      * Oldingi last_seen_at bilan hozirgi vaqt orasida katta bo'shliq bo'lsa, catch-up job'ni navbatga qo'yadi.
