@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\BranchDevice;
+use App\Services\Telegram\AdminLog;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -135,9 +136,8 @@ class HikvisionHealthcheckCommand extends Command
                 $isCurrentlyOnline = in_array($dev->device_id, $onlineDeviceIds);
                 if ($isCurrentlyOnline) {
                     $wasOffline = ! $dev->is_online;
-                    $dev->is_online = true;
-                    $dev->last_seen_at = now();
-                    $dev->save();
+                    $dev->markSeen(); // uzoq aloqasiz qolgan bo'lsa, catch-up sync navbatga qo'yiladi
+                    Cache::forget("hikvision_device_down_alert:{$dev->id}");
 
                     if ($wasOffline) {
                         $this->line("Device status updated: {$dev->device_id} is now ONLINE 🟢");
@@ -149,6 +149,14 @@ class HikvisionHealthcheckCommand extends Command
                         $dev->save();
                         $this->line("Device status updated: {$dev->device_id} is now OFFLINE 🔴");
                         Log::info('BranchDevice status changed to OFFLINE', ['device_id' => $dev->device_id]);
+                    }
+
+                    // Uzoq (catchup_gap_minutes) offline bo'lsa, adminga bir martalik ogohlantirish (qayta ulanganda kalit tozalanadi)
+                    $gapMinutes = (int) config('hikvision.catchup_gap_minutes', 30);
+                    if ($gapMinutes > 0 && $dev->last_seen_at && $dev->last_seen_at->diffInMinutes(now()) >= $gapMinutes
+                        && Cache::add("hikvision_device_down_alert:{$dev->id}", 1, now()->addDays(30))) {
+                        $branch = e($dev->branch?->name ?? ('#' . $dev->branch_id));
+                        AdminLog::send("🔴 <b>[QURILMA OFFLINE]</b>\n{$branch} (" . e($dev->device_id) . ")\nOxirgi aloqa: " . $dev->last_seen_at->format('Y-m-d H:i'));
                     }
                 }
             }

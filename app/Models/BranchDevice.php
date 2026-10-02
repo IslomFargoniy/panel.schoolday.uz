@@ -39,4 +39,19 @@ class BranchDevice extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+
+    /**
+     * Qurilma aloqada ekanini belgilaydi. ISUP qurilma uzoq vaqt aloqasiz bo'lib qaytgan bo'lsa,
+     * offline davridagi hodisalarni to'ldirish uchun catch-up job navbatga qo'yiladi.
+     */
+    public function markSeen(): void
+    {
+        $previousSeen = $this->last_seen_at ? \Carbon\Carbon::instance($this->last_seen_at) : null;
+
+        $this->is_online = true;
+        $this->last_seen_at = now();
+        $this->save();
+
+        \App\Jobs\CatchUpDeviceEventsJob::dispatchIfGap($this, $previousSeen);
+    }
 }

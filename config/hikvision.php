@@ -33,6 +33,12 @@ return [
     // Davomat baribir yangilanadi. 0 — o'chirish (doim yuboriladi).
     'notify_max_delay_minutes' => (int) env('HIKVISION_NOTIFY_MAX_DELAY_MINUTES', 10),
 
+    // ISUP qurilma shuncha daqiqadan ko'p aloqasiz bo'lib qayta ulansa, offline davri qurilmadan qayta sinxronlanadi. 0 — o'chirish.
+    'catchup_gap_minutes' => (int) env('HIKVISION_CATCHUP_GAP_MINUTES', 30),
+
+    // Catch-up sinxronlash eng ko'pi bilan shuncha kun orqaga qaraydi.
+    'catchup_max_age_days' => (int) env('HIKVISION_CATCHUP_MAX_AGE_DAYS', 45),
+
     /*
     |--------------------------------------------------------------------------
     | Self-healing restart command

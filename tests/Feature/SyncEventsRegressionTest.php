@@ -31,8 +31,8 @@ function syncFixture(): array
     $studentA = Student::create(['name' => 'Ali', 'employeeNoString' => 'S-A', 'class_id' => $class->id, 'status' => 'active']);
     $studentB = Student::create(['name' => 'Vali', 'employeeNoString' => 'S-B', 'class_id' => $class->id, 'status' => 'active']);
 
-    $deviceA = BranchDevice::create(['branch_id' => $branch->id, 'name' => 'A', 'device_id' => 'DEV_A', 'connection_type' => 'isup', 'status' => true]);
-    $deviceB = BranchDevice::create(['branch_id' => $branch->id, 'name' => 'B', 'device_id' => 'DEV_B', 'connection_type' => 'isup', 'status' => true]);
+    $deviceA = BranchDevice::create(['branch_id' => $branch->id, 'name' => 'A', 'device_id' => 'DEV_A', 'connection_type' => 'isup', 'status' => true, 'is_online' => true]);
+    $deviceB = BranchDevice::create(['branch_id' => $branch->id, 'name' => 'B', 'device_id' => 'DEV_B', 'connection_type' => 'isup', 'status' => true, 'is_online' => true]);
 
     return compact('studentA', 'studentB', 'deviceA', 'deviceB');
 }

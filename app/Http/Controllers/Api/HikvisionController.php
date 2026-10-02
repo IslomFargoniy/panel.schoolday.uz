@@ -120,10 +120,7 @@ class HikvisionController extends Controller
                 return response()->json(['success' => false, 'reason' => 'school_inactive'], 200);
             }
 
-            $branchDevice->update([
-                'is_online' => true,
-                'last_seen_at' => now(),
-            ]);
+            $branchDevice->markSeen();
 
             // --- 3. We only care about AccessControllerEvent type -----------
             $accessEventData = $eventData->AccessControllerEvent ?? null;
@@ -320,10 +317,13 @@ class HikvisionController extends Controller
             $device = BranchDevice::where('device_id', $deviceId)->first();
             if ($device) {
                 $isOnline = in_array($status, ['online', true, 1, '1'], true);
-                $device->update([
-                    'is_online' => $isOnline,
-                    'last_seen_at' => now(),
-                ]);
+                if ($isOnline) {
+                    // last_seen_at = qurilma oxirgi marta onlayn bo'lgan vaqt (offline signali uni yangilamaydi,
+                    // aks holda uzilish davomiyligini aniqlab bo'lmaydi). Uzoq uzilishdan keyin catch-up sync ishga tushadi.
+                    $device->markSeen();
+                } else {
+                    $device->update(['is_online' => false]);
+                }
             }
         }
 
