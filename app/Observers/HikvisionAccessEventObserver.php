@@ -153,7 +153,8 @@ class HikvisionAccessEventObserver
                         $updates['start_time'] = $attendance->start_time ?: $startHm;
                         $updates['end_time'] = $attendance->end_time ?: $endHm;
                         $statusToNotify = $leftStatus($updates['is_left_early']);
-                    } else {
+                    } elseif ((bool) $attendance->is_late !== $updates['is_late']) {
+                        // Faqat kechikish holati o'zgarsa xabar beriladi (takroriy kirish skani ikkinchi xabar yubormaydi)
                         $statusToNotify = $lateStatus($updates['is_late']);
                     }
 

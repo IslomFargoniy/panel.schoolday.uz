@@ -265,3 +265,16 @@ test('unchanged record (re-scan, older check-out) does not send a notification',
 
     Carbon\Carbon::setTestNow();
 });
+
+test('out-of-order duplicate entrance scan does not send a second arrival notification', function () {
+    Queue::fake();
+    Carbon\Carbon::setTestNow('2026-09-29 07:59:00');
+
+    scanEvent($this->student, '2026-09-29 07:58:00'); // birinchi yetib kelgan
+    scanEvent($this->student, '2026-09-29 07:55:00'); // ertaroq, 3 daqiqa farq, kechikish holati o'zgarmaydi
+
+    expect(attendanceFor($this->student, '2026-09-29')->first_check_in->format('H:i'))->toBe('07:55');
+    Queue::assertPushed(SendTelegramNotificationJob::class, 1);
+
+    Carbon\Carbon::setTestNow();
+});
