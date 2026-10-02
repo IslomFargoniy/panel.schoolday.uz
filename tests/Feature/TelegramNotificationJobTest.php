@@ -9,9 +9,12 @@ use App\Models\SchoolClass;
 use App\Models\Shift;
 use App\Models\Student;
 use App\Services\Telegram\TelegramService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
+    // Hodisalar 2026-09-29 08:15 da: "yangi hodisa" bo'lishi uchun joriy vaqt shu kunga muzlatiladi (eskirgan hodisalar uchun xabar yuborilmaydi)
+    Carbon::setTestNow('2026-09-29 08:20:00');
     $this->branch = Branch::create(['name' => 'Main Branch']);
     $this->shift = Shift::create([
         'name' => 'Morning Shift',
@@ -31,6 +34,10 @@ beforeEach(function () {
         'telegram_id' => '987654321',
         'status' => 'active',
     ]);
+});
+
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
 test('hikvision access event dispatches SendTelegramNotificationJob', function () {

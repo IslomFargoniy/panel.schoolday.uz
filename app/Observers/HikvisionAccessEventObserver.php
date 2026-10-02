@@ -7,7 +7,9 @@ use App\Models\DailyAttendance;
 use App\Models\HikvisionAccessEvent;
 use App\Models\Student;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class HikvisionAccessEventObserver
 {
@@ -47,6 +49,15 @@ class HikvisionAccessEventObserver
             $shiftEndTime,
             &$statusToNotify
         ) {
+            $shift = $student->schoolClass->shift;
+            $startHm = Carbon::parse($shift->start_time)->format('H:i');
+            $endHm = Carbon::parse($shift->end_time)->format('H:i');
+
+            $isLateAt = fn (CarbonInterface $t) => $t->greaterThan($shiftStartTime);
+            $isLeftEarlyAt = fn (CarbonInterface $t) => $t->lessThan($shiftEndTime);
+            $lateStatus = fn (bool $late) => $late ? '🔴 <b>Kechikdi</b>' : '🔵 <b>Vaqtida keldi</b>';
+            $leftStatus = fn (bool $early) => $early ? '🔴 <b>Vaqtli ketdi</b>' : '🟢 <b>Darsdan so‘ng ketdi</b>';
+
             $attendance = DailyAttendance::where('student_id', $student->id)
                 ->where('date', $date)
                 ->lockForUpdate()
@@ -59,7 +70,7 @@ class HikvisionAccessEventObserver
             if (! $attendance) {
                 if ($isExplicitCheckOut) {
                     // Out-of-order check-out without prior check-in
-                    $isLeftEarly = $now->lessThan($shiftEndTime);
+                    $isLeftEarly = $isLeftEarlyAt($now);
 
                     DailyAttendance::create([
                         'student_id' => $student->id,
@@ -68,14 +79,14 @@ class HikvisionAccessEventObserver
                         'last_check_out' => $now,
                         'is_late' => false,
                         'is_left_early' => $isLeftEarly,
-                        'start_time' => Carbon::parse($student->schoolClass->shift->start_time)->format('H:i'),
-                        'end_time' => Carbon::parse($student->schoolClass->shift->end_time)->format('H:i'),
+                        'start_time' => $startHm,
+                        'end_time' => $endHm,
                     ]);
 
-                    $statusToNotify = $isLeftEarly ? '🔴 <b>Vaqtli ketdi</b>' : '🟢 <b>Darsdan so‘ng ketdi</b>';
+                    $statusToNotify = $leftStatus($isLeftEarly);
                 } else {
                     // First check-in of the day
-                    $isLate = $now->greaterThan($shiftStartTime);
+                    $isLate = $isLateAt($now);
 
                     DailyAttendance::create([
                         'student_id' => $student->id,
@@ -84,88 +95,120 @@ class HikvisionAccessEventObserver
                         'last_check_out' => null,
                         'is_late' => $isLate,
                         'is_left_early' => false,
-                        'start_time' => Carbon::parse($student->schoolClass->shift->start_time)->format('H:i'),
-                        'end_time' => Carbon::parse($student->schoolClass->shift->end_time)->format('H:i'),
+                        'start_time' => $startHm,
+                        'end_time' => $endHm,
                     ]);
 
-                    $statusToNotify = $isLate ? '🔴 <b>Kechikdi</b>' : '🔵 <b>Vaqtida keldi</b>';
+                    $statusToNotify = $lateStatus($isLate);
                 }
-            } else {
-                if ($isExplicitCheckIn) {
-                    // Re-scan at entrance turnstile: do not treat as check-out
-                    if ($attendance->first_check_in === null) {
-                        $isLate = $now->greaterThan($shiftStartTime);
-                        $attendance->update([
-                            'first_check_in' => $now,
-                            'is_late' => $isLate,
-                        ]);
-                        $statusToNotify = $isLate ? '🔴 <b>Kechikdi</b>' : '🔵 <b>Vaqtida keldi</b>';
+
+                return;
+            }
+
+            // Hodisalar kechikib / tartibsiz kelishi mumkin (internet uzilishi): yozuv kelish tartibiga emas,
+            // hodisa vaqtiga bog'liq bo'lishi kerak — first_check_in doim eng erta, last_check_out doim eng kech vaqt.
+            $first = $attendance->first_check_in;
+            $last = $attendance->last_check_out;
+            $treatAsCheckOut = $isExplicitCheckOut;
+
+            if ($isExplicitCheckIn) {
+                if ($first === null) {
+                    $isLate = $isLateAt($now);
+                    $attendance->update(['first_check_in' => $now, 'is_late' => $isLate]);
+                    $statusToNotify = $lateStatus($isLate);
+                } elseif ($now->lessThan($first)) {
+                    // Ertaroq kirish keyin yetib keldi: eng erta vaqt saqlanadi
+                    $wasLate = (bool) $attendance->is_late;
+                    $isLate = $isLateAt($now);
+                    $attendance->update(['first_check_in' => $now, 'is_late' => $isLate]);
+                    if ($wasLate !== $isLate) {
+                        $statusToNotify = $lateStatus($isLate);
+                    }
+                }
+                // Aks holda: kirish turniketida qayta skan — chiqish deb hisoblanmaydi
+
+                return;
+            }
+
+            if (! $isExplicitCheckOut) {
+                // Status ko'rsatilmagan: vaqt farqi bo'yicha aniqlanadi
+                if ($first === null) {
+                    if ($last !== null && $now->lessThan($last)) {
+                        // Faqat chiqish bilan yaratilgan yozuv, keyin undan ertaroq hodisa keldi — bu kirish
+                        $isLate = $isLateAt($now);
+                        $attendance->update(['first_check_in' => $now, 'is_late' => $isLate]);
+                        $statusToNotify = $lateStatus($isLate);
+
+                        return;
+                    }
+                    $treatAsCheckOut = true;
+                } elseif ($now->lessThan($first)) {
+                    // Tartibsiz kelgan, birinchi saqlangan hodisadan ertaroq hodisa
+                    $updates = ['first_check_in' => $now, 'is_late' => $isLateAt($now)];
+
+                    if (abs($now->diffInMinutes($first)) >= 15 && $last === null) {
+                        // Oldin saqlangan "kirish" aslida chiqish edi (u birinchi bo'lib yetib kelgan)
+                        $updates['last_check_out'] = $first;
+                        $updates['is_left_early'] = $isLeftEarlyAt($first);
+                        $updates['start_time'] = $attendance->start_time ?: $startHm;
+                        $updates['end_time'] = $attendance->end_time ?: $endHm;
+                        $statusToNotify = $leftStatus($updates['is_left_early']);
+                    } else {
+                        $statusToNotify = $lateStatus($updates['is_late']);
                     }
 
-                    return;
-                }
-
-                if ($isExplicitCheckOut) {
-                    // Explicit check-out event
-                    $alreadyCheckedOutRecently = $attendance->last_check_out &&
-                        abs($now->diffInMinutes($attendance->last_check_out)) < 15;
-
-                    $isLeftEarly = $now->lessThan($shiftEndTime);
-
-                    $attendance->update([
-                        'last_check_out' => $now,
-                        'is_left_early' => $isLeftEarly,
-                        'start_time' => $attendance->start_time ?: Carbon::parse($student->schoolClass->shift->start_time)->format('H:i'),
-                        'end_time' => $attendance->end_time ?: Carbon::parse($student->schoolClass->shift->end_time)->format('H:i'),
-                    ]);
-
-                    if (! $alreadyCheckedOutRecently) {
-                        $statusToNotify = $isLeftEarly ? '🔴 <b>Vaqtli ketdi</b>' : '🟢 <b>Darsdan so‘ng ketdi</b>';
-                    }
+                    $attendance->update($updates);
 
                     return;
-                }
-
-                // Status is unspecified (null/empty): determine by time difference from first_check_in
-                $diffMinutes = $attendance->first_check_in ? abs($now->diffInMinutes($attendance->first_check_in)) : 999;
-
-                // If scan occurs within 15 minutes of check-in, consider it a duplicate entrance scan
-                if ($diffMinutes < 15) {
+                } elseif (abs($now->diffInMinutes($first)) < 15) {
+                    // Kirishdan keyin 15 daqiqa ichidagi skan — kirish turniketida takroriy skan
                     return;
+                } else {
+                    $treatAsCheckOut = true;
                 }
+            }
 
-                // Legitimate check-out after at least 15 minutes of attendance
-                $alreadyCheckedOutRecently = $attendance->last_check_out &&
-                    abs($now->diffInMinutes($attendance->last_check_out)) < 15;
-
-                $isLeftEarly = $now->lessThan($shiftEndTime);
+            if ($treatAsCheckOut) {
+                // last_check_out hech qachon kamaymaydi (eski chiqish kech yetib kelsa ham)
+                $isNewer = $last === null || $now->greaterThan($last);
+                $newLast = $isNewer ? $now : $last;
+                $alreadyCheckedOutRecently = $last && abs($now->diffInMinutes($last)) < 15;
+                $isLeftEarly = $isLeftEarlyAt($newLast);
 
                 $attendance->update([
-                    'last_check_out' => $now,
+                    'last_check_out' => $newLast,
                     'is_left_early' => $isLeftEarly,
-                    'start_time' => $attendance->start_time ?: Carbon::parse($student->schoolClass->shift->start_time)->format('H:i'),
-                    'end_time' => $attendance->end_time ?: Carbon::parse($student->schoolClass->shift->end_time)->format('H:i'),
+                    'start_time' => $attendance->start_time ?: $startHm,
+                    'end_time' => $attendance->end_time ?: $endHm,
                 ]);
 
-                if (! $alreadyCheckedOutRecently) {
-                    $statusToNotify = $isLeftEarly ? '🔴 <b>Vaqtli ketdi</b>' : '🟢 <b>Darsdan so‘ng ketdi</b>';
+                if ($isNewer && ! $alreadyCheckedOutRecently) {
+                    $statusToNotify = $leftStatus($isLeftEarly);
                 }
             }
         });
 
-        // Send Telegram notification asynchronously via Queue (skip if synced and > 10 min old)
+        // Telegram xabari (ota-onalarga) faqat yangi hodisa uchun: eskirgan (kechikib yetib kelgan) hodisalar uchun yuborilmaydi,
+        // hodisa qaysi yo'l bilan (callback yoki ISUP sync) kelganidan qat'i nazar.
         if ($statusToNotify) {
-            $isSynced = ($event->access?->eventDescription === 'ISUP AcsEvent Sync');
-            $isOlderThan10Min = $now->lessThan(now()->subMinutes(10));
+            $maxDelay = (int) config('hikvision.notify_max_delay_minutes', 10);
 
-            if (! ($isSynced && $isOlderThan10Min)) {
-                SendTelegramNotificationJob::dispatch(
-                    $student,
-                    $event,
-                    $statusToNotify,
-                    $now->format('Y-m-d H:i:s')
-                )->afterCommit();
+            if ($maxDelay > 0 && $now->lessThan(now()->subMinutes($maxDelay))) {
+                Log::info('Hikvision: stale event, parent notification skipped', [
+                    'student_id' => $student->id,
+                    'event_time' => $now->format('Y-m-d H:i:s'),
+                    'delay_minutes' => (int) $now->diffInMinutes(now()),
+                ]);
+
+                return;
             }
+
+            SendTelegramNotificationJob::dispatch(
+                $student,
+                $event,
+                $statusToNotify,
+                $now->format('Y-m-d H:i:s')
+            )->afterCommit();
         }
     }
 }

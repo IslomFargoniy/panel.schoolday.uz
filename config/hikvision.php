@@ -29,6 +29,10 @@ return [
 
     'timeout' => (int) env('HIKVISION_TIMEOUT', 10),
 
+    // Hodisa vaqti shuncha daqiqadan eski bo'lsa (internet uzilib kechikib yetib kelgan), ota-onalarga Telegram xabari yuborilmaydi.
+    // Davomat baribir yangilanadi. 0 — o'chirish (doim yuboriladi).
+    'notify_max_delay_minutes' => (int) env('HIKVISION_NOTIFY_MAX_DELAY_MINUTES', 10),
+
     /*
     |--------------------------------------------------------------------------
     | Self-healing restart command
