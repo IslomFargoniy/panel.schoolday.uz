@@ -14,6 +14,7 @@ class SchoolSetting extends Model
         'school_id',
         'webhook_url',
         'sms_sender',
+        'telegram_bot_token',
         'telegram_channel_id',
         'timezone',
     ];

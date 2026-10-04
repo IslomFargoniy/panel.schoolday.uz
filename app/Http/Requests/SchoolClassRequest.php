@@ -36,6 +36,16 @@ class SchoolClassRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('telegram_group_id')) {
+            $val = trim((string) $this->telegram_group_id);
+            $this->merge([
+                'telegram_group_id' => $val !== '' ? $val : null,
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

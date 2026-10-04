@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Observers\SchoolClassObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[ObservedBy([SchoolClassObserver::class])]
 class SchoolClass extends Model
 {
     protected $table = 'classes';
