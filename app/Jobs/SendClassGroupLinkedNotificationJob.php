@@ -39,17 +39,13 @@ class SendClassGroupLinkedNotificationJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(TelegramService $defaultTelegramService): void
+    public function handle(TelegramService $telegramService): void
     {
-        $schoolClass = SchoolClass::with(['shift.branch.school.school_setting'])->withCount('students')->find($this->schoolClassId);
+        $schoolClass = SchoolClass::with(['shift.branch.school'])->withCount('students')->find($this->schoolClassId);
 
         if (! $schoolClass || empty($schoolClass->telegram_group_id)) {
             return;
         }
-
-        $schoolSetting = $schoolClass->shift?->branch?->school?->school_setting;
-        $customToken = ! empty($schoolSetting?->telegram_bot_token) ? (string) $schoolSetting->telegram_bot_token : null;
-        $telegramService = $customToken ? new TelegramService($customToken) : $defaultTelegramService;
 
         if (! $telegramService->hasToken()) {
             return;
