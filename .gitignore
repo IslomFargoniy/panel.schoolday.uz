@@ -35,3 +35,6 @@ sync-tool/*.spec
 sync-tool/__pycache__/
 sync-tool/config.json
 sync-tool/schoolday_sync_tool.zip
+
+# Android APK (serverga rsync orqali yuklanadi)
+/public/android/*.apk

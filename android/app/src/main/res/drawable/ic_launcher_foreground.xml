@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Qalpoq tepasi -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,30L82,43L54,56L26,43Z" />
+    <!-- Qalpoq asosi -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M36,50L36,62C36,67 44,72 54,72C64,72 72,67 72,62L72,50L54,58.5Z" />
+    <!-- Popuk -->
+    <path
+        android:fillColor="#FF54A9F7"
+        android:pathData="M77,45.5L79,44.6L79,62L77,62Z" />
+    <path
+        android:fillColor="#FF34D399"
+        android:pathData="M78,66m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+</vector>
