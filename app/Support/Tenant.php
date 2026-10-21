@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,5 +67,26 @@ class Tenant
         if (! static::canAccessSchool($schoolId, $user)) {
             abort(403, __('Ushbu maktabga kirish huquqi yo‘q.'));
         }
+    }
+
+    /**
+     * Restrict a query to the user's schools; global admins are left unrestricted.
+     * $relation is the path to the Branch (e.g. "schoolClass.shift.branch"), or null when the query is on branches.
+     */
+    public static function restrict(Builder $query, ?string $relation = null, ?User $user = null, string $column = 'school_id'): Builder
+    {
+        $user = $user ?? Auth::user();
+
+        if (static::isGlobalAdmin($user)) {
+            return $query;
+        }
+
+        $schoolIds = static::schoolIds($user);
+
+        if ($relation === null) {
+            return $query->whereIn($column, $schoolIds);
+        }
+
+        return $query->whereHas($relation, fn (Builder $b) => $b->whereIn('school_id', $schoolIds));
     }
 }

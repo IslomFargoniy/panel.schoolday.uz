@@ -25,6 +25,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/telegram/webhook',
         ]);
 
+        $middleware->alias([
+            'abilities' => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'school.active' => App\Http\Middleware\CheckSchoolActive::class,
+        ]);
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
