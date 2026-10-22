@@ -39,13 +39,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { session.languageFlow.collect { v -> _uiState.update { it.copy(language = v) } } }
         viewModelScope.launch { session.themeModeFlow.collect { v -> _uiState.update { it.copy(themeMode = v) } } }
         viewModelScope.launch { session.biometricEnabledFlow.collect { v -> _uiState.update { it.copy(isBiometricEnabled = v) } } }
+        // The signed-in user lives in AuthRepository: this ViewModel outlives a sign-out, so it must not keep its own copy
+        viewModelScope.launch { auth.user.collect { u -> _uiState.update { it.copy(user = u) } } }
         loadUser()
     }
 
     fun loadUser() {
-        viewModelScope.launch {
-            (auth.me() as? Resource.Success)?.data?.let { user -> _uiState.update { it.copy(user = user) } }
-        }
+        viewModelScope.launch { auth.me() }
     }
 
     fun setLanguage(lang: String) = viewModelScope.launch { session.setLanguage(lang) }

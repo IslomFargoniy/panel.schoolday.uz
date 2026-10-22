@@ -77,6 +77,44 @@ sealed class Screen(
         fun createRoute(id: Int) = "report/$id"
     }
     object ChangePassword : Screen("change_password", "Parolni o'zgartirish")
+
+    // Management (create / edit). Optional ids: -1 = none.
+    object StudentForm : Screen("student_form?studentId={studentId}&classId={classId}") {
+        fun createRoute(studentId: Int? = null, classId: Int? = null) = query("student_form", "studentId" to studentId, "classId" to classId)
+    }
+    object ClassForm : Screen("class_form?classId={classId}&shiftId={shiftId}") {
+        fun createRoute(classId: Int? = null, shiftId: Int? = null) = query("class_form", "classId" to classId, "shiftId" to shiftId)
+    }
+    object Shifts : Screen("shifts", "Smenalar")
+    object Branches : Screen("branches", "Filiallar")
+    object BranchDetail : Screen("branch/{branchId}") {
+        fun createRoute(id: Int) = "branch/$id"
+    }
+    object BranchForm : Screen("branch_form?branchId={branchId}") {
+        fun createRoute(branchId: Int? = null) = query("branch_form", "branchId" to branchId)
+    }
+    object DeviceForm : Screen("device_form?deviceId={deviceId}&branchId={branchId}") {
+        fun createRoute(deviceId: Int? = null, branchId: Int? = null) = query("device_form", "deviceId" to deviceId, "branchId" to branchId)
+    }
+    object ProfileEdit : Screen("profile_edit")
+    object TwoFactor : Screen("two_factor")
+
+    // Admin / Superadmin
+    object Schools : Screen("schools", "Maktablar")
+    object SchoolForm : Screen("school_form?schoolId={schoolId}") {
+        fun createRoute(schoolId: Int? = null) = query("school_form", "schoolId" to schoolId)
+    }
+    object Users : Screen("users", "Foydalanuvchilar")
+    object UserForm : Screen("user_form?userId={userId}") {
+        fun createRoute(userId: Int? = null) = query("user_form", "userId" to userId)
+    }
+    object SystemSettings : Screen("system_settings", "Tizim sozlamalari")
+}
+
+/** "student_form?studentId=5" — null values are left out (the screen then gets its default -1). */
+private fun query(base: String, vararg args: Pair<String, Int?>): String {
+    val q = args.filter { it.second != null }.joinToString("&") { "${it.first}=${it.second}" }
+    return if (q.isEmpty()) base else "$base?$q"
 }
 
 val bottomNavItems = listOf(

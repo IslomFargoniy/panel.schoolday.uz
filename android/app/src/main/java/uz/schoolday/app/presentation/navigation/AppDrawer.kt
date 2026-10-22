@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uz.schoolday.app.data.remote.dto.Permissions
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.initials
 import uz.schoolday.app.util.tr
@@ -30,20 +31,35 @@ data class DrawerEntry(val route: String, val title: String, val icon: ImageVect
 
 data class DrawerGroup(val title: String, val entries: List<DrawerEntry>)
 
+/** Drawer groups; "Boshqaruv" and "Tizim" only for the roles that may use them (the server checks too). */
 @Composable
-fun drawerGroups(): List<DrawerGroup> {
+fun drawerGroups(permissions: Permissions?): List<DrawerGroup> {
     val c = SchoolDayTheme.colors
-    return listOf(
+    val groups = mutableListOf(
         DrawerGroup(tr("Davomat"), listOf(
             DrawerEntry(Screen.Monitoring.route, tr("Monitoring"), Icons.Outlined.Sensors, c.success, c.successBg),
             DrawerEntry(Screen.Reports.route, tr("Hisobotlar"), Icons.Outlined.Assessment, c.accentText, c.indigoBg)
         )),
         DrawerGroup(tr("Maktab"), listOf(
-            DrawerEntry(Screen.Classes.route, tr("Sinflar"), Icons.Outlined.Class, c.warning, c.warningBg),
             DrawerEntry(Screen.Students.route, tr("O'quvchilar"), Icons.Outlined.People, c.accentText, c.indigoBg),
+            DrawerEntry(Screen.Classes.route, tr("Sinflar"), Icons.Outlined.Class, c.warning, c.warningBg),
+            DrawerEntry(Screen.Shifts.route, tr("Smenalar"), Icons.Outlined.Schedule, c.success, c.successBg),
+            DrawerEntry(Screen.Branches.route, tr("Filiallar"), Icons.Outlined.Store, c.accentText, c.indigoBg),
             DrawerEntry(Screen.Devices.route, tr("Qurilmalar"), Icons.Outlined.Router, c.danger, c.dangerBg)
         ))
     )
+    if (permissions?.manageSchools == true) {
+        groups += DrawerGroup(tr("Boshqaruv"), listOf(
+            DrawerEntry(Screen.Schools.route, tr("Maktablar"), Icons.Outlined.School, c.accentText, c.indigoBg)
+        ))
+    }
+    if (permissions?.manageUsers == true || permissions?.systemSettings == true) {
+        groups += DrawerGroup(tr("Tizim"), listOfNotNull(
+            DrawerEntry(Screen.Users.route, tr("Foydalanuvchilar"), Icons.Outlined.ManageAccounts, c.warning, c.warningBg).takeIf { permissions.manageUsers },
+            DrawerEntry(Screen.SystemSettings.route, tr("Tizim sozlamalari"), Icons.Outlined.Tune, c.danger, c.dangerBg).takeIf { permissions.systemSettings }
+        ))
+    }
+    return groups
 }
 
 @Composable

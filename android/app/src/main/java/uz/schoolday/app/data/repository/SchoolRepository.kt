@@ -1,5 +1,6 @@
 package uz.schoolday.app.data.repository
 
+import kotlinx.coroutines.CancellationException
 import android.content.Context
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +21,8 @@ data class ReportQuery(
     val schoolId: Int? = null,
     val branchId: Int? = null,
     val classId: Int? = null,
-    val studentId: Int? = null
+    val studentId: Int? = null,
+    val shiftId: Int? = null
 ) {
     fun toMap(): Map<String, String> = buildMap {
         put("start_date", startDate)
@@ -30,6 +32,7 @@ data class ReportQuery(
         branchId?.let { put("branch_id", it.toString()) }
         classId?.let { put("class_id", it.toString()) }
         studentId?.let { put("student_id", it.toString()) }
+        shiftId?.let { put("shift_id", it.toString()) }
     }
 }
 
@@ -41,8 +44,8 @@ class SchoolRepository @Inject constructor(
 ) {
     suspend fun filters() = apiCall(gson) { api.filters() }
 
-    suspend fun dashboard(date: String, schoolId: Int?, branchId: Int?) =
-        apiCall(gson) { api.dashboard(date, schoolId, branchId) }
+    suspend fun dashboard(date: String, schoolId: Int?, branchId: Int?, days: Int = 7) =
+        apiCall(gson) { api.dashboard(date, schoolId, branchId, days) }
 
     suspend fun monitoring(date: String, schoolId: Int?, branchId: Int?) =
         apiCall(gson) { api.monitoring(date, schoolId, branchId) }
@@ -77,6 +80,8 @@ class SchoolRepository @Inject constructor(
             val file = File(dir, "davomat_${query.startDate}_${query.endDate}.xlsx")
             body.byteStream().use { input -> file.outputStream().use { input.copyTo(it) } }
             Resource.Success(file)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Resource.Error(tr("Internetga ulanib bo'lmadi"))
         }

@@ -7,6 +7,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.Response
 import uz.schoolday.app.data.local.SessionStore
+import uz.schoolday.app.util.I18n
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,6 +23,7 @@ class AuthInterceptor @Inject constructor(
         val builder = original.newBuilder()
             .url(withCurrentServer(original.url))
             .header("Accept", "application/json")
+            .header("Accept-Language", I18n.language)
         if (!token.isNullOrBlank()) builder.header("Authorization", "Bearer $token")
 
         val response = chain.proceed(builder.build())

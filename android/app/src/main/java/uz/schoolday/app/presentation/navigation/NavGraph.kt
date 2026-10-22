@@ -21,6 +21,13 @@ import androidx.navigation.navArgument
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
+import uz.schoolday.app.presentation.account.ProfileEditScreen
+import uz.schoolday.app.presentation.account.TwoFactorScreen
+import uz.schoolday.app.presentation.admin.SchoolFormScreen
+import uz.schoolday.app.presentation.admin.SchoolListScreen
+import uz.schoolday.app.presentation.admin.SystemSettingsScreen
+import uz.schoolday.app.presentation.admin.UserFormScreen
+import uz.schoolday.app.presentation.admin.UserListScreen
 import uz.schoolday.app.presentation.classes.ClassDetailScreen
 import uz.schoolday.app.presentation.classes.ClassListScreen
 import uz.schoolday.app.presentation.components.LocalOpenDrawer
@@ -32,7 +39,14 @@ import uz.schoolday.app.presentation.reports.ReportScreen
 import uz.schoolday.app.presentation.settings.ChangePasswordScreen
 import uz.schoolday.app.presentation.settings.SettingsScreen
 import uz.schoolday.app.presentation.settings.SettingsViewModel
+import uz.schoolday.app.presentation.structure.BranchDetailScreen
+import uz.schoolday.app.presentation.structure.BranchFormScreen
+import uz.schoolday.app.presentation.structure.BranchListScreen
+import uz.schoolday.app.presentation.structure.ClassFormScreen
+import uz.schoolday.app.presentation.structure.DeviceFormScreen
+import uz.schoolday.app.presentation.structure.ShiftsScreen
 import uz.schoolday.app.presentation.students.StudentDetailScreen
+import uz.schoolday.app.presentation.students.StudentFormScreen
 import uz.schoolday.app.presentation.students.StudentListScreen
 import uz.schoolday.app.util.DateUtils
 import uz.schoolday.app.util.tr
@@ -44,6 +58,11 @@ fun NavController.navigateToTab(route: String) {
         launchSingleTop = true
         restoreState = true
     }
+}
+
+/** Optional int route arguments; -1 means "not given". */
+private fun optionalInts(vararg names: String) = names.map { name ->
+    navArgument(name) { type = NavType.IntType; defaultValue = -1 }
 }
 
 /** The signed-in app: tabs with the glass bar, the left drawer and the pushed screens. */
@@ -70,7 +89,7 @@ fun MainNavGraph(userName: String) {
             AppDrawer(
                 userName = userName,
                 subtitle = schoolsLine,
-                groups = drawerGroups(),
+                groups = drawerGroups(settings.user?.permissions),
                 currentRoute = currentRoute,
                 onOpen = { route ->
                     scope.launch { drawerState.close() }
@@ -121,6 +140,24 @@ fun MainNavGraph(userName: String) {
                         arguments = listOf(navArgument("attendanceId") { type = NavType.IntType })
                     ) { entry -> ReportDetailScreen(entry.arguments?.getInt("attendanceId") ?: 0, navController) }
                     composable(Screen.ChangePassword.route) { ChangePasswordScreen(navController) }
+
+                    // Management
+                    composable(Screen.StudentForm.route, arguments = optionalInts("studentId", "classId")) { StudentFormScreen(navController) }
+                    composable(Screen.ClassForm.route, arguments = optionalInts("classId", "shiftId")) { ClassFormScreen(navController) }
+                    composable(Screen.Shifts.route) { ShiftsScreen(navController) }
+                    composable(Screen.Branches.route) { BranchListScreen(navController) }
+                    composable(Screen.BranchDetail.route, arguments = listOf(navArgument("branchId") { type = NavType.IntType })) { BranchDetailScreen(navController) }
+                    composable(Screen.BranchForm.route, arguments = optionalInts("branchId")) { BranchFormScreen(navController) }
+                    composable(Screen.DeviceForm.route, arguments = optionalInts("deviceId", "branchId")) { DeviceFormScreen(navController) }
+                    composable(Screen.ProfileEdit.route) { ProfileEditScreen(navController) }
+                    composable(Screen.TwoFactor.route) { TwoFactorScreen(navController) }
+
+                    // Admin / Superadmin
+                    composable(Screen.Schools.route) { SchoolListScreen(navController) }
+                    composable(Screen.SchoolForm.route, arguments = optionalInts("schoolId")) { SchoolFormScreen(navController) }
+                    composable(Screen.Users.route) { UserListScreen(navController) }
+                    composable(Screen.UserForm.route, arguments = optionalInts("userId")) { UserFormScreen(navController) }
+                    composable(Screen.SystemSettings.route) { SystemSettingsScreen(navController) }
                 }
 
                 if (isBottomBarVisible) {

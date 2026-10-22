@@ -39,7 +39,28 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     val ui by viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
     var passwordVisible by remember { mutableStateOf(false) }
+    var forgotOpen by remember { mutableStateOf(false) }
     val c = SchoolDayTheme.colors
+
+    if (forgotOpen) {
+        var email by remember { mutableStateOf(ui.login.takeIf { '@' in it }.orEmpty()) }
+        AlertDialog(
+            onDismissRequest = { forgotOpen = false; viewModel.clearForgot() },
+            title = { Text(tr("Parolni tiklash")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(tr("Emailingizni kiriting — parolni tiklash havolasini yuboramiz."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    OutlinedTextField(
+                        value = email, onValueChange = { email = it.trim() }, label = { Text(tr("Email")) }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()
+                    )
+                    ui.forgotMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = c.success) }
+                }
+            },
+            confirmButton = { Button(onClick = { viewModel.sendReset(email) }, enabled = '@' in email && !ui.sendingReset) { Text(tr("Yuborish")) } },
+            dismissButton = { TextButton(onClick = { forgotOpen = false; viewModel.clearForgot() }) { Text(tr("Yopish")) } }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -155,6 +176,10 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
             }
             if (ui.needsCode) {
                 TextButton(onClick = viewModel::cancelCode, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text(tr("Orqaga")) }
+            } else {
+                TextButton(onClick = { forgotOpen = true }, modifier = Modifier.align(Alignment.End)) {
+                    Text(tr("Parolni unutdingizmi?"), style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
 

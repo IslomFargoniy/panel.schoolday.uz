@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Router
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -35,6 +35,8 @@ import javax.inject.Inject
 
 data class DevicesUiState(
     val devices: List<DeviceDto> = emptyList(),
+    val online: Boolean? = null,
+    val type: String? = null,
     val loaded: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
@@ -42,7 +44,7 @@ data class DevicesUiState(
 
 @HiltViewModel
 class DevicesViewModel @Inject constructor(
-    private val repository: SchoolRepository,
+    private val manage: uz.schoolday.app.data.repository.ManageRepository,
     private val scopeStore: ScopeStore
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DevicesUiState())
@@ -56,6 +58,16 @@ class DevicesViewModel @Inject constructor(
         viewModelScope.launch { scopeStore.scope.collect { load() } }
     }
 
+    fun onOnline(v: Boolean?) {
+        _uiState.update { it.copy(online = v) }
+        load()
+    }
+
+    fun onType(v: String?) {
+        _uiState.update { it.copy(type = v) }
+        load()
+    }
+
     fun selectSchool(id: Int?) = scopeStore.selectSchool(id)
     fun selectBranch(id: Int?) = scopeStore.selectBranch(id)
 
@@ -64,7 +76,7 @@ class DevicesViewModel @Inject constructor(
         job = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val s = scopeStore.scope.value
-            when (val r = repository.devices(s.schoolId, s.branchId)) {
+            when (val r = manage.devices(s, _uiState.value.online, _uiState.value.type)) {
                 is Resource.Success -> _uiState.update { it.copy(isLoading = false, loaded = true, devices = r.data.orEmpty()) }
                 is Resource.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = r.message) }
             }
@@ -79,6 +91,7 @@ fun DevicesScreen(navController: NavController, viewModel: DevicesViewModel = hi
     val schools by viewModel.schools.collectAsState()
     val scope by viewModel.scope.collectAsState()
     val online = ui.devices.count { it.isOnline }
+    uz.schoolday.app.presentation.navigation.OnChangedReturn(navController) { viewModel.load() }
 
     Scaffold(
         topBar = {
@@ -88,27 +101,51 @@ fun DevicesScreen(navController: NavController, viewModel: DevicesViewModel = hi
                 onBack = { navController.popBackStack() }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(uz.schoolday.app.presentation.navigation.Screen.DeviceForm.createRoute(branchId = scope.branchId)) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+            ) { Icon(androidx.compose.material.icons.Icons.Outlined.Add, tr("Qo'shish"), tint = MaterialTheme.colorScheme.onPrimary) }
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         PullToRefreshBox(isRefreshing = ui.isLoading, onRefresh = viewModel::load, modifier = Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(
-                contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 32.dp),
+                contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                item { ScopeBar(schools, scope, viewModel::selectSchool, viewModel::selectBranch) }
+                item {
+                    ScopeBar(schools, scope, viewModel::selectSchool, viewModel::selectBranch) {
+                        DropdownChip(
+                            label = when (ui.online) { true -> tr("Onlayn"); false -> tr("Oflayn"); null -> tr("Barcha holatlar") },
+                            options = listOf<Pair<Boolean?, String>>(null to tr("Barcha holatlar"), true to tr("Onlayn"), false to tr("Oflayn")),
+                            onSelect = viewModel::onOnline,
+                            icon = androidx.compose.material.icons.Icons.Outlined.Wifi
+                        )
+                        DropdownChip(
+                            label = when (ui.type) { "isup" -> "ISUP"; "http_listening" -> "HTTP"; else -> tr("Barcha turlar") },
+                            options = listOf<Pair<String?, String>>(null to tr("Barcha turlar"), "isup" to "ISUP", "http_listening" to "HTTP"),
+                            onSelect = viewModel::onType,
+                            icon = androidx.compose.material.icons.Icons.Outlined.Lan
+                        )
+                    }
+                }
                 ui.errorMessage?.let { item { ErrorBanner(it) } }
                 if (ui.loaded && ui.devices.isEmpty()) item { EmptyState(tr("Qurilmalar topilmadi"), Icons.Outlined.Router) }
-                items(ui.devices, key = { it.id }) { DeviceRow(it) }
+                items(ui.devices, key = { it.id }) { d ->
+                    DeviceRow(d) { navController.navigate(uz.schoolday.app.presentation.navigation.Screen.DeviceForm.createRoute(deviceId = d.id, branchId = d.branchId)) }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun DeviceRow(d: DeviceDto) {
+private fun DeviceRow(d: DeviceDto, onClick: () -> Unit) {
     val c = SchoolDayTheme.colors
-    SdCard(padding = PaddingValues(14.dp)) {
+    SdCard(onClick = onClick, padding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RowIcon(Icons.Outlined.Router, if (d.isOnline) c.success else c.danger, if (d.isOnline) c.successBg else c.dangerBg, size = 42)
             Spacer(Modifier.width(12.dp))

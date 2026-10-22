@@ -49,6 +49,23 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
     val context = LocalContext.current
     var showLogout by remember { mutableStateOf(false) }
     var pinSetup by remember { mutableStateOf(false) }
+    var deleteAccount by remember { mutableStateOf(false) }
+    val deleteVm: uz.schoolday.app.presentation.account.DeleteAccountViewModel = hiltViewModel()
+    val deleting by deleteVm.busy.collectAsState()
+    val deleteError by deleteVm.error.collectAsState()
+
+    if (deleteAccount) {
+        PasswordPromptDialog(
+            title = tr("Hisobni o'chirish"),
+            text = tr("Hisobingiz butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi."),
+            confirmLabel = tr("O'chirish"),
+            busy = deleting,
+            error = deleteError,
+            onConfirm = deleteVm::delete,
+            onDismiss = { deleteAccount = false },
+            danger = true
+        )
+    }
 
     if (pinSetup) {
         PinSetupDialog(onDismiss = { pinSetup = false }, onSet = { pin -> viewModel.enableBiometric(pin); pinSetup = false })
@@ -67,6 +84,8 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
         )
     }
 
+    LaunchedEffect(Unit) { viewModel.loadUser() }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding(),
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 16.dp, bottom = BottomBarContentPadding),
@@ -83,6 +102,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                     .clip(RoundedCornerShape(22.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, c.border, RoundedCornerShape(22.dp))
+                    .clickable { navController.navigate(Screen.ProfileEdit.route) }
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -104,6 +124,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                     )
                 }
                 if (user?.isGlobalAdmin == true) StatusPill(tr("Admin"), Tone.Info)
+                Icon(Icons.Rounded.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
@@ -140,6 +161,14 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                     iconTint = c.accentText,
                     iconBg = c.indigoBg,
                     onClick = { navController.navigate(Screen.ChangePassword.route) }
+                )
+                RowDivider()
+                SettingsRowItem(
+                    icon = Icons.Outlined.Security,
+                    title = tr("Ikki bosqichli tasdiqlash"),
+                    iconTint = if (ui.user?.twoFactorEnabled == true) c.success else MaterialTheme.colorScheme.onSurfaceVariant,
+                    iconBg = if (ui.user?.twoFactorEnabled == true) c.successBg else c.surface2,
+                    onClick = { navController.navigate(Screen.TwoFactor.route) }
                 )
                 RowDivider()
                 SettingsRowItem(icon = Icons.Outlined.Router, title = tr("Qurilmalar"), onClick = { navController.navigate(Screen.Devices.route) })
@@ -208,6 +237,15 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                     RowIcon(Icons.AutoMirrored.Outlined.Logout, c.danger, c.dangerBg)
                     Spacer(Modifier.width(12.dp))
                     Text(tr("Tizimdan chiqish"), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.danger)
+                }
+                RowDivider()
+                Row(
+                    modifier = Modifier.fillMaxWidth().clickable { deleteAccount = true }.padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RowIcon(Icons.Outlined.PersonRemove, c.danger, c.dangerBg)
+                    Spacer(Modifier.width(12.dp))
+                    Text(tr("Hisobni o'chirish"), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.danger)
                 }
             }
         }

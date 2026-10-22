@@ -1,5 +1,9 @@
 package uz.schoolday.app.presentation.students
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +19,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,6 +31,7 @@ import uz.schoolday.app.data.remote.dto.StudentDto
 import uz.schoolday.app.presentation.components.*
 import uz.schoolday.app.presentation.dashboard.EventRow
 import uz.schoolday.app.presentation.navigation.BottomBarContentPadding
+import uz.schoolday.app.presentation.navigation.OnChangedReturn
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.DateUtils
@@ -39,6 +45,33 @@ fun StudentListScreen(navController: NavController, viewModel: StudentListViewMo
     val scope by viewModel.scope.collectAsState()
     val classes = remember(schools, scope) { viewModel.classes() }
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    var addMenu by remember { mutableStateOf(false) }
+    var importOpen by remember { mutableStateOf(false) }
+
+    OnChangedReturn(navController) { viewModel.reload() }
+
+    LaunchedEffect(ui.message) {
+        ui.message?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onMessageShown()
+        }
+    }
+    LaunchedEffect(ui.templateFile) {
+        ui.templateFile?.let {
+            shareExcel(context, it, tr("Excel shablon"))
+            viewModel.onTemplateShared()
+        }
+    }
+
+    if (importOpen) {
+        ImportDialog(
+            classes = classes.map { it.id to it.name },
+            presetClassId = ui.classId,
+            onImport = { classId, uri -> importOpen = false; viewModel.import(classId, uri) },
+            onDismiss = { importOpen = false }
+        )
+    }
 
     // Next page when the last rows come into view
     val nearEnd by remember {
@@ -49,53 +82,129 @@ fun StudentListScreen(navController: NavController, viewModel: StudentListViewMo
     }
     LaunchedEffect(nearEnd, ui.students.size) { if (nearEnd) viewModel.loadMore() }
 
-    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().padding(horizontal = 18.dp)) {
-        Spacer(Modifier.height(16.dp))
-        SdHeader(title = tr("O'quvchilar"), overline = tr("Jami: %s ta", ui.total))
-        Spacer(Modifier.height(14.dp))
-        OutlinedTextField(
-            value = ui.search,
-            onValueChange = viewModel::onSearch,
-            placeholder = { Text(tr("Ism, ID yoki telefon...")) },
-            leadingIcon = { Icon(Icons.Outlined.Search, null) },
-            trailingIcon = {
-                if (ui.search.isNotEmpty()) IconButton(onClick = { viewModel.onSearch("") }) { Icon(Icons.Outlined.Clear, tr("Tozalash")) }
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(10.dp))
-        ScopeBar(schools, scope, viewModel::selectSchool, viewModel::selectBranch) {
-            if (classes.isNotEmpty()) {
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 18.dp)) {
+            Spacer(Modifier.height(16.dp))
+            SdHeader(title = tr("O'quvchilar"), overline = tr("Jami: %s ta", ui.total)) {
+                if (ui.importing || ui.downloading) CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.height(14.dp))
+            OutlinedTextField(
+                value = ui.search,
+                onValueChange = viewModel::onSearch,
+                placeholder = { Text(tr("Ism, ID yoki telefon...")) },
+                leadingIcon = { Icon(Icons.Outlined.Search, null) },
+                trailingIcon = {
+                    if (ui.search.isNotEmpty()) IconButton(onClick = { viewModel.onSearch("") }) { Icon(Icons.Outlined.Clear, tr("Tozalash")) }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(10.dp))
+            ScopeBar(schools, scope, viewModel::selectSchool, viewModel::selectBranch) {
+                if (classes.isNotEmpty()) {
+                    DropdownChip(
+                        label = classes.firstOrNull { it.id == ui.classId }?.name ?: tr("Barcha sinflar"),
+                        options = listOf<Pair<Int?, String>>(null to tr("Barcha sinflar")) + classes.map { it.id as Int? to it.name },
+                        onSelect = viewModel::onClass,
+                        icon = Icons.Outlined.Class
+                    )
+                }
                 DropdownChip(
-                    label = classes.firstOrNull { it.id == ui.classId }?.name ?: tr("Barcha sinflar"),
-                    options = listOf<Pair<Int?, String>>(null to tr("Barcha sinflar")) + classes.map { it.id as Int? to it.name },
-                    onSelect = viewModel::onClass,
-                    icon = Icons.Outlined.Class
+                    label = when (ui.status) { "inactive" -> tr("Faol emas"); "all" -> tr("Hammasi"); else -> tr("Faol") },
+                    options = listOf("active" to tr("Faol"), "inactive" to tr("Faol emas"), "all" to tr("Hammasi")),
+                    onSelect = viewModel::onStatus,
+                    icon = Icons.Outlined.FilterList
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+
+            PullToRefreshBox(isRefreshing = ui.isLoading, onRefresh = { viewModel.reload() }, modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(bottom = BottomBarContentPadding + 72.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ui.errorMessage?.let { item { ErrorBanner(it) } }
+                    if (ui.students.isEmpty() && !ui.isLoading && ui.errorMessage == null) {
+                        item { EmptyState(tr("O'quvchilar topilmadi"), Icons.Outlined.PersonSearch) }
+                    }
+                    items(ui.students, key = { it.id }) { s ->
+                        StudentRow(s, trailing = {
+                            if (s.status == "inactive") StatusPill(tr("Faol emas"), Tone.Neutral)
+                            else Icon(Icons.Rounded.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }) { navController.navigate(Screen.StudentDetail.createRoute(s.id)) }
+                    }
+                    if (ui.isLoadingMore) item { LoadingBox() }
+                }
+            }
+        }
+
+        Box(Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = BottomBarContentPadding)) {
+            FloatingActionButton(
+                onClick = { addMenu = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(16.dp)
+            ) { Icon(Icons.Outlined.Add, tr("Qo'shish")) }
+            DropdownMenu(expanded = addMenu, onDismissRequest = { addMenu = false }) {
+                DropdownMenuItem(
+                    text = { Text(tr("Yangi o'quvchi")) },
+                    leadingIcon = { Icon(Icons.Outlined.PersonAdd, null) },
+                    onClick = { addMenu = false; navController.navigate(Screen.StudentForm.createRoute(classId = ui.classId)) }
+                )
+                DropdownMenuItem(
+                    text = { Text(tr("Excel'dan import")) },
+                    leadingIcon = { Icon(Icons.Outlined.UploadFile, null) },
+                    onClick = { addMenu = false; importOpen = true }
+                )
+                DropdownMenuItem(
+                    text = { Text(tr("Excel shablon")) },
+                    leadingIcon = { Icon(Icons.Outlined.FileDownload, null) },
+                    onClick = { addMenu = false; viewModel.downloadTemplate() }
                 )
             }
         }
-        Spacer(Modifier.height(10.dp))
-
-        PullToRefreshBox(isRefreshing = ui.isLoading, onRefresh = { viewModel.reload() }, modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(bottom = BottomBarContentPadding),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                ui.errorMessage?.let { item { ErrorBanner(it) } }
-                if (ui.students.isEmpty() && !ui.isLoading && ui.errorMessage == null) {
-                    item { EmptyState(tr("O'quvchilar topilmadi"), Icons.Outlined.PersonSearch) }
-                }
-                items(ui.students, key = { it.id }) { s ->
-                    StudentRow(s) { navController.navigate(Screen.StudentDetail.createRoute(s.id)) }
-                }
-                if (ui.isLoadingMore) item { LoadingBox() }
-            }
-        }
     }
+}
+
+/** Pick the class, then an .xlsx/.xls/.csv file with name, phone, gender columns (as in the template). */
+@Composable
+private fun ImportDialog(classes: List<Pair<Int, String>>, presetClassId: Int?, onImport: (Int, Uri) -> Unit, onDismiss: () -> Unit) {
+    var classId by remember { mutableStateOf(presetClassId) }
+    var file by remember { mutableStateOf<Uri?>(null) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) file = uri }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(tr("Excel'dan import")) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(tr("Ustunlar: name, phone, gender. Avval shablonni yuklab oling."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SelectField(tr("Sinf"), classId, classes.map { it.first as Int? to it.second }, { classId = it })
+                OutlinedButton(
+                    onClick = {
+                        picker.launch(arrayOf(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "application/vnd.ms-excel",
+                            "text/csv",
+                            "text/comma-separated-values"
+                        ))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Outlined.AttachFile, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(if (file == null) tr("Faylni tanlash") else tr("Fayl tanlandi"))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onImport(classId!!, file!!) }, enabled = classId != null && file != null) { Text(tr("Yuklash")) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Bekor qilish")) } }
+    )
 }
 
 @Composable
@@ -127,12 +236,22 @@ fun StudentDetailScreen(studentId: Int, navController: NavController, viewModel:
     val student = ui.detail?.student
     var photo by remember { mutableStateOf<EventDto?>(null) }
 
+    OnChangedReturn(navController) { viewModel.load() }
+
     photo?.let { e ->
         PhotoViewerDialog(e.picture.orEmpty(), e.name.orEmpty(), "${DateUtils.formatDisplayDate(e.time)} ${DateUtils.formatTime(e.time)}") { photo = null }
     }
 
     Scaffold(
-        topBar = { SdTopBar(title = student?.name ?: tr("O'quvchi"), subtitle = student?.className, onBack = { navController.popBackStack() }) },
+        topBar = {
+            SdTopBar(title = student?.name ?: tr("O'quvchi"), subtitle = student?.className, onBack = { navController.popBackStack() }) {
+                if (student != null) {
+                    IconButton(onClick = { navController.navigate(Screen.StudentForm.createRoute(studentId = studentId)) }) {
+                        Icon(Icons.Outlined.Edit, tr("Tahrirlash"))
+                    }
+                }
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         PullToRefreshBox(isRefreshing = ui.isLoading, onRefresh = viewModel::load, modifier = Modifier.fillMaxSize().padding(padding)) {

@@ -109,7 +109,7 @@ fun DashboardScreen(navController: NavController, viewModel: DashboardViewModel 
                 }
             }
 
-            ui.data?.trend?.takeIf { it.isNotEmpty() }?.let { trend -> item { TrendCard(trend) } }
+            ui.data?.trend?.takeIf { it.isNotEmpty() }?.let { trend -> item { TrendCard(trend, ui.monthly, viewModel::onMonthly) } }
 
             item { SectionTitle(tr("Tezkor amallar")) }
             item {
@@ -221,21 +221,25 @@ private fun AttendanceHeroCard(stats: DayStats, caption: String) {
 
 /** Stacked bars for the last days: on time (green) under late (amber); days nobody came are school holidays. */
 @Composable
-private fun TrendCard(days: List<TrendDay>) {
+private fun TrendCard(days: List<TrendDay>, monthly: Boolean, onMonthly: (Boolean) -> Unit) {
     val c = SchoolDayTheme.colors
     val max = (days.maxOfOrNull { it.present + it.absent } ?: 0).coerceAtLeast(1)
     SdCard(padding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(tr("Haftalik dinamika"), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
+            Text(if (monthly) tr("Oylik dinamika") else tr("Haftalik dinamika"), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
+            SegmentedTabs(listOf(tr("Hafta"), tr("Oy")), if (monthly) 1 else 0, { onMonthly(it == 1) }, Modifier.width(140.dp))
+        }
+        Spacer(Modifier.height(8.dp))
+        Row {
             Legend(c.success, tr("Vaqtida"))
             Spacer(Modifier.width(10.dp))
             Legend(c.warning, tr("Kechikdi"))
         }
         Spacer(Modifier.height(14.dp))
-        Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) {
-            days.forEach { d ->
+        Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(if (days.size > 10) 2.dp else 8.dp), verticalAlignment = Alignment.Bottom) {
+            days.forEachIndexed { index, d ->
                 Column(Modifier.weight(1f).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-                    if (d.present > 0) {
+                    if (d.present > 0 && days.size <= 10) {
                         Text("${d.present}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(2.dp))
                     }
@@ -254,7 +258,13 @@ private fun TrendCard(days: List<TrendDay>) {
                         }
                     }
                     Spacer(Modifier.height(6.dp))
-                    Text(DateUtils.shortWeekday(d.date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    // A month has no room for every label: day numbers 1, 5, 10…
+                    val label = when {
+                        days.size <= 10 -> DateUtils.shortWeekday(d.date)
+                        index == 0 || d.date.takeLast(2).toInt() % 5 == 0 -> d.date.takeLast(2).trimStart('0')
+                        else -> ""
+                    }
+                    Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, softWrap = false)
                 }
             }
         }

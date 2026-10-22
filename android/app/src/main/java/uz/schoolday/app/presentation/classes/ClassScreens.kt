@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -33,6 +37,7 @@ import uz.schoolday.app.data.repository.SchoolRepository
 import uz.schoolday.app.data.repository.Scope
 import uz.schoolday.app.data.repository.ScopeStore
 import uz.schoolday.app.presentation.components.*
+import uz.schoolday.app.presentation.navigation.OnChangedReturn
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.students.StudentRow
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
@@ -91,14 +96,20 @@ fun ClassListScreen(navController: NavController, viewModel: ClassListViewModel 
     val ui by viewModel.uiState.collectAsState()
     val schools by viewModel.schools.collectAsState()
     val scope by viewModel.scope.collectAsState()
+    OnChangedReturn(navController) { viewModel.load() }
 
     Scaffold(
         topBar = { SdTopBar(title = tr("Sinflar"), subtitle = tr("%s ta sinf", ui.classes.size), onBack = { navController.popBackStack() }) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate(Screen.ClassForm.createRoute()) }, containerColor = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp)) {
+                Icon(Icons.Outlined.Add, tr("Qo'shish"), tint = MaterialTheme.colorScheme.onPrimary)
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         PullToRefreshBox(isRefreshing = ui.isLoading, onRefresh = viewModel::load, modifier = Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(
-                contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 32.dp),
+                contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -197,13 +208,20 @@ fun ClassDetailScreen(classId: Int, initialDate: String, navController: NavContr
         when (it.attendance?.status) { null, "absent" -> 0; "late" -> 1; else -> 2 }
     }
 
+    OnChangedReturn(navController) { viewModel.load() }
+
     Scaffold(
         topBar = {
             SdTopBar(
                 title = cls?.name ?: tr("Sinf"),
                 subtitle = cls?.let { listOfNotNull(it.shiftName, it.branchName).joinToString(" · ") },
                 onBack = { navController.popBackStack() }
-            )
+            ) {
+                if (cls != null) {
+                    IconButton(onClick = { navController.navigate(Screen.StudentForm.createRoute(classId = cls.id)) }) { Icon(Icons.Outlined.PersonAdd, tr("O'quvchi qo'shish")) }
+                    IconButton(onClick = { navController.navigate(Screen.ClassForm.createRoute(classId = cls.id)) }) { Icon(Icons.Outlined.Edit, tr("Tahrirlash")) }
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->

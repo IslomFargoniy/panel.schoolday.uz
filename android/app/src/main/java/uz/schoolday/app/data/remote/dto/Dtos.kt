@@ -43,7 +43,15 @@ data class UserDto(
     val roles: List<String> = emptyList(),
     val isGlobalAdmin: Boolean = false,
     val twoFactorEnabled: Boolean = false,
-    val schools: List<SchoolRef> = emptyList()
+    val schools: List<SchoolRef> = emptyList(),
+    val permissions: Permissions = Permissions()
+)
+
+/** Which menus the app shows; the server checks every request anyway. */
+data class Permissions(
+    val manageSchools: Boolean = false,
+    val manageUsers: Boolean = false,
+    val systemSettings: Boolean = false
 )
 
 data class SchoolRef(
@@ -160,8 +168,20 @@ data class StudentDto(
     val telegramLinked: Boolean = false,
     val classId: Int? = null,
     val className: String? = null,
+    val shiftId: Int? = null,
     val shiftName: String? = null,
+    val branchId: Int? = null,
     val branchName: String? = null,
+    // Edit form fields
+    val address: String? = null,
+    val telegramId: String? = null,
+    val userVerifyMode: String? = null,
+    val localUiRight: Boolean = false,
+    val doorRight: String? = null,
+    val planTemplateNo: String? = null,
+    val validEnabled: Boolean = false,
+    val validBegin: String? = null,
+    val validEnd: String? = null,
     /** Only in a class's student list: that day's attendance, null = absent. */
     val attendance: AttendanceDto? = null
 )
@@ -199,6 +219,8 @@ data class ClassDto(
     val shiftName: String? = null,
     val branchName: String? = null,
     val telegramLinked: Boolean = false,
+    val telegramGroupId: String? = null,
+    val branchId: Int? = null,
     val totalStudents: Int = 0,
     val presentStudents: Int = 0,
     val onTimeStudents: Int = 0,
@@ -222,6 +244,7 @@ data class DeviceDto(
     val connectionType: String? = null,
     val status: Boolean = true,
     val isOnline: Boolean = false,
+    val hasEncryptionKey: Boolean = false,
     val lastSeenAt: String? = null,
     val branchId: Int? = null,
     val branchName: String? = null,

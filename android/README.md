@@ -1,12 +1,22 @@
 # SchoolDay Android
 
-Maktab admini uchun mobil ilova: davomat, jonli monitoring, o'quvchilar, sinflar, hisobotlar (Excel) va Face ID qurilmalar holati.
+Web paneldagi har bir amal ilovada ham bor, rolga qarab:
+
+- **Maktab admini:** davomat, jonli monitoring, hisobotlar (Excel, o'chirish); o'quvchilar (CRUD, yuz rasmi kamera/galereyadan, Excel import), sinflar, smenalar, filiallar, qurilmalar; profil, 2FA.
+- **Admin:** + maktablar (yaratish, tahrirlash, o'chirish), maktab sozlamalari, foydalanuvchini maktabga biriktirish.
+- **Superadmin:** + foydalanuvchilar (rol bilan) va tizim sozlamalari (Telegram bot token).
+
+Menyular `auth/me` dagi `permissions` bo'yicha ko'rinadi; har bir so'rovni server baribir tekshiradi.
 Dizayn va arxitektura `panel.payday.uz/android` bilan bir xil: Kotlin, Jetpack Compose (Material3), Hilt, Retrofit va DataStore.
 
 ## API
 
 Laravel `routes/api.php` ichidagi `/api/v1/*` (Sanctum token, `school` ability). Login: `POST /api/v1/auth/login` `{login, password, code?}`.
 Barcha ma'lumot `App\Support\Tenant` orqali foydalanuvchi maktablari bilan cheklanadi.
+Biznes qoidalari (filial limiti, o'chirish shartlari…) `app/Actions` da: web panel ham, API ham shularni ishlatadi.
+Xato matnlari `public/locales/{uz,ru,en}` dan, ilova yuborgan `Accept-Language` tilida qaytadi.
+
+Yuz tekshiruvi ML Kit (Google Play services orqali, model APK ichida emas). Play services bo'lmagan telefonda tekshiruv o'tkazib yuboriladi.
 
 ## Release
 

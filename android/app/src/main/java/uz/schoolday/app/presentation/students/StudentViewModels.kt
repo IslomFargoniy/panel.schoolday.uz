@@ -12,6 +12,7 @@ import uz.schoolday.app.data.remote.dto.EventDto
 import uz.schoolday.app.data.remote.dto.FilterSchool
 import uz.schoolday.app.data.remote.dto.StudentDetailDto
 import uz.schoolday.app.data.remote.dto.StudentDto
+import uz.schoolday.app.data.repository.ManageRepository
 import uz.schoolday.app.data.repository.Resource
 import uz.schoolday.app.data.repository.SchoolRepository
 import uz.schoolday.app.data.repository.Scope
@@ -22,6 +23,13 @@ import javax.inject.Inject
 data class StudentListUiState(
     val search: String = "",
     val classId: Int? = null,
+    /** "active", "inactive" or "all". */
+    val status: String = "active",
+    val importing: Boolean = false,
+    val downloading: Boolean = false,
+    /** Downloaded template, waiting to be shared. */
+    val templateFile: java.io.File? = null,
+    val message: String? = null,
     val students: List<StudentDto> = emptyList(),
     val total: Int = 0,
     val page: Int = 0,
@@ -35,7 +43,7 @@ data class StudentListUiState(
 
 @HiltViewModel
 class StudentListViewModel @Inject constructor(
-    private val repository: SchoolRepository,
+    private val manage: ManageRepository,
     private val scopeStore: ScopeStore
 ) : ViewModel() {
 
@@ -66,8 +74,37 @@ class StudentListViewModel @Inject constructor(
         reload()
     }
 
+    fun onStatus(status: String) {
+        _uiState.update { it.copy(status = status) }
+        reload()
+    }
+
     fun selectSchool(id: Int?) = scopeStore.selectSchool(id)
     fun selectBranch(id: Int?) = scopeStore.selectBranch(id)
+
+    fun downloadTemplate() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(downloading = true) }
+            when (val r = manage.studentsTemplate()) {
+                is Resource.Success -> _uiState.update { it.copy(downloading = false, templateFile = r.data) }
+                is Resource.Error -> _uiState.update { it.copy(downloading = false, message = r.message) }
+            }
+        }
+    }
+
+    fun onTemplateShared() = _uiState.update { it.copy(templateFile = null) }
+
+    fun import(classId: Int, uri: android.net.Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(importing = true) }
+            when (val r = manage.importStudents(classId, uri)) {
+                is Resource.Success -> _uiState.update { it.copy(importing = false, message = uz.schoolday.app.util.tr("Import boshlandi. O'quvchilar bir necha daqiqada paydo bo'ladi.")) }
+                is Resource.Error -> _uiState.update { it.copy(importing = false, message = r.message) }
+            }
+        }
+    }
+
+    fun onMessageShown() = _uiState.update { it.copy(message = null) }
 
     fun reload(debounce: Boolean = false) {
         job?.cancel()
@@ -90,7 +127,7 @@ class StudentListViewModel @Inject constructor(
     private suspend fun fetch(page: Int) {
         val s = _uiState.value
         val scope = scopeStore.scope.value
-        when (val r = repository.students(s.search, scope.schoolId, scope.branchId, s.classId, page)) {
+        when (val r = manage.students(s.search, scope, s.classId, s.status, page)) {
             is Resource.Success -> {
                 val p = r.data!!
                 _uiState.update {

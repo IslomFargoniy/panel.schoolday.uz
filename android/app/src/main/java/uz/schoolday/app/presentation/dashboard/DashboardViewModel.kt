@@ -17,6 +17,8 @@ import javax.inject.Inject
 
 data class DashboardUiState(
     val date: String = DateUtils.today(),
+    /** Chart period: false = last 7 days, true = the month up to the picked day. */
+    val monthly: Boolean = false,
     val data: DashboardDto? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
@@ -45,6 +47,11 @@ class DashboardViewModel @Inject constructor(
         load()
     }
 
+    fun onMonthly(monthly: Boolean) {
+        _uiState.update { it.copy(monthly = monthly) }
+        load()
+    }
+
     fun selectSchool(id: Int?) = scopeStore.selectSchool(id)
     fun selectBranch(id: Int?) = scopeStore.selectBranch(id)
 
@@ -58,7 +65,9 @@ class DashboardViewModel @Inject constructor(
         job = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val s = scopeStore.scope.value
-            when (val r = repository.dashboard(_uiState.value.date, s.schoolId, s.branchId)) {
+            val ui = _uiState.value
+            val days = if (ui.monthly) ui.date.takeLast(2).toInt() else 7
+            when (val r = repository.dashboard(ui.date, s.schoolId, s.branchId, days)) {
                 is Resource.Success -> _uiState.update { it.copy(isLoading = false, data = r.data) }
                 is Resource.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = r.message) }
             }

@@ -1,5 +1,6 @@
 package uz.schoolday.app.data.repository
 
+import kotlinx.coroutines.CancellationException
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import retrofit2.Response
@@ -20,6 +21,8 @@ suspend fun <T> apiCall(gson: Gson, request: suspend () -> Response<ApiResponse<
     } else {
         Resource.Error(body?.message ?: errorMessage(gson, response) ?: tr("Server xatosi (%s)", response.code()))
     }
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     Resource.Error(tr("Internetga ulanib bo'lmadi"))
 }
@@ -33,6 +36,8 @@ suspend fun <T> pageCall(gson: Gson, request: suspend () -> Response<ApiResponse
     } else {
         Resource.Error(body?.message ?: errorMessage(gson, response) ?: tr("Server xatosi (%s)", response.code()))
     }
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     Resource.Error(tr("Internetga ulanib bo'lmadi"))
 }
@@ -43,12 +48,16 @@ suspend fun apiAction(gson: Gson, request: suspend () -> Response<ApiResponse<An
     val body = response.body()
     if (response.isSuccessful && body?.success != false) Resource.Success(Unit)
     else Resource.Error(body?.message ?: errorMessage(gson, response) ?: tr("Server xatosi (%s)", response.code()))
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     Resource.Error(tr("Internetga ulanib bo'lmadi"))
 }
 
 fun errorJson(gson: Gson, response: Response<*>): JsonObject? = try {
     response.errorBody()?.string()?.let { gson.fromJson(it, JsonObject::class.java) }
+} catch (e: CancellationException) {
+    throw e
 } catch (e: Exception) {
     null
 }

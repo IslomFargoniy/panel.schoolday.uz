@@ -26,6 +26,9 @@ data class ReportUiState(
     val endDate: String = DateUtils.today(),
     val status: String = "all",
     val classId: Int? = null,
+    val shiftId: Int? = null,
+    /** Filter by one student (picked by search). */
+    val student: uz.schoolday.app.data.remote.dto.StudentDto? = null,
     val rows: List<AttendanceDto> = emptyList(),
     val total: Int = 0,
     val page: Int = 0,
@@ -56,7 +59,7 @@ class ReportViewModel @Inject constructor(
 
     init {
         viewModelScope.launch { scopeStore.load() }
-        viewModelScope.launch { scopeStore.scope.collect { _uiState.update { it.copy(classId = null) }; reload() } }
+        viewModelScope.launch { scopeStore.scope.collect { _uiState.update { it.copy(classId = null, shiftId = null) }; reload() } }
     }
 
     fun classes() = scopeStore.classes()
@@ -81,13 +84,30 @@ class ReportViewModel @Inject constructor(
         reload()
     }
 
+    fun onShift(id: Int?) {
+        _uiState.update { it.copy(shiftId = id, classId = null) }
+        reload()
+    }
+
+    fun onStudent(student: uz.schoolday.app.data.remote.dto.StudentDto?) {
+        _uiState.update { it.copy(student = student) }
+        reload()
+    }
+
+    /** Shifts within the picked school / branch. */
+    fun shifts() = scopeStore.branches().filter { scopeStore.scope.value.branchId == null || it.id == scopeStore.scope.value.branchId }
+        .flatMap { b -> b.shifts.map { it.id to "${it.name} · ${b.name}" } }
+
+    suspend fun searchStudents(text: String) =
+        (repository.students(text, scopeStore.scope.value.schoolId, scopeStore.scope.value.branchId, null, 1) as? Resource.Success)?.data?.items.orEmpty()
+
     fun selectSchool(id: Int?) = scopeStore.selectSchool(id)
     fun selectBranch(id: Int?) = scopeStore.selectBranch(id)
 
     private fun query(): ReportQuery {
         val s = _uiState.value
         val scope = scopeStore.scope.value
-        return ReportQuery(s.startDate, s.endDate, s.status, scope.schoolId, scope.branchId, s.classId)
+        return ReportQuery(s.startDate, s.endDate, s.status, scope.schoolId, scope.branchId, s.classId, s.student?.id, s.shiftId)
     }
 
     fun reload() {
@@ -144,6 +164,8 @@ class ReportViewModel @Inject constructor(
 
 data class ReportDetailUiState(
     val attendance: AttendanceDto? = null,
+    val deleted: Boolean = false,
+    val message: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
@@ -151,6 +173,7 @@ data class ReportDetailUiState(
 @HiltViewModel
 class ReportDetailViewModel @Inject constructor(
     private val repository: SchoolRepository,
+    private val manage: uz.schoolday.app.data.repository.ManageRepository,
     savedState: SavedStateHandle
 ) : ViewModel() {
     private val id: Int = savedState["attendanceId"] ?: 0
@@ -170,4 +193,26 @@ class ReportDetailViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteAttendance() {
+        viewModelScope.launch {
+            when (val r = manage.deleteAttendance(id)) {
+                is Resource.Success -> _uiState.update { it.copy(deleted = true) }
+                is Resource.Error -> _uiState.update { it.copy(message = r.message) }
+            }
+        }
+    }
+
+    fun deleteEvent(eventId: Int) {
+        viewModelScope.launch {
+            when (val r = manage.deleteEvent(eventId)) {
+                is Resource.Success -> {
+                    _uiState.update { s -> s.copy(attendance = s.attendance?.copy(events = s.attendance.events.filter { it.id != eventId }), message = uz.schoolday.app.util.tr("O'chirildi")) }
+                }
+                is Resource.Error -> _uiState.update { it.copy(message = r.message) }
+            }
+        }
+    }
+
+    fun onMessageShown() = _uiState.update { it.copy(message = null) }
 }

@@ -35,6 +35,9 @@ class MainActivity : FragmentActivity() {
     @Inject
     lateinit var scopeStore: ScopeStore
 
+    @Inject
+    lateinit var auth: uz.schoolday.app.data.repository.AuthRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -68,7 +71,7 @@ class MainActivity : FragmentActivity() {
 
                         !loggedIn -> {
                             // Signed out (or the token expired): forget the other account's schools
-                            LaunchedEffect(Unit) { scopeStore.clear(); unlocked = false }
+                            LaunchedEffect(Unit) { scopeStore.clear(); auth.clearUser(); unlocked = false }
                             LoginScreen()
                         }
 
@@ -82,7 +85,11 @@ class MainActivity : FragmentActivity() {
 
                         else -> {
                             // Already inside the app: turning biometrics on in Profil must not lock it right away.
-                            LaunchedEffect(Unit) { unlocked = true }
+                            LaunchedEffect(Unit) {
+                                unlocked = true
+                                // Opened with a saved session: fetch who this is (permissions decide the menus)
+                                if (auth.user.value == null) auth.me()
+                            }
                             MainNavGraph(userName = userName.orEmpty())
                         }
                     }

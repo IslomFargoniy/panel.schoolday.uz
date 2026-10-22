@@ -30,6 +30,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Play services downloads the face model when the app is installed -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="face" />
+
         <!-- Excel hisobotini boshqa ilovaga ulashish uchun -->
         <provider
             android:name="androidx.core.content.FileProvider"

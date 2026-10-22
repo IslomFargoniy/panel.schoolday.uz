@@ -1,7 +1,9 @@
 package uz.schoolday.app.presentation.reports
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,6 +28,7 @@ import uz.schoolday.app.data.remote.dto.EventDto
 import uz.schoolday.app.presentation.components.*
 import uz.schoolday.app.presentation.dashboard.EventRow
 import uz.schoolday.app.presentation.navigation.Screen
+import uz.schoolday.app.presentation.navigation.finishForm
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.DateUtils
 import uz.schoolday.app.util.tr
@@ -37,6 +40,8 @@ fun ReportScreen(navController: NavController, viewModel: ReportViewModel = hilt
     val schools by viewModel.schools.collectAsState()
     val scope by viewModel.scope.collectAsState()
     val classes = remember(schools, scope) { viewModel.classes() }
+    val shifts = remember(schools, scope) { viewModel.shifts() }
+    var pickStudent by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val c = SchoolDayTheme.colors
     val listState = rememberLazyListState()
@@ -61,6 +66,15 @@ fun ReportScreen(navController: NavController, viewModel: ReportViewModel = hilt
         }
     }
     LaunchedEffect(nearEnd, ui.rows.size) { if (nearEnd) viewModel.loadMore() }
+    uz.schoolday.app.presentation.navigation.OnChangedReturn(navController) { viewModel.reload() }
+
+    if (pickStudent) {
+        StudentPickerDialog(
+            search = viewModel::searchStudents,
+            onPick = { pickStudent = false; viewModel.onStudent(it) },
+            onDismiss = { pickStudent = false }
+        )
+    }
 
     val statusLabels = listOf(tr("Hammasi"), tr("Vaqtida"), tr("Kechikkan"), tr("Kelmagan"), tr("Erta ketgan"))
 
@@ -97,12 +111,32 @@ fun ReportScreen(navController: NavController, viewModel: ReportViewModel = hilt
                 }
                 item {
                     ScopeBar(schools, scope, viewModel::selectSchool, viewModel::selectBranch) {
+                        if (shifts.size > 1) {
+                            DropdownChip(
+                                label = shifts.firstOrNull { it.first == ui.shiftId }?.second ?: tr("Barcha smenalar"),
+                                options = listOf<Pair<Int?, String>>(null to tr("Barcha smenalar")) + shifts.map { it.first as Int? to it.second },
+                                onSelect = viewModel::onShift,
+                                icon = Icons.Outlined.Schedule
+                            )
+                        }
                         if (classes.isNotEmpty()) {
                             DropdownChip(
                                 label = classes.firstOrNull { it.id == ui.classId }?.name ?: tr("Barcha sinflar"),
                                 options = listOf<Pair<Int?, String>>(null to tr("Barcha sinflar")) + classes.map { it.id as Int? to it.name },
                                 onSelect = viewModel::onClass,
                                 icon = Icons.Outlined.Class
+                            )
+                        }
+                        // One student: tap to search, tap again to clear
+                        val student = ui.student
+                        if (student == null) {
+                            AssistChip(onClick = { pickStudent = true }, label = { Text(tr("O'quvchi")) }, leadingIcon = { Icon(Icons.Outlined.PersonSearch, null, Modifier.size(16.dp)) })
+                        } else {
+                            InputChip(
+                                selected = true,
+                                onClick = { viewModel.onStudent(null) },
+                                label = { Text(student.name, maxLines = 1) },
+                                trailingIcon = { Icon(Icons.Outlined.Close, tr("Tozalash"), Modifier.size(16.dp)) }
                             )
                         }
                     }
@@ -182,6 +216,35 @@ fun ReportDetailScreen(attendanceId: Int, navController: NavController, viewMode
     val c = SchoolDayTheme.colors
     val a = ui.attendance
     var photo by remember { mutableStateOf<EventDto?>(null) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    var deletingEvent by remember { mutableStateOf<EventDto?>(null) }
+    val context = LocalContext.current
+
+    LaunchedEffect(ui.deleted) {
+        if (ui.deleted) {
+            android.widget.Toast.makeText(context, tr("O'chirildi"), android.widget.Toast.LENGTH_SHORT).show()
+            navController.finishForm()
+        }
+    }
+    LaunchedEffect(ui.message) {
+        ui.message?.let { android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_LONG).show(); viewModel.onMessageShown() }
+    }
+    if (confirmDelete) {
+        ConfirmDeleteDialog(
+            tr("Davomatni o'chirish"),
+            tr("Bu kunning davomat yozuvi o'chiriladi. Qurilma hodisalari qoladi."),
+            { confirmDelete = false; viewModel.deleteAttendance() },
+            { confirmDelete = false }
+        )
+    }
+    deletingEvent?.let { e ->
+        ConfirmDeleteDialog(
+            tr("Hodisani o'chirish"),
+            tr("%s dagi kirish hodisasi o'chirilsinmi?", DateUtils.formatTime(e.time)),
+            { deletingEvent = null; viewModel.deleteEvent(e.id) },
+            { deletingEvent = null }
+        )
+    }
 
     photo?.let { e -> PhotoViewerDialog(e.picture.orEmpty(), e.name.orEmpty(), DateUtils.formatTime(e.time)) { photo = null } }
 
@@ -191,7 +254,11 @@ fun ReportDetailScreen(attendanceId: Int, navController: NavController, viewMode
                 title = a?.student?.name ?: tr("Davomat"),
                 subtitle = a?.let { DateUtils.formatLongDate(it.date) },
                 onBack = { navController.popBackStack() }
-            )
+            ) {
+                if (a?.id != null) {
+                    IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Outlined.DeleteOutline, tr("O'chirish"), tint = c.danger) }
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
@@ -233,7 +300,12 @@ fun ReportDetailScreen(attendanceId: Int, navController: NavController, viewMode
                             SdCard {
                                 att.events.forEachIndexed { i, e ->
                                     if (i > 0) RowDivider()
-                                    EventRow(e, onPhoto = { photo = e })
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(Modifier.weight(1f)) { EventRow(e, onPhoto = { photo = e }) }
+                                        IconButton(onClick = { deletingEvent = e }) {
+                                            Icon(Icons.Outlined.DeleteOutline, tr("O'chirish"), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -245,4 +317,46 @@ fun ReportDetailScreen(attendanceId: Int, navController: NavController, viewMode
             }
         }
     }
+}
+
+/** Search a student by name / ID / phone (within the picked school and branch). */
+@Composable
+fun StudentPickerDialog(
+    search: suspend (String) -> List<uz.schoolday.app.data.remote.dto.StudentDto>,
+    onPick: (uz.schoolday.app.data.remote.dto.StudentDto) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var text by remember { mutableStateOf("") }
+    var results by remember { mutableStateOf(emptyList<uz.schoolday.app.data.remote.dto.StudentDto>()) }
+    LaunchedEffect(text) {
+        if (text.length < 2) { results = emptyList(); return@LaunchedEffect }
+        kotlinx.coroutines.delay(300)
+        results = search(text)
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(tr("O'quvchini tanlang")) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                SdTextField(text, { text = it }, tr("Ism, ID yoki telefon..."))
+                Column(Modifier.heightIn(max = 320.dp).verticalScroll(rememberScrollState())) {
+                    results.forEach { s ->
+                        Row(
+                            Modifier.fillMaxWidth().clickable { onPick(s) }.padding(vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Avatar(s.faceImage, s.name, sizeDp = 34)
+                            Spacer(Modifier.width(10.dp))
+                            Column {
+                                Text(s.name, style = MaterialTheme.typography.bodyLarge)
+                                s.className?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Bekor qilish")) } }
+    )
 }

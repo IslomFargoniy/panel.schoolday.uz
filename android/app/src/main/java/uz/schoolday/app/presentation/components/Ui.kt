@@ -398,7 +398,7 @@ private fun DatePickerDialogFor(date: String, maxDate: String?, onPick: (String)
 
 /** Read-only field that opens a calendar; [date] is "yyyy-MM-dd". */
 @Composable
-fun DateField(date: String, onChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
+fun DateField(date: String, onChange: (String) -> Unit, label: String, modifier: Modifier = Modifier, maxToday: Boolean = true) {
     var open by remember { mutableStateOf(false) }
     val interaction = remember { MutableInteractionSource() }
     // A read-only text field swallows clicks, so react to its press events instead
@@ -416,7 +416,7 @@ fun DateField(date: String, onChange: (String) -> Unit, label: String, modifier:
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
     )
-    if (open) DatePickerDialogFor(date, maxDate = DateUtils.today(), onPick = onChange, onDismiss = { open = false })
+    if (open) DatePickerDialogFor(date, maxDate = if (maxToday) DateUtils.today() else null, onPick = onChange, onDismiss = { open = false })
 }
 
 /** Label on the left, value on the right; for detail cards. */
