@@ -60,6 +60,7 @@ trait ProfileValidationRules
             'nullable',
             'string',
             'max:255',
+            new \App\Rules\PhoneNumber,
             $userId === null
             ? Rule::unique(User::class)
             : Rule::unique(User::class)->ignore($userId),

@@ -2,6 +2,7 @@ import { Plus, Upload, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
+import { formatPhone } from '@/lib/format';
 
 interface StudentsTableProps {
     students: any;
@@ -111,7 +112,7 @@ export function StudentsTable({
                                                 {student.name}
                                             </span>
                                             <span className="text-xs text-muted-foreground">
-                                                {student.phone}
+                                                {formatPhone(student.phone)}
                                             </span>
                                         </div>
                                         {student.status === 'active' ? (

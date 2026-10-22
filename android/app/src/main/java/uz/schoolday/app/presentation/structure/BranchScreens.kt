@@ -42,6 +42,7 @@ import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.navigation.finishForm
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.DateUtils
+import uz.schoolday.app.util.formatMacInput
 import uz.schoolday.app.util.tr
 import javax.inject.Inject
 
@@ -388,7 +389,7 @@ fun BranchFormScreen(navController: NavController, viewModel: BranchFormViewMode
         )
         ui.macs.forEachIndexed { i, mac ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                SdTextField(mac, { v -> viewModel.edit { it.copy(macs = it.macs.toMutableList().also { l -> l[i] = v.uppercase() }) } }, tr("MAC manzil"), Modifier.weight(1f), placeholder = "AA:BB:CC:DD:EE:FF")
+                SdTextField(mac, { v -> viewModel.edit { it.copy(macs = it.macs.toMutableList().also { l -> l[i] = formatMacInput(v) }) } }, tr("MAC manzil"), Modifier.weight(1f), placeholder = "AA:BB:CC:DD:EE:FF")
                 IconButton(onClick = { viewModel.edit { it.copy(macs = it.macs.filterIndexed { j, _ -> j != i }) } }) {
                     Icon(Icons.Outlined.RemoveCircleOutline, tr("O'chirish"), tint = SchoolDayTheme.colors.danger)
                 }

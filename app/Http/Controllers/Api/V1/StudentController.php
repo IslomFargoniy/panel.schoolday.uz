@@ -32,7 +32,8 @@ class StudentController extends ApiController
                 $search = $request->input('search');
                 $q->where(fn ($q) => $q->where('name', 'like', "%{$search}%")
                     ->orWhere('employeeNoString', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%"));
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->when(\App\Support\Phone::searchDigits($search), fn ($q, $digits) => $q->orWhere('phone', 'like', "%{$digits}%")));
             })
             ->orderBy('name');
 

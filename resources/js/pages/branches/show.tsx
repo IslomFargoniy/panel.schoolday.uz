@@ -38,6 +38,7 @@ import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/pagination';
 import { storageUrl } from '@/lib/utils';
+import { formatPhone } from '@/lib/format';
 import type {
     Branch,
     BreadcrumbItem,
@@ -987,7 +988,7 @@ export default function BranchShowPage({
                                                                         {student.phone && (
                                                                             <div className="font-mono text-[11px] text-muted-foreground">
                                                                                 {
-                                                                                    student.phone
+                                                                                    formatPhone(student.phone)
                                                                                 }
                                                                             </div>
                                                                         )}

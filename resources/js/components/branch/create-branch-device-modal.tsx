@@ -27,6 +27,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { Branch, BranchDevice } from '@/types';
+import { formatMacInput } from '@/lib/format';
 
 interface CreateBranchDeviceModalProps {
     branch?: Branch;
@@ -299,7 +300,7 @@ export default function CreateBranchDeviceModal({
                             placeholder="88:de:39:32:d8:0f"
                             value={data.mac_address}
                             onChange={(e) =>
-                                setData('mac_address', e.target.value)
+                                setData('mac_address', formatMacInput(e.target.value))
                             }
                             className="h-9 rounded-lg border-input font-mono text-xs sm:text-sm"
                             required={data.connection_type === 'http_listening'}

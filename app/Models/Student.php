@@ -30,6 +30,14 @@ class Student extends Model
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
+    /** Saved as "+998901234567" whatever was typed; a value that isn't a phone is kept as is. */
+    protected function phone(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn ($value) => \App\Support\Phone::normalizeOrKeep($value),
+        );
+    }
+
     public function schoolClass(): BelongsTo
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');

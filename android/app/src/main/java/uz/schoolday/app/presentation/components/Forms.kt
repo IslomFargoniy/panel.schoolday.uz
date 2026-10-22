@@ -20,6 +20,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
+import uz.schoolday.app.util.PhoneFormat
+import uz.schoolday.app.util.PhoneVisualTransformation
 import uz.schoolday.app.util.tr
 
 /**
@@ -82,7 +84,8 @@ fun SdTextField(
     minLines: Int = 1,
     placeholder: String? = null,
     supporting: String? = null,
-    password: Boolean = false
+    password: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
@@ -92,10 +95,25 @@ fun SdTextField(
         supportingText = supporting?.let { { Text(it) } },
         singleLine = singleLine,
         minLines = minLines,
-        visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (password) PasswordVisualTransformation() else visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = if (password) KeyboardType.Password else keyboardType),
         shape = RoundedCornerShape(12.dp),
         modifier = modifier.fillMaxWidth()
+    )
+}
+
+/** Phone number: digits only, shown as "+998 90 123 45 67" while typing; the raw value goes to the server. */
+@Composable
+fun PhoneField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier, supporting: String? = null) {
+    SdTextField(
+        value = PhoneFormat.sanitize(value),
+        onValueChange = { onValueChange(PhoneFormat.sanitize(it)) },
+        label = label,
+        modifier = modifier,
+        keyboardType = KeyboardType.Phone,
+        placeholder = "+998 90 123 45 67",
+        supporting = supporting,
+        visualTransformation = PhoneVisualTransformation()
     )
 }
 

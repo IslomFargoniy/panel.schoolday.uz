@@ -40,6 +40,7 @@ import uz.schoolday.app.util.BiometricHelper
 import uz.schoolday.app.util.DateUtils
 import uz.schoolday.app.util.findFragmentActivity
 import uz.schoolday.app.util.initials
+import uz.schoolday.app.util.PhoneFormat
 import uz.schoolday.app.util.tr
 
 @Composable
@@ -116,7 +117,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                 Column(Modifier.weight(1f)) {
                     Text(name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
-                        listOfNotNull(user?.phone, user?.email).joinToString(" · ").ifBlank { "-" },
+                        listOfNotNull(PhoneFormat.display(user?.phone), user?.email).joinToString(" · ").ifBlank { "-" },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

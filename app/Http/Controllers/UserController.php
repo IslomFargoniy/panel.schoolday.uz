@@ -41,7 +41,8 @@ class UserController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->when(\App\Support\Phone::searchDigits($search), fn ($q, $digits) => $q->orWhere('phone', 'like', "%{$digits}%"));
             });
         }
 
@@ -69,14 +70,14 @@ class UserController extends Controller
 
     public function store(Request $request, SaveUser $save)
     {
-        $save->create($request->validate(SaveUser::rules()));
+        $save->create(SaveUser::prepare($request)->validate(SaveUser::rules()));
 
         return redirect()->back()->with('success', ['key' => 'crud.user_created']);
     }
 
     public function update(Request $request, User $user, SaveUser $save)
     {
-        $save->update($user, $request->validate(SaveUser::rules($user)));
+        $save->update($user, SaveUser::prepare($request)->validate(SaveUser::rules($user)));
 
         return redirect()->back()->with('success', ['key' => 'crud.user_updated']);
     }

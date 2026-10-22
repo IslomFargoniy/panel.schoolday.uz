@@ -36,12 +36,8 @@ class StudentsImport implements ShouldQueue, ToCollection, WithChunkReading, Wit
                     continue;
                 }
 
-                if ($phone) {
-                    $phone = trim((string) $phone);
-                    if (! str_starts_with($phone, '+')) {
-                        $phone = '+' . $phone;
-                    }
-                }
+                // Excel gives numbers as 998901234567 or 901234567; Student normalises to +998…
+                $phone = $phone !== null ? trim((string) $phone) : null;
 
                 $gender = 'unknown';
                 if ($jins !== null) {

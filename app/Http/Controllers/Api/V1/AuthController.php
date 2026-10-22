@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\School;
 use App\Models\User;
+use App\Support\Phone;
 use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -99,15 +100,8 @@ class AuthController extends ApiController
             return User::where('email', Str::lower($login))->first();
         }
 
-        // "+998 90 123-45-67", "998901234567" va "901234567" ko'rinishlari
-        $digits = preg_replace('/\D/', '', $login);
-        $candidates = array_values(array_unique(array_filter([
-            $login,
-            $digits,
-            strlen($digits) >= 9 ? substr($digits, -9) : null,
-            strlen($digits) >= 9 ? '998' . substr($digits, -9) : null,
-            strlen($digits) >= 9 ? '+998' . substr($digits, -9) : null,
-        ])));
+        // Any spelling: "+998 90 123-45-67", "998901234567", "901234567"
+        $candidates = Phone::candidates($login);
 
         return User::whereIn('phone', $candidates)->first();
     }

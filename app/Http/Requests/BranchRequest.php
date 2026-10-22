@@ -11,6 +11,17 @@ class BranchRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (is_array($this->input('mac_addresses'))) {
+            $this->merge([
+                'mac_addresses' => array_values(array_filter(
+                    array_map(fn ($m) => \App\Support\MacAddress::normalizeOrKeep(is_string($m) ? $m : null), $this->input('mac_addresses'))
+                )),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -18,7 +29,7 @@ class BranchRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'mac_addresses' => 'nullable|array',
-            'mac_addresses.*' => 'nullable|string|max:255',
+            'mac_addresses.*' => ['nullable', 'string', 'max:255', 'regex:' . \App\Support\MacAddress::REGEX],
         ];
     }
 

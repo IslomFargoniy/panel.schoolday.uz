@@ -39,6 +39,7 @@ import uz.schoolday.app.presentation.navigation.OnChangedReturn
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.navigation.finishForm
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
+import uz.schoolday.app.util.PhoneFormat
 import uz.schoolday.app.util.tr
 import javax.inject.Inject
 
@@ -150,7 +151,7 @@ fun UserListScreen(navController: NavController, viewModel: UserListViewModel = 
                             Column(Modifier.weight(1f)) {
                                 Text(u.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(
-                                    listOfNotNull(u.email, u.schools.joinToString(", ") { it.name }.ifBlank { null }).joinToString(" · "),
+                                    listOfNotNull(u.email, PhoneFormat.display(u.phone), u.schools.joinToString(", ") { it.name }.ifBlank { null }).joinToString(" · "),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     maxLines = 1,
@@ -270,7 +271,7 @@ fun UserFormScreen(navController: NavController, viewModel: UserFormViewModel = 
         }
         SdTextField(ui.name, { v -> viewModel.edit { it.copy(name = v) } }, tr("F.I.SH"))
         SdTextField(ui.email, { v -> viewModel.edit { it.copy(email = v) } }, tr("Email"), keyboardType = KeyboardType.Email)
-        SdTextField(ui.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"), keyboardType = KeyboardType.Phone, placeholder = "+998 90 123 45 67")
+        PhoneField(ui.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"))
         SdTextField(
             ui.password, { v -> viewModel.edit { it.copy(password = v) } }, tr("Parol"), password = true,
             supporting = if (ui.isEdit) tr("Bo'sh qoldirilsa, parol o'zgarmaydi") else tr("Kamida 8 belgi")

@@ -15,6 +15,13 @@ class ProfileUpdateRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('phone')) {
+            $this->merge(['phone' => \App\Support\Phone::normalizeOrKeep($this->input('phone'))]);
+        }
+    }
+
     public function rules(): array
     {
         return $this->profileRules($this->user()->id);

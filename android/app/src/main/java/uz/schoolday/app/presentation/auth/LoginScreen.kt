@@ -32,6 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import uz.schoolday.app.R
 import uz.schoolday.app.presentation.components.ErrorBanner
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
+import uz.schoolday.app.util.PhoneFormat
+import uz.schoolday.app.util.PhoneVisualTransformation
 import uz.schoolday.app.util.tr
 
 @Composable
@@ -105,11 +107,13 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
             }
 
             if (!ui.needsCode) {
+                val phoneLike = PhoneFormat.looksLikePhone(ui.login)
                 OutlinedTextField(
                     value = ui.login,
-                    onValueChange = viewModel::onLoginChanged,
+                    onValueChange = { v -> viewModel.onLoginChanged(if (PhoneFormat.looksLikePhone(v)) PhoneFormat.sanitize(v) else v) },
+                    visualTransformation = if (phoneLike) PhoneVisualTransformation() else VisualTransformation.None,
                     label = { Text(tr("Email yoki telefon raqam")) },
-                    leadingIcon = { Icon(Icons.Outlined.Person, null, tint = MaterialTheme.colorScheme.primary) },
+                    leadingIcon = { Icon(if (phoneLike) Icons.Outlined.Phone else Icons.Outlined.Person, null, tint = MaterialTheme.colorScheme.primary) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),

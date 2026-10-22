@@ -13,6 +13,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit, update } from '@/routes/profile';
 import { send } from '@/routes/verification';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 type ProfileForm = {
     name: string;
@@ -101,15 +102,13 @@ export default function Profile({
                                 {t('settings.phone', 'Phone Number')}
                             </Label>
 
-                            <Input
+                            <PhoneInput
                                 id="phone"
-                                className="mt-1 block w-full"
+                                className="mt-1"
                                 value={data.phone}
-                                onChange={(e) =>
-                                    setData('phone', e.target.value)
-                                }
+                                onChange={(val) => setData('phone', val || '')}
                                 autoComplete="tel"
-                                placeholder="+99890XXXXXXX"
+                                placeholder="+998 90 123 45 67"
                             />
 
                             <InputError

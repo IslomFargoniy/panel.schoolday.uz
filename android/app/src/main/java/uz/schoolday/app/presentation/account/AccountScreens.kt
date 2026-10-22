@@ -88,7 +88,7 @@ fun ProfileEditScreen(navController: NavController, viewModel: ProfileViewModel 
     FormScaffold(tr("Profilni tahrirlash"), { navController.popBackStack() }, viewModel::save, ui.saving, ui.error) {
         SdTextField(ui.name, { v -> viewModel.edit { it.copy(name = v) } }, tr("F.I.SH"))
         SdTextField(ui.email, { v -> viewModel.edit { it.copy(email = v) } }, tr("Email"), keyboardType = KeyboardType.Email)
-        SdTextField(ui.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"), keyboardType = KeyboardType.Phone, placeholder = "+998 90 123 45 67")
+        PhoneField(ui.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"))
         Text(tr("Email yoki telefon bilan tizimga kirasiz."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

@@ -36,11 +36,18 @@ class StudentRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('phone')) {
+            $this->merge(['phone' => \App\Support\Phone::normalizeOrKeep($this->input('phone'))]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:255',
+            'phone' => ['nullable', 'string', 'max:255', new \App\Rules\PhoneNumber],
             'address' => 'nullable|string',
             'telegram_id' => 'nullable|numeric',
             'class_id' => 'required|exists:classes,id',

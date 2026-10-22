@@ -38,6 +38,8 @@ import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.navigation.finishForm
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.DateUtils
+import uz.schoolday.app.util.PhoneFormat
+import uz.schoolday.app.util.ThousandsTransformation
 import uz.schoolday.app.util.tr
 import javax.inject.Inject
 
@@ -203,7 +205,7 @@ class SchoolFormViewModel @Inject constructor(
     private fun apply(s: SchoolDto) = _ui.update {
         it.copy(
             loading = false, name = s.name, address = s.address.orEmpty(), comment = s.comment.orEmpty(),
-            branchLimit = s.branchLimit?.toString() ?: "", branchPrice = s.branchPrice?.let { p -> if (p % 1.0 == 0.0) p.toLong().toString() else p.toString() } ?: "",
+            branchLimit = s.branchLimit?.toString() ?: "", branchPrice = s.branchPrice?.toLong()?.toString() ?: "",
             validDate = s.validDate.orEmpty(), active = s.status == 1, settings = s.settings, users = s.users
         )
     }
@@ -324,7 +326,10 @@ fun SchoolFormScreen(navController: NavController, viewModel: SchoolFormViewMode
         FormSectionTitle(tr("Obuna"))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             SdTextField(ui.branchLimit, { v -> viewModel.edit { it.copy(branchLimit = v.filter(Char::isDigit)) } }, tr("Filial limiti"), Modifier.weight(1f), keyboardType = KeyboardType.Number)
-            SdTextField(ui.branchPrice, { v -> viewModel.edit { it.copy(branchPrice = v.filter { ch -> ch.isDigit() || ch == '.' }) } }, tr("Filial narxi"), Modifier.weight(1f), keyboardType = KeyboardType.Decimal)
+            SdTextField(
+                ui.branchPrice, { v -> viewModel.edit { it.copy(branchPrice = v.filter(Char::isDigit).take(12)) } }, tr("Filial narxi (so'm)"),
+                Modifier.weight(1f), keyboardType = KeyboardType.Number, visualTransformation = ThousandsTransformation
+            )
         }
         DateField(ui.validDate.ifBlank { DateUtils.today() }, { v -> viewModel.edit { it.copy(validDate = v) } }, tr("Amal qilish muddati"), Modifier.fillMaxWidth(), maxToday = false)
         SwitchRow(tr("Faol"), ui.active, { v -> viewModel.edit { it.copy(active = v) } }, tr("Faol bo'lmagan maktab adminlari tizimga kira olmaydi"))
@@ -359,7 +364,7 @@ fun SchoolFormScreen(navController: NavController, viewModel: SchoolFormViewMode
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(u.name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text(listOfNotNull(u.email, u.phone).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                                Text(listOfNotNull(u.email, PhoneFormat.display(u.phone)).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                             }
                             IconButton(onClick = { removing = u }) { Icon(Icons.Outlined.PersonRemove, tr("Ajratish"), tint = c.danger) }
                         }
@@ -396,7 +401,7 @@ fun UserLookupDialog(lookup: suspend (String) -> List<UserBrief>, onPick: (UserB
                             Spacer(Modifier.width(10.dp))
                             Column {
                                 Text(u.name, style = MaterialTheme.typography.bodyLarge)
-                                Text(listOfNotNull(u.email, u.phone).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(listOfNotNull(u.email, PhoneFormat.display(u.phone)).joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }

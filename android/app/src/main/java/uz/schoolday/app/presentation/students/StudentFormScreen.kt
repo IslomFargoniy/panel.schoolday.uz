@@ -272,7 +272,7 @@ fun StudentFormScreen(navController: NavController, viewModel: StudentFormViewMo
         SelectField(tr("Holat"), f.status, listOf("active" to tr("Faol"), "inactive" to tr("Faol emas")), { v -> viewModel.edit { it.copy(status = v) } })
 
         FormSectionTitle(tr("Aloqa"))
-        SdTextField(f.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"), keyboardType = KeyboardType.Phone, placeholder = "+998 90 123 45 67")
+        PhoneField(f.phone, { v -> viewModel.edit { it.copy(phone = v) } }, tr("Telefon"))
         SdTextField(f.address, { v -> viewModel.edit { it.copy(address = v) } }, tr("Manzil"), singleLine = false, minLines = 2)
         SdTextField(
             f.telegramId, { v -> viewModel.edit { it.copy(telegramId = v.filter { c -> c.isDigit() || c == '-' }) } }, tr("Ota-ona Telegram ID"),

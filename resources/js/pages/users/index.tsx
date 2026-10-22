@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { formatPhone } from '@/lib/format';
 
 interface RoleItem {
     id: number;
@@ -339,7 +340,7 @@ export default function UsersIndex({
                                                 {user.email}
                                             </td>
                                             <td className="px-6 py-4">
-                                                {user.phone || '-'}
+                                                {formatPhone(user.phone) || '-'}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="inline-flex items-center rounded-md bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-secondary-foreground/20 ring-inset">

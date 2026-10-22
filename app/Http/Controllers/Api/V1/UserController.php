@@ -41,14 +41,14 @@ class UserController extends ApiController
 
     public function store(Request $request, SaveUser $save): JsonResponse
     {
-        $user = $save->create($request->validate(SaveUser::rules()));
+        $user = $save->create(SaveUser::prepare($request)->validate(SaveUser::rules()));
 
         return $this->ok($this->payload($user->load(['roles', 'user_schools.school'])), status: 201);
     }
 
     public function update(Request $request, User $user, SaveUser $save): JsonResponse
     {
-        $save->update($user, $request->validate(SaveUser::rules($user)));
+        $save->update($user, SaveUser::prepare($request)->validate(SaveUser::rules($user)));
 
         return $this->ok($this->payload($user->load(['roles', 'user_schools.school'])));
     }
@@ -64,7 +64,8 @@ class UserController extends ApiController
     {
         return $query->where(fn ($q) => $q->where('name', 'like', "%{$text}%")
             ->orWhere('email', 'like', "%{$text}%")
-            ->orWhere('phone', 'like', "%{$text}%"));
+            ->orWhere('phone', 'like', "%{$text}%")
+            ->when(\App\Support\Phone::searchDigits($text), fn ($q, $digits) => $q->orWhere('phone', 'like', "%{$digits}%")));
     }
 
     private function payload(User $user): array

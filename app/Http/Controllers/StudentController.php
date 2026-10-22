@@ -66,7 +66,8 @@ class StudentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('employeeNoString', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->when(\App\Support\Phone::searchDigits($search), fn ($q, $digits) => $q->orWhere('phone', 'like', "%{$digits}%"));
             });
         }
 

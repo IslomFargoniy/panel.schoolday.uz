@@ -35,6 +35,7 @@ import uz.schoolday.app.presentation.navigation.OnChangedReturn
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
 import uz.schoolday.app.util.DateUtils
+import uz.schoolday.app.util.PhoneFormat
 import uz.schoolday.app.util.tr
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -282,7 +283,7 @@ fun StudentDetailScreen(studentId: Int, navController: NavController, viewModel:
                     item {
                         SdCard {
                             InfoLine(tr("ID raqam"), s.employeeNo ?: "—")
-                            InfoLine(tr("Telefon"), s.phone ?: "—")
+                            InfoLine(tr("Telefon"), PhoneFormat.display(s.phone) ?: "—")
                             InfoLine(tr("Smena"), s.shiftName ?: "—")
                             InfoLine(
                                 tr("Telegram"),

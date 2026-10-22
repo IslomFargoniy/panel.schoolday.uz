@@ -54,6 +54,14 @@ class User extends Authenticatable
         ];
     }
 
+    /** Saved as "+998901234567" whatever was typed; a value that isn't a phone is kept as is. */
+    protected function phone(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn ($value) => \App\Support\Phone::normalizeOrKeep($value),
+        );
+    }
+
     public function user_schools()
     {
         return $this->hasMany(UserSchool::class, 'user_id');

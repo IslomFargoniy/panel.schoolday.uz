@@ -33,8 +33,9 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         Fortify::authenticateUsing(function (Request $request) {
+            // Email, or a phone in any spelling ("90 123 45 67", "+998 90 123-45-67")
             $user = \App\Models\User::where('email', $request->email)
-                ->orWhere('phone', $request->email)
+                ->orWhereIn('phone', \App\Support\Phone::candidates((string) $request->email))
                 ->first();
 
             if ($user &&

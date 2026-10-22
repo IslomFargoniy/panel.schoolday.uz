@@ -21,6 +21,7 @@ import uz.schoolday.app.data.repository.Scope
 import uz.schoolday.app.data.repository.ScopeStore
 import uz.schoolday.app.presentation.components.*
 import uz.schoolday.app.presentation.navigation.finishForm
+import uz.schoolday.app.util.formatMacInput
 import uz.schoolday.app.util.tr
 import javax.inject.Inject
 
@@ -160,7 +161,7 @@ fun DeviceFormScreen(navController: NavController, viewModel: DeviceFormViewMode
                 supporting = if (ui.hasKey) tr("Kalit saqlangan. O'zgartirish uchun yangisini kiriting.") else tr("Terminaldagi ISUP kaliti")
             )
         } else {
-            SdTextField(ui.mac, { v -> viewModel.edit { it.copy(mac = v.uppercase()) } }, tr("MAC manzil"), placeholder = "AA:BB:CC:DD:EE:FF")
+            SdTextField(ui.mac, { v -> viewModel.edit { it.copy(mac = formatMacInput(v)) } }, tr("MAC manzil"), placeholder = "AA:BB:CC:DD:EE:FF")
         }
     }
 }
