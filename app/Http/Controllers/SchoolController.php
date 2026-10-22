@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Schools\CreateSchool;
+use App\Actions\Schools\DeleteSchool;
 use App\Http\Requests\StoreSchoolRequest;
 use App\Http\Requests\UpdateSchoolRequest;
 use App\Models\School;
 use App\Support\Tenant;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class SchoolController extends Controller
@@ -59,24 +60,17 @@ class SchoolController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSchoolRequest $request)
+    public function store(StoreSchoolRequest $request, CreateSchool $create)
     {
         try {
-            $school = School::create($request->validated());
-
-            // If created by an admin, also attach the creator if needed
-            if (Auth::check()) {
-                $school->user_schools()->create([
-                    'user_id' => Auth::id(),
-                ]);
-            }
-
-            return redirect()->back()->with('success', ['key' => 'crud.school_created']);
+            $create($request->validated(), $request->user());
         } catch (Exception $e) {
             \Illuminate\Support\Facades\Log::error('School create error: ' . $e->getMessage());
 
             return back()->with('error', ['key' => 'crud.school_create_error']);
         }
+
+        return redirect()->back()->with('success', ['key' => 'crud.school_created']);
     }
 
     /**
@@ -116,27 +110,12 @@ class SchoolController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(School $school)
+    public function destroy(School $school, DeleteSchool $delete)
     {
         $this->authorize('delete', $school);
 
-        $hasBranches = $school->branches()->exists();
-        $hasStudents = \App\Models\Student::whereHas('schoolClass.shift.branch', function ($q) use ($school) {
-            $q->where('school_id', $school->id);
-        })->exists();
+        $delete($school);
 
-        if ($hasBranches || $hasStudents) {
-            return redirect()->back()->with('error', ['key' => 'crud.cannot_delete_school_with_data']);
-        }
-
-        try {
-            $school->delete();
-
-            return redirect()->back()->with('success', ['key' => 'crud.school_deleted']);
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('School delete error: ' . $e->getMessage());
-
-            return redirect()->back()->with('error', ['key' => 'crud.school_delete_error']);
-        }
+        return redirect()->back()->with('success', ['key' => 'crud.school_deleted']);
     }
 }

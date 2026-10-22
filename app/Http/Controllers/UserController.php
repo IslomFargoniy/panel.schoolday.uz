@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Users\DeleteUser;
+use App\Actions\Users\SaveUser;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -66,61 +67,23 @@ class UserController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, SaveUser $save)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|string|exists:roles,name',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        $user->assignRole($validated['role']);
+        $save->create($request->validate(SaveUser::rules()));
 
         return redirect()->back()->with('success', ['key' => 'crud.user_created']);
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, SaveUser $save)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20|unique:users,phone,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'role' => 'required|string|exists:roles,name',
-        ]);
-
-        $data = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-        ];
-
-        if (! empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($data);
-        $user->syncRoles([$validated['role']]);
+        $save->update($user, $request->validate(SaveUser::rules($user)));
 
         return redirect()->back()->with('success', ['key' => 'crud.user_updated']);
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user, DeleteUser $delete)
     {
-        if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', ['key' => 'crud.cannot_delete_self']);
-        }
-
-        $user->delete();
+        $delete($user, $request->user());
 
         return redirect()->back()->with('success', ['key' => 'crud.user_deleted']);
     }

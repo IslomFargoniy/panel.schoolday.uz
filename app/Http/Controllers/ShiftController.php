@@ -116,16 +116,8 @@ class ShiftController extends Controller
     {
         $this->authorize('delete', $shift);
 
-        try {
-            $shift->delete();
+        \App\Actions\DeleteRecord::run($shift, 'crud.delete_shift_error');
 
-            return redirect()->back()->with('success', 'crud.deleted');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'crud.delete_shift_error');
-            }
-
-            return redirect()->back()->with('error', 'crud.error');
-        }
+        return redirect()->back()->with('success', 'crud.deleted');
     }
 }

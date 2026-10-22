@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\DeleteRecord;
+use App\Actions\Students\SaveStudent;
 use App\Models\Branch;
 use App\Models\School;
 use App\Models\SchoolClass;
@@ -108,42 +110,18 @@ class StudentController extends Controller
         ]);
     }
 
-    public function store(\App\Http\Requests\StudentRequest $request)
+    public function store(\App\Http\Requests\StudentRequest $request, SaveStudent $save)
     {
-        $validated = $request->validated();
-
-        $class = SchoolClass::with('shift.branch')->findOrFail($validated['class_id']);
-        Tenant::authorizeSchool($class->shift?->branch?->school_id);
-
-        if ($request->hasFile('face_image')) {
-            $path = $request->file('face_image')->store('faces', 'public');
-            $validated['face_image'] = '/storage/' . $path;
-        }
-
-        Student::create($validated);
+        $save->create($request->validated(), $request->file('face_image'), $request->user());
 
         return redirect()->back()->with('success', 'crud.created');
     }
 
-    public function update(\App\Http\Requests\StudentRequest $request, Student $student)
+    public function update(\App\Http\Requests\StudentRequest $request, Student $student, SaveStudent $save)
     {
         $this->authorize('update', $student);
 
-        $validated = $request->validated();
-
-        if (isset($validated['class_id']) && (int) $validated['class_id'] !== (int) $student->class_id) {
-            $newClass = SchoolClass::with('shift.branch')->findOrFail($validated['class_id']);
-            Tenant::authorizeSchool($newClass->shift?->branch?->school_id);
-        }
-
-        if ($request->hasFile('face_image')) {
-            $path = $request->file('face_image')->store('faces', 'public');
-            $validated['face_image'] = '/storage/' . $path;
-        } else {
-            unset($validated['face_image']);
-        }
-
-        $student->update($validated);
+        $save->update($student, $request->validated(), $request->file('face_image'), $request->user());
 
         return redirect()->back()->with('success', 'crud.updated');
     }
@@ -152,17 +130,9 @@ class StudentController extends Controller
     {
         $this->authorize('delete', $student);
 
-        try {
-            $student->delete();
+        DeleteRecord::run($student, 'crud.student_has_relations');
 
-            return redirect()->back()->with('success', 'crud.deleted');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', ['key' => 'crud.student_has_relations']);
-            }
-
-            return redirect()->back()->with('error', 'crud.error');
-        }
+        return redirect()->back()->with('success', 'crud.deleted');
     }
 
     public function template()

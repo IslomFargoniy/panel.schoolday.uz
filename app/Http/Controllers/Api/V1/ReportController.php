@@ -61,6 +61,27 @@ class ReportController extends ApiController
         ]);
     }
 
+    public function destroy(int $id): JsonResponse
+    {
+        $attendance = DailyAttendance::findOrFail($id);
+        $this->authorize('delete', $attendance);
+
+        $attendance->delete();
+
+        return $this->ok(null);
+    }
+
+    public function destroyEvent(int $id): JsonResponse
+    {
+        $event = HikvisionAccessEvent::findOrFail($id);
+        $this->authorize('delete', $event);
+
+        $event->faceRects()->delete();
+        $event->delete();
+
+        return $this->ok(null);
+    }
+
     private function filters(Request $request): array
     {
         $request->validate([

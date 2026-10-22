@@ -2,23 +2,32 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\DeleteRecord;
+use App\Actions\Students\SaveStudent;
+use App\Exports\StudentsTemplateExport;
+use App\Http\Requests\StudentRequest;
 use App\Http\Resources\V1\AttendanceResource;
 use App\Http\Resources\V1\EventResource;
 use App\Http\Resources\V1\StudentResource;
+use App\Imports\StudentsImport;
 use App\Models\HikvisionAccessEvent;
+use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class StudentController extends ApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $request->validate(['status' => 'nullable|in:active,inactive']);
+        $request->validate(['status' => 'nullable|in:active,inactive,all']);
 
         $query = Student::with('schoolClass.shift.branch')
-            ->where('status', $request->input('status', 'active'))
+            ->when($request->input('status', 'active') !== 'all', fn ($q) => $q->where('status', $request->input('status', 'active')))
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->input('search');
                 $q->where(fn ($q) => $q->where('name', 'like', "%{$search}%")
@@ -77,5 +86,53 @@ class StudentController extends ApiController
             : collect();
 
         return $this->ok(EventResource::collection($events));
+    }
+
+    public function store(StudentRequest $request, SaveStudent $save): JsonResponse
+    {
+        $student = $save->create($request->validated(), $request->file('face_image'), $request->user());
+
+        return $this->ok((new StudentResource($student->fresh('schoolClass.shift.branch')))->resolve($request), status: 201);
+    }
+
+    /** POST, not PUT: PHP parses multipart bodies (the face photo) only on POST. */
+    public function update(StudentRequest $request, Student $student, SaveStudent $save): JsonResponse
+    {
+        $this->authorize('update', $student);
+
+        $save->update($student, $request->validated(), $request->file('face_image'), $request->user());
+
+        return $this->ok((new StudentResource($student->fresh('schoolClass.shift.branch')))->resolve($request));
+    }
+
+    public function destroy(Student $student): JsonResponse
+    {
+        $this->authorize('delete', $student);
+
+        DeleteRecord::run($student, 'crud.student_has_relations');
+
+        return $this->ok(null);
+    }
+
+    public function template(): BinaryFileResponse
+    {
+        return Excel::download(new StudentsTemplateExport, 'shablon_oquvchilar.xlsx');
+    }
+
+    /** Rows are created in the background (queued import), like on the web panel. */
+    public function import(Request $request): JsonResponse
+    {
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv',
+            'class_id' => 'required|exists:classes,id',
+        ]);
+
+        $class = SchoolClass::with('shift.branch')->findOrFail($request->input('class_id'));
+        Tenant::authorizeSchool($class->shift?->branch?->school_id);
+
+        $path = $request->file('excel_file')->store('imports');
+        Excel::queueImport(new StudentsImport($class->id), $path);
+
+        return $this->ok(null, \App\Support\UiText::get('crud.students_imported_queued'), 202);
     }
 }

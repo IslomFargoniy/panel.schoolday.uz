@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\DeleteRecord;
+use App\Http\Requests\SchoolClassRequest;
 use App\Http\Resources\V1\AttendanceResource;
 use App\Http\Resources\V1\SchoolClassResource;
 use App\Http\Resources\V1\StudentResource;
 use App\Models\DailyAttendance;
 use App\Models\SchoolClass;
+use App\Models\Shift;
+use App\Support\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,6 +56,41 @@ class SchoolClassController extends ApiController
                 ];
             })->values(),
         ]);
+    }
+
+    public function store(SchoolClassRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $shift = Shift::with('branch')->findOrFail($data['shift_id']);
+        Tenant::authorizeSchool($shift->branch?->school_id);
+
+        $class = SchoolClass::create($data)->load('shift.branch');
+
+        return $this->ok(new SchoolClassResource($class), status: 201);
+    }
+
+    public function update(SchoolClassRequest $request, SchoolClass $schoolClass): JsonResponse
+    {
+        $this->authorize('update', $schoolClass);
+        $data = $request->validated();
+
+        if ((int) $data['shift_id'] !== (int) $schoolClass->shift_id) {
+            $shift = Shift::with('branch')->findOrFail($data['shift_id']);
+            Tenant::authorizeSchool($shift->branch?->school_id);
+        }
+
+        $schoolClass->update($data);
+
+        return $this->ok(new SchoolClassResource($schoolClass->load('shift.branch')));
+    }
+
+    public function destroy(SchoolClass $schoolClass): JsonResponse
+    {
+        $this->authorize('delete', $schoolClass);
+
+        DeleteRecord::run($schoolClass, 'crud.delete_class_error');
+
+        return $this->ok(null);
     }
 
     private function withDayCounts($query, Carbon $date)

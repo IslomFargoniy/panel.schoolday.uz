@@ -26,8 +26,20 @@ class StudentResource extends JsonResource
             'telegram_linked' => (bool) $this->telegram_id,
             'class_id' => $this->class_id,
             'class_name' => $class?->name,
+            'shift_id' => $shift?->id,
             'shift_name' => $shift?->name,
+            'branch_id' => $branch?->id,
             'branch_name' => $branch?->name,
+            // Form fields (edit screen)
+            'address' => $this->address,
+            'telegram_id' => $this->telegram_id ? (string) $this->telegram_id : null,
+            'user_verify_mode' => $this->user_verify_mode,
+            'local_ui_right' => (bool) $this->local_ui_right,
+            'door_right' => $this->door_right,
+            'plan_template_no' => $this->plan_template_no,
+            'valid_enabled' => (bool) $this->valid_enabled,
+            'valid_begin' => $this->valid_begin?->format('Y-m-d'),
+            'valid_end' => $this->valid_end?->format('Y-m-d'),
         ];
     }
 }

@@ -135,16 +135,8 @@ class SchoolClassController extends Controller
     {
         $this->authorize('delete', $schoolClass);
 
-        try {
-            $schoolClass->delete();
+        \App\Actions\DeleteRecord::run($schoolClass, 'crud.delete_class_error');
 
-            return redirect()->back()->with('success', 'crud.deleted');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'crud.delete_class_error');
-            }
-
-            return redirect()->back()->with('error', 'crud.error');
-        }
+        return redirect()->back()->with('success', 'crud.deleted');
     }
 }

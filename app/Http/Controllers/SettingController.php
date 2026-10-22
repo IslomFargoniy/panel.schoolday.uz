@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Settings\SaveSystemSettings;
 use App\Models\Setting;
-use App\Services\Telegram\TelegramService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -18,34 +18,9 @@ class SettingController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, SaveSystemSettings $save)
     {
-        $rules = [
-            'telegram_bot_token' => 'nullable|string',
-        ];
-
-        $validated = $request->validate($rules);
-
-        foreach ($validated as $key => $value) {
-            Setting::updateOrCreate(
-                ['key' => $key],
-                ['value' => $value]
-            );
-        }
-
-        if (! empty($validated['telegram_bot_token'])) {
-            if (empty(config('services.telegram.webhook_secret'))) {
-                // The webhook endpoint rejects every request without a secret, so do not register it
-                return redirect()->back()->with('error', ['key' => 'settings.telegram_secret_missing']);
-            }
-
-            $url = url('/api/telegram/webhook');
-            if (str_starts_with($url, 'https')) {
-                if (! app(TelegramService::class)->setWebhook($url)) {
-                    return redirect()->back()->with('error', ['key' => 'settings.telegram_webhook_failed']);
-                }
-            }
-        }
+        $save($request->validate(SaveSystemSettings::RULES));
 
         return redirect()->back()->with('success', ['key' => 'crud.settings_saved']);
     }

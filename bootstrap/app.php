@@ -28,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
             'school.active' => App\Http\Middleware\CheckSchoolActive::class,
+            'global.admin' => App\Http\Middleware\GlobalAdminMiddleware::class,
+            'superadmin' => App\Http\Middleware\SuperadminMiddleware::class,
         ]);
 
         $middleware->web(append: [
@@ -37,5 +39,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // A refused business rule: JSON for the mobile API, a flash error for the web panel
+        $exceptions->render(function (App\Exceptions\ActionFailed $e, Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['success' => false, 'message' => $e->userMessage(), 'error' => $e->key], 422);
+            }
+
+            return back()->with('error', array_filter(['key' => $e->key, 'params' => $e->params]));
+        });
     })->create();

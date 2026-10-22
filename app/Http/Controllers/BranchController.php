@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Branches\SaveBranch;
+use App\Actions\DeleteRecord;
 use App\Models\Branch;
 use App\Models\School;
 use App\Support\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class BranchController extends Controller
@@ -158,55 +159,18 @@ class BranchController extends Controller
         ]);
     }
 
-    public function store(\App\Http\Requests\BranchRequest $request)
+    public function store(\App\Http\Requests\BranchRequest $request, SaveBranch $save)
     {
-        $validated = $request->validated();
-        $macAddresses = $validated['mac_addresses'] ?? [];
-        unset($validated['mac_addresses']);
-
-        // Determine school_id
-        $schoolId = $validated['school_id'] ?? null;
-        if (! $schoolId && Auth::check()) {
-            $schoolId = Auth::user()->user_schools()->value('school_id');
-        }
-        if (! $schoolId && Tenant::isGlobalAdmin()) {
-            $schoolId = School::first()?->id;
-        }
-
-        Tenant::authorizeSchool($schoolId);
-
-        $school = School::findOrFail($schoolId);
-        if ($school->branch_limit !== null && $school->branches()->count() >= $school->branch_limit) {
-            return redirect()->back()->with('error', ['key' => 'crud.branch_limit_reached', 'params' => ['limit' => $school->branch_limit]]);
-        }
-        $validated['school_id'] = $schoolId;
-
-        $branch = Branch::create($validated);
-
-        $this->syncMacAddresses($branch, $macAddresses);
+        $save->create($request->validated(), $request->user());
 
         return redirect()->back()->with('success', ['key' => 'crud.branch_created']);
     }
 
-    public function update(\App\Http\Requests\BranchRequest $request, Branch $branch)
+    public function update(\App\Http\Requests\BranchRequest $request, Branch $branch, SaveBranch $save)
     {
         $this->authorize('update', $branch);
 
-        $validated = $request->validated();
-        $macAddresses = $validated['mac_addresses'] ?? [];
-        unset($validated['mac_addresses']);
-
-        if (isset($validated['school_id']) && (int) $validated['school_id'] !== (int) $branch->school_id) {
-            Tenant::authorizeSchool((int) $validated['school_id']);
-            $newSchool = School::findOrFail($validated['school_id']);
-            if ($newSchool->branch_limit !== null && $newSchool->branches()->count() >= $newSchool->branch_limit) {
-                return redirect()->back()->with('error', ['key' => 'crud.branch_limit_reached', 'params' => ['limit' => $newSchool->branch_limit]]);
-            }
-        }
-
-        $branch->update($validated);
-
-        $this->syncMacAddresses($branch, $macAddresses);
+        $save->update($branch, $request->validated(), $request->user());
 
         return redirect()->back()->with('success', ['key' => 'crud.branch_updated']);
     }
@@ -214,42 +178,9 @@ class BranchController extends Controller
     public function destroy(Branch $branch)
     {
         $this->authorize('delete', $branch);
-        try {
-            $branch->delete();
 
-            return redirect()->back()->with('success', ['key' => 'crud.branch_deleted']);
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', ['key' => 'crud.branch_has_relations']);
-            }
+        DeleteRecord::run($branch, 'crud.branch_has_relations');
 
-            return redirect()->back()->with('error', ['key' => 'crud.error']);
-        }
-    }
-
-    private function syncMacAddresses(Branch $branch, array $macAddresses): void
-    {
-        $clean = collect($macAddresses)
-            ->map(fn ($m) => strtoupper(trim($m)))
-            ->filter(fn ($m) => $m !== '')
-            ->unique()
-            ->values()
-            ->toArray();
-
-        // Delete old HTTP listening devices not in new list (preserve ISUP devices)
-        $branch->devices()->where('connection_type', 'http_listening')->whereNotIn('mac_address', $clean)->delete();
-
-        // Create new ones
-        foreach ($clean as $mac) {
-            $branch->devices()->firstOrCreate(
-                ['mac_address' => $mac],
-                [
-                    'name' => 'Hikvision Terminal',
-                    'device_id' => null,
-                    'connection_type' => 'http_listening',
-                    'status' => true,
-                ]
-            );
-        }
+        return redirect()->back()->with('success', ['key' => 'crud.branch_deleted']);
     }
 }

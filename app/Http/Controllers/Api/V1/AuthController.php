@@ -149,6 +149,12 @@ class AuthController extends ApiController
             'roles' => $user->getRoleNames()->values(),
             'is_global_admin' => $isGlobalAdmin,
             'two_factor_enabled' => $user->hasEnabledTwoFactorAuthentication(),
+            // Which menus the app shows; the server checks every request anyway
+            'permissions' => [
+                'manage_schools' => $isGlobalAdmin,
+                'manage_users' => $user->hasRole('Superadmin'),
+                'system_settings' => $user->hasRole('Superadmin'),
+            ],
             'schools' => $schools->map(fn (School $s) => [
                 'id' => $s->id,
                 'name' => $s->name,
