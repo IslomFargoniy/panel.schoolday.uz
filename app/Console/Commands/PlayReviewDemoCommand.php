@@ -67,8 +67,10 @@ class PlayReviewDemoCommand extends Command
             ])->save();
             UserSchool::firstOrCreate(['user_id' => $user->id, 'school_id' => $school->id]);
 
-            $branch = Branch::firstOrCreate(['school_id' => $school->id, 'name' => 'Main building']);
-            $shift = Shift::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Morning'], ['start_time' => '08:00', 'end_time' => '13:00']);
+            $branch = Branch::firstOrNew(['school_id' => $school->id]);
+            $branch->fill(['name' => 'Asosiy bino'])->save();
+            $shift = Shift::firstOrNew(['branch_id' => $branch->id]);
+            $shift->fill(['name' => '1-smena', 'start_time' => '08:00', 'end_time' => '13:00'])->save();
 
             $students = collect();
             foreach (self::STUDENTS as $className => $names) {
