@@ -39,7 +39,7 @@
         The school can edit or delete students, reports and events at any time.</p>
 
     <h2>Deleting your account</h2>
-    <p>In the app: <b>Settings → Delete account</b> (password required). Your account and access tokens are deleted immediately.
+    <p>In the app: <b>Profile → Delete account</b> (password required). Your account and access tokens are deleted immediately.
         You can also request deletion by email; see <a href="{{ url('/delete-account') }}">{{ url('/delete-account') }}</a>.
         Student and attendance records belong to the school and are deleted by the school.</p>
 
@@ -82,7 +82,7 @@
     <p>Ilova va server orasidagi barcha aloqa shifrlangan (HTTPS). Ma’lumot maktab SchoolDay’dan foydalanguncha saqlanadi; maktab istalgan vaqtda o‘chira oladi.</p>
 
     <h2>Hisobni o‘chirish</h2>
-    <p>Ilovada: <b>Sozlamalar → Hisobni o‘chirish</b> (parol so‘raladi). Yoki email orqali: <a href="{{ url('/delete-account') }}">{{ url('/delete-account') }}</a>.
+    <p>Ilovada: <b>Profil → Hisobni o‘chirish</b> (parol so‘raladi). Yoki email orqali: <a href="{{ url('/delete-account') }}">{{ url('/delete-account') }}</a>.
         O‘quvchi va davomat ma’lumotlari maktabga tegishli va maktab tomonidan o‘chiriladi.</p>
 
     <h2>Aloqa</h2>
@@ -116,7 +116,7 @@
         (со снимком) отправляются в чаты, подключённые школой, например родителям. Данные не продаются.</p>
 
     <h2>Удаление аккаунта</h2>
-    <p>В приложении: <b>Настройки → Удалить аккаунт</b>. Или по email: <a href="{{ url('/delete-account') }}">{{ url('/delete-account') }}</a>.</p>
+    <p>В приложении: <b>Профиль → Удалить аккаунт</b>. Или по email: <a href="{{ url('/delete-account') }}">{{ url('/delete-account') }}</a>.</p>
 
     <h2>Контакты</h2>
     <p><a href="mailto:{{ $email }}">{{ $email }}</a></p>

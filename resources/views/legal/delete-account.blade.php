@@ -8,7 +8,7 @@
     <h2>In the app</h2>
     <ol>
         <li>Open SchoolDay and sign in.</li>
-        <li>Go to <b>Settings</b> and tap <b>Delete account</b>.</li>
+        <li>Go to <b>Profile</b> (bottom tab), scroll down and tap <b>Delete account</b>.</li>
         <li>Enter your password and confirm.</li>
     </ol>
     <p>Your account, profile data (name, login, email, phone, Telegram ID) and all access tokens are deleted immediately and cannot be restored.</p>
@@ -25,7 +25,7 @@
     <h2>Ilovada</h2>
     <ol>
         <li>SchoolDay’ni oching va kiring.</li>
-        <li><b>Sozlamalar</b> → <b>Hisobni o‘chirish</b>.</li>
+        <li><b>Profil</b> (pastki menyu) → <b>Hisobni o‘chirish</b>.</li>
         <li>Parolni kiriting va tasdiqlang.</li>
     </ol>
     <p>Hisob, profil ma’lumotlari (ism, login, email, telefon, Telegram ID) va barcha tokenlar darhol o‘chiriladi, qayta tiklanmaydi.</p>
@@ -40,7 +40,7 @@
     <h2>В приложении</h2>
     <ol>
         <li>Откройте SchoolDay и войдите.</li>
-        <li><b>Настройки</b> → <b>Удалить аккаунт</b>.</li>
+        <li><b>Профиль</b> → <b>Удалить аккаунт</b>.</li>
         <li>Введите пароль и подтвердите.</li>
     </ol>
     <p>Аккаунт, данные профиля (имя, логин, email, телефон, Telegram ID) и токены удаляются сразу и без возможности восстановления.</p>
