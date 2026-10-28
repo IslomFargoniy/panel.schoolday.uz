@@ -10,6 +10,10 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// Public pages linked from Google Play (privacy policy, account deletion)
+Route::view('privacy', 'legal.privacy', ['email' => 'abdurahmanislam304@gmail.com'])->name('privacy');
+Route::view('delete-account', 'legal.delete-account', ['email' => 'abdurahmanislam304@gmail.com'])->name('delete-account');
+
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MonitoringController;
