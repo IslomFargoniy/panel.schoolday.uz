@@ -37,9 +37,9 @@ Imzo: `keystore.properties` va `schoolday-release.keystore` (ikkalasi ham gitga 
 - Play App Signing yoqiladi; bizning keystore "upload key" bo'lib qoladi.
 - Crash hisobotlari uchun `app/build/outputs/mapping/release/mapping.txt` ni shu versiyaga yuklang.
 - Paket nomi `uz.schoolday.app`, minSdk 26, targetSdk 36.
-- Play Console'da kerak bo'ladi: maxfiylik siyosati URL'i (saytda hali yo'q), 512×512 ikonka, 1024×500 banner,
+- Play Console'da kerak bo'ladi: maxfiylik siyosati https://panel.schoolday.uz/privacy, hisobni o‘chirish https://panel.schoolday.uz/delete-account, 512×512 ikonka, 1024×500 banner,
   telefon skrinshotlari, Data safety anketasi (login, o'quvchi ismi va davomati serverdan o'qiladi; telefondan hech narsa yig'ilmaydi).
-- Kirish faqat maktab bergan hisob bilan: ko'rib chiquvchilar uchun "App access" bo'limiga demo login kiriting.
+- Kirish faqat maktab bergan hisob bilan: ko‘rib chiquvchilar uchun "App access" ga review@schoolday.uz kiriting; demo maktabni tiklash: `php artisan schoolday:play-demo`.
 
 ## Testlar
 
