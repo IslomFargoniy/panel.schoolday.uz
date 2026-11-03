@@ -20,7 +20,7 @@ const translations = {
         contact_phone_desc: "Bizga qo'ng'iroq qiling",
         contact_phone_desc2: "Qo'shimcha telefon raqam",
         footer: "Barcha huquqlar himoyalangan.",
-        page_title: "SchoolDay - Maktab va Bog'chalar uchun Aqlli Davomat va Turniket Tizimi (Face ID)",
+        page_title: "SchoolDay — maktab va bog'cha uchun Face ID davomat va turniket",
         meta_desc: "Maktab va bog'chalar uchun eng yaxshi davomat tizimi. Hikvision turniketlari, Face ID (yuzni tanish), Telegram xabarnomalar va avtomatik hisobotlar. O'quvchilar xavfsizligini biz bilan ta'minlang.",
         meta_keywords: "maktab davomat tizimi, turniket tizimlari, bog'cha davomati, yuzni tanish davomati, Face ID maktab, o'quvchilar xavfsizligi, telegram bot davomat, Hikvision davomat tizimi, elektron davomat, maktab xavfsizligi, o'quvchi nazorati"
     },

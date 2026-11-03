@@ -16,6 +16,7 @@ set -euo pipefail
 # ── Konfiguratsiya ──────────────────────────────────────────
 SERVER="root@193.180.213.188"
 REMOTE_PATH="/var/www/panel_school_usr/data/www/panel.schoolday.uz"
+LANDING_PATH="/var/www/schoolday_uz_usr/data/www/schoolday.uz"
 PHP="/opt/php83/bin/php"
 BRANCH="main"
 
@@ -128,6 +129,16 @@ deploy() {
     run_remote "$PHP artisan view:cache"
     run_remote "$PHP artisan event:cache"
     log_success "Keshlar yaratildi"
+
+    # 7.5 schoolday.uz landing: repo ichidagi landing/ nginx docroot'iga ko'chiriladi.
+    # --delete: docroot'da faqat landing/ dagi fayllar qoladi (eski .git va h.k. ochiq turmasin).
+    # Landing xatosi panel deployini to'xtatmaydi.
+    log_info "schoolday.uz landing yangilanmoqda..."
+    if run_remote "test -f landing/index.html && rsync -a --delete --delete-excluded --exclude=README.md landing/ $LANDING_PATH/ && chown -R schoolday_uz_usr:schoolday_uz_usr $LANDING_PATH && find $LANDING_PATH -type d -exec chmod 755 {} + && find $LANDING_PATH -type f -exec chmod 644 {} +"; then
+        log_success "schoolday.uz yangilandi"
+    else
+        log_warn "schoolday.uz landing yangilanmadi (panel deployi joyida)"
+    fi
 
     # 8. Queue worker & Reverb restart
     if [[ "$MODE" == "full" ]]; then

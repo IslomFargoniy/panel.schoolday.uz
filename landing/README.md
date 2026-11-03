@@ -1,46 +1,6 @@
-# SchoolDay - Smart Attendance & Safety Ecosystem
+# schoolday.uz — landing sahifa
 
-SchoolDay is a modern landing page for an innovative school management system focusing on smart attendance, security turnstiles, and Face ID technology.
+Statik sahifa (HTML/CSS/JS, build kerak emas). Ilgari alohida `IslomFargoniy/landing.schoolday` reposida edi, 2026-11-03 da tarixi bilan shu papkaga ko'chirildi.
 
-## 🚀 Features
-
-- **Smart Attendance System**: Real-time tracking of student movements with automated reporting.
-- **Turnstiles & Face ID**: Integration with the latest Hikvision face recognition terminals for maximum security.
-- **Telegram Notifications**: Instant alerts for parents when their child arrives or leaves school.
-- **Multilingual Support**: Full support for Uzbek (UZ), Russian (RU), and English (EN).
-- **SEO Optimized**: Optimized meta tags (title, description, keywords) for all supported languages to ensure high visibility on search engines like Google.
-- **Responsive Design**: Premium, dark-themed UI that works perfectly on all devices.
-
-## 🛠️ Technology Stack
-
-- **HTML5**: Semantic structure.
-- **Vanilla CSS**: Custom design system with glassmorphism and dynamic animations.
-- **Vanilla JavaScript**: Lightweight logic for language switching, theme toggling, and scroll effects.
-
-## 🌐 SEO & Languages
-
-The project includes a robust dynamic SEO system. Switching the language via the UI automatically updates:
-- Page Title
-- Meta Description
-- Meta Keywords
-- Open Graph (OG) tags
-
-This ensures that the site is searchable and looks great when shared on social media across all three languages.
-
-## 📦 Installation
-
-Since this is a static landing page, you can simply:
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:IslomFargoniy/landing.schoolday.git
-   ```
-2. Open `index.html` in your favorite browser.
-
-## 📞 Contact
-
-For any questions or inquiries, please contact us:
-- **Telegram**: [@IslomFargniy](https://t.me/IslomFargniy)
-- **Phone**: +998 91 115 77 09 / +998 99 303 34 84
-
----
-© 2026 SchoolDay Ecosystem. All rights reserved.
+- **Deploy:** repo ildizidagi `./deploy.sh` panel bilan birga shu papkani serverdagi `/var/www/schoolday_uz_usr/data/www/schoolday.uz/` ga `rsync --delete` bilan yoyadi. U papkadagi qo'lda qilingan o'zgarishlar keyingi deployda o'chadi.
+- **SEO:** `sitemap.xml` va `robots.txt` shu yerda. Sahifa o'zgarsa `sitemap.xml` dagi `lastmod` ni va `index.html` dagi `style.css?v=` ni yangilang. Title `script.js` dagi `page_title` dan ham o'rnatiladi, ikkalasini bir xil tuting.

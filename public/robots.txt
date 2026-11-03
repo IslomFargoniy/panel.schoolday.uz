@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+# O'quvchi rasmlari va davomat suratlari qidiruvga chiqmasin
+Disallow: /storage/
+Disallow: /api/
+
+Sitemap: https://schoolday.uz/sitemap.xml

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="SchoolDay boshqaruv paneli: maktab va bog'chalar uchun Face ID va turniket davomati, ota-onalarga Telegram xabarnomalar, hisobotlar.">
 
     {{-- Inline script to detect system dark mode preference and apply it immediately --}}
     <script>
