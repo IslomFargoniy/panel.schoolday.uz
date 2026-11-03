@@ -108,29 +108,12 @@ class HikvisionSyncService
                     } else {
                         $storagePath = str_replace('/storage/', '', $student->face_image);
                         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storagePath)) {
-                            $faceUrl = url('storage/' . ltrim($storagePath, '/'));
+                            $faceUrl = self::faceUrl($storagePath);
                         }
                     }
 
                     if ($faceUrl) {
-                        $facePayload = [
-                            'faceLibType' => 'blackFD',
-                            'FDID' => '1',
-                            'FPID' => $employeeNo,
-                            'faceURL' => $faceUrl,
-                        ];
-
-                        $faceRes = Http::timeout(config('hikvision.timeout', 10))->post($this->gatewayUrl(), [
-                            'device_id' => $device->device_id,
-                            'method' => 'POST',
-                            'url' => 'POST /ISAPI/Intelligent/FDLib/FaceDataRecord?format=json',
-                            'body' => json_encode($facePayload),
-                        ]);
-
-                        Log::info("HikvisionSync [ISUP Face]: Student {$employeeNo} face uploaded", [
-                            'faceUrl' => $faceUrl,
-                            'response' => $faceRes->json(),
-                        ]);
+                        $this->uploadFaceViaIsup($device, $employeeNo, $faceUrl);
                     }
                 }
 
@@ -148,6 +131,69 @@ class HikvisionSyncService
 
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Public URL the terminal downloads the face photo from. Built from config, not url(): jobs run
+     * without a request, so url() falls back to APP_URL, which the device cannot reach if it is localhost.
+     */
+    public static function faceUrl(string $storagePath): string
+    {
+        $base = rtrim((string) config('hikvision.public_url', config('app.url')), '/');
+
+        return $base . '/storage/' . ltrim($storagePath, '/');
+    }
+
+    /**
+     * Add the face over ISUP; if the device rejects it (e.g. a face already exists for this FPID),
+     * fall back to FDSetUp, which adds or replaces. Returns true only when the device answers statusCode 1.
+     */
+    protected function uploadFaceViaIsup(BranchDevice $device, string $employeeNo, string $faceUrl): bool
+    {
+        $payload = json_encode([
+            'faceLibType' => 'blackFD',
+            'FDID' => '1',
+            'FPID' => $employeeNo,
+            'faceURL' => $faceUrl,
+        ]);
+
+        $attempts = [
+            ['POST', 'POST /ISAPI/Intelligent/FDLib/FaceDataRecord?format=json'],
+            ['PUT', 'PUT /ISAPI/Intelligent/FDLib/FDSetUp?format=json'],
+        ];
+
+        $last = null;
+        foreach ($attempts as [$method, $url]) {
+            $res = Http::timeout(max(15, (int) config('hikvision.timeout', 10)))->post($this->gatewayUrl(), [
+                'device_id' => $device->device_id,
+                'method' => $method,
+                'url' => $url,
+                'body' => $payload,
+            ]);
+
+            $last = self::isapiStatus($res->json());
+            if (($last['statusCode'] ?? null) == 1) {
+                Log::info("HikvisionSync [ISUP Face]: Student {$employeeNo} face uploaded to {$device->device_id} ({$method})");
+
+                return true;
+            }
+        }
+
+        Log::warning("HikvisionSync [ISUP Face]: Student {$employeeNo} face NOT uploaded to {$device->device_id}", [
+            'faceUrl' => $faceUrl,
+            'response' => $last,
+        ]);
+
+        return false;
+    }
+
+    /** Decode the device's ISAPI JSON answer wrapped by the gateway ({"success":..,"response":"{...}"}). */
+    protected static function isapiStatus(?array $gatewayBody): array
+    {
+        $raw = $gatewayBody['response'] ?? null;
+        $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+
+        return is_array($decoded) ? $decoded : ($gatewayBody ?? []);
     }
 
     /**

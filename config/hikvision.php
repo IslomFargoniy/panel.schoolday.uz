@@ -47,5 +47,9 @@ return [
     | failures exceed the threshold. Set to null to disable self-healing.
     | Example: "systemctl restart hikvision-isup-schoolday"
     */
+    // Terminal o'quvchi rasmini shu manzildan o'zi yuklab oladi (faceURL). APP_URL ga bog'liq emas:
+    // fon ishida url() APP_URL dan oladi va u localhost bo'lib qolsa qurilma "urlDownloadFail" qaytaradi.
+    'public_url' => env('HIKVISION_PUBLIC_URL', 'https://panel.schoolday.uz'),
+
     'restart_command' => env('HIKVISION_RESTART_COMMAND', null),
 ];
