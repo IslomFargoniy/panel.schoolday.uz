@@ -2,8 +2,8 @@
 const translations = {
     uz: {
         badge: "Yangi avlod maktab boshqaruvi",
-        heading1: "Maktabingizni",
-        heading2: "eng yuqori aniqlikda boshqaring",
+        heading1: "Maktab va bog'cha uchun",
+        heading2: "Face ID davomat va turniket tizimi",
         description: "SchoolDay — maktab va bog'chalarda davomatni qayd etish, o'quvchilarni aqlli boshqarish va real vaqtda Hikvision tizimi orqali nazorat qilish uchun eng mukammal yechim.",
         btn_login: "Tizimga kirish",
         btn_contact: "Bog'lanish",
@@ -26,8 +26,8 @@ const translations = {
     },
     ru: {
         badge: "Управление школами нового поколения",
-        heading1: "Управляйте своей школой",
-        heading2: "с высочайшей точностью",
+        heading1: "Система посещаемости",
+        heading2: "для школ и детских садов с Face ID",
         description: "SchoolDay предоставляет интегрированную экосистему для учета посещаемости, умного управления учащимися и контроля доступа Hikvision в реальном времени.",
         btn_login: "Войти в систему",
         btn_contact: "Связаться с нами",
@@ -50,8 +50,8 @@ const translations = {
     },
     en: {
         badge: "Next Generation School Management",
-        heading1: "Manage your school with",
-        heading2: "ultimate precision",
+        heading1: "Face ID attendance",
+        heading2: "for schools and kindergartens",
         description: "SchoolDay provides a highly integrated ecosystem for attendance tracking, student management, and real-time Hikvision access control.",
         btn_login: "Sign In",
         btn_contact: "Contact Us",

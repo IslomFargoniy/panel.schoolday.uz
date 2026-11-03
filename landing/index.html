@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SchoolDay — maktab va bog'cha uchun Face ID davomat va turniket</title>
     <link rel="canonical" href="https://schoolday.uz/">
+    <link rel="alternate" hreflang="uz" href="https://schoolday.uz/">
+    <link rel="alternate" hreflang="ru" href="https://schoolday.uz/ru/">
+    <link rel="alternate" hreflang="x-default" href="https://schoolday.uz/">
     <meta name="description"
         content="Maktab va bog'chalar uchun eng yaxshi davomat tizimi. Hikvision turniketlari, Face ID (yuzni tanish), Telegram xabarnomalar va avtomatik hisobotlar. O'quvchilar xavfsizligini biz bilan ta'minlang.">
     <meta name="keywords"
@@ -34,7 +37,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="images/icons/icon-192x192.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <meta name="theme-color" content="#f97316">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -139,8 +142,8 @@
 
                     <!-- Heading -->
                     <h1 class="heading">
-                        <span id="heading1">Maktabingizni </span><br>
-                        <span class="heading__gradient" id="heading2">eng yuqori aniqlikda boshqaring</span>
+                        <span id="heading1">Maktab va bog'cha uchun </span><br>
+                        <span class="heading__gradient" id="heading2">Face ID davomat va turniket tizimi</span>
                     </h1>
 
                     <!-- Description -->
@@ -269,6 +272,12 @@
         </main>
 
         <!-- Footer -->
+        <nav aria-label="Sahifalar" style="text-align:center; position:relative; z-index:1; padding:0 1.5rem 1rem; display:flex; gap:1.25rem; justify-content:center; flex-wrap:wrap;">
+            <a href="/maktab-turniket/" style="color:var(--text-light);">Maktab va bog'cha uchun turniket</a>
+            <a href="/ru/" hreflang="ru" style="color:var(--text-light);">Система посещаемости для школ (RU)</a>
+            <a href="https://payday.uz/" style="color:var(--text-light);">Xodimlar davomati — PayDay</a>
+        </nav>
+
         <footer class="footer">
             &copy; <span id="year"></span> SchoolDay Ecosystem. <span id="footer-rights">Barcha huquqlar
                 himoyalangan.</span>
@@ -278,7 +287,7 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 
 </html>
