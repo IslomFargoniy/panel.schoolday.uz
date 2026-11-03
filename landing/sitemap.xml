@@ -17,6 +17,38 @@
     <lastmod>2026-11-03</lastmod>
   </url>
   <url>
+    <loc>https://schoolday.uz/maqolalar/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://schoolday.uz/maqolalar/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://schoolday.uz/ru/stati/"/>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/ru/stati/</loc>
+    <lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="uz" href="https://schoolday.uz/maqolalar/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://schoolday.uz/ru/stati/"/>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/maqolalar/maktabda-elektron-davomat/</loc>
+    <lastmod>2026-11-03</lastmod>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/maqolalar/maktabga-turniket-ornatish/</loc>
+    <lastmod>2026-11-03</lastmod>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/maqolalar/farzandim-maktabga-keldimi/</loc>
+    <lastmod>2026-11-03</lastmod>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/maqolalar/bogcha-davomat-va-xavfsizlik/</loc>
+    <lastmod>2026-11-03</lastmod>
+  </url>
+  <url>
+    <loc>https://schoolday.uz/ru/stati/elektronnaya-poseshchaemost-v-shkole/</loc>
+    <lastmod>2026-11-03</lastmod>
+  </url>
+  <url>
     <loc>https://panel.schoolday.uz/privacy</loc>
     <lastmod>2026-11-03</lastmod>
   </url>
