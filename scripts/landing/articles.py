@@ -29,10 +29,10 @@ ARTICLES = [
 </ul>
 
 <h2>Sinflar va smenalar bo'yicha hisobot</h2>
-<p>O'quvchilar sinflar va smenalarga biriktiriladi. Shunda direktor yoki sinf rahbari bir qarashda ko'radi: bugun qaysi sinfdan kim keldi, kim kechikdi, kim kelmadi. Oylik hisobot ham bir tugma bilan tayyor bo'ladi.</p>
+<p>O'quvchilar sinflar va smenalarga biriktiriladi. Shunda direktor panelda, sinf rahbari esa sinfning Telegram guruhida ko'radi: bugun kim keldi, kim kechikdi, kim kelmadi. Istalgan davr bo'yicha hisobot Excel'ga bir tugma bilan yuklanadi.</p>
 
 <h2>Turniket kerakmi?</h2>
-<p>Shart emas. Faqat Face ID terminalining o'zi davomat uchun yetarli. Agar maktabga begonalar kirmasligi muhim bo'lsa, terminal <a href="/maktab-turniket/">turniketga ulanadi</a> va u faqat bazadagi o'quvchi va xodimlar uchun ochiladi.</p>
+<p>Shart emas. Faqat Face ID terminalining o'zi davomat uchun yetarli. Agar maktabga begonalar kirmasligi muhim bo'lsa, terminal <a href="/maktab-turniket/">turniketga ulanadi</a> va u faqat bazadagi o'quvchilar uchun ochiladi.</p>
 
 <h2>Joriy etish bosqichlari</h2>
 <ol>
@@ -90,26 +90,26 @@ ARTICLES = [
 <p>Rasm muhim: ota-ona xabar haqiqatan o'z farzandi haqida ekanini ko'radi.</p>
 
 <h2>Ota-ona qanday ulanadi?</h2>
-<p>Hech qanday ilova o'rnatish shart emas. Ota-ona SchoolDay Telegram botini ochib, telefon raqamini yuboradi. Raqam maktab bazasidagi o'quvchi ma'lumotiga mos kelsa, xabarlar avtomatik kela boshlaydi.</p>
+<p>Hech qanday ilova o'rnatish shart emas. Ota-ona SchoolDay Telegram botini ochib, telefon raqamini yuboradi. Raqam maktab bazasidagi o'quvchi ma'lumotiga mos kelsa, xabarlar avtomatik kela boshlaydi. Har bir o'quvchiga bitta telefon raqami biriktiriladi — xabar shu raqam egasiga boradi.</p>
 
 <h2>Sinf guruhiga ham xabar</h2>
 <p>Sinf rahbari xohlasa, sinfning Telegram guruhiga ham xabarlar keladi — shunda u kim kelgani va kim kelmaganini bir joyda ko'radi.</p>
 
 <h2>Maxfiylik haqida</h2>
-<p>Xabar faqat o'quvchining o'z ota-onasiga va maktab belgilagan guruhga boradi. O'quvchilar rasmlari Google kabi qidiruv tizimlarida indekslanmaydi.</p>
+<p>Xabar faqat o'quvchiga biriktirilgan raqam egasiga va sinfning Telegram guruhiga boradi. O'quvchilar rasmlari qidiruv tizimlari uchun yopilgan (robots.txt).</p>
 <p>Maktabingizda shunday tizim bo'lishini istaysizmi? <a href="/">SchoolDay</a> haqida batafsil o'qing yoki biz bilan bog'laning.</p>
 """),
 
   dict(lang="uz", slug="bogcha-davomat-va-xavfsizlik", date=TODAY,
     title="Bog'chada bolalar davomati va xavfsizligi: zamonaviy yechimlar",
     desc="Bog'chada bolalar davomatini qanday yuritish va xavfsizlikni oshirish mumkin: Face ID terminali, kirish nazorati, ota-onalarga Telegram xabar va guruhlar bo'yicha hisobot.",
-    lead="Bog'chada davomat faqat hisobot uchun emas — bu birinchi navbatda bolalar xavfsizligi. Kim keldi, kim olib ketdi va binoga kim kirdi — tarbiyachi va mudira buni har doim bilishi kerak.",
+    lead="Bog'chada davomat faqat hisobot uchun emas — bu birinchi navbatda bolalar xavfsizligi. Kim keldi, kim ketdi va qachon — tarbiyachi va mudira buni har doim bilishi kerak.",
     body="""
 <h2>Bog'chada davomatning o'ziga xosligi</h2>
 <p>Bolalarni ota-onalar olib keladi va olib ketadi, guruhlar kichik, ish kuni esa uzun. Qog'oz ro'yxat tarbiyachining vaqtini oladi, xatolar esa ko'p bo'ladi — ayniqsa ertalabki gavjum paytda.</p>
 
 <h2>Face ID terminali bilan davomat</h2>
-<p>Kirishga yuzni tanish terminali o'rnatiladi. Bola (yoki uni olib kelgan xodim) terminal oldidan o'tganda davomat avtomatik yoziladi. Karta yoki kalit kerak emas — bolalar ularni tez yo'qotadi.</p>
+<p>Kirishga yuzni tanish terminali o'rnatiladi. Bola terminal oldidan o'tganda davomat avtomatik yoziladi. Karta yoki kalit kerak emas — bolalar ularni tez yo'qotadi.</p>
 
 <h2>Kirish nazorati</h2>
 <p>Terminal eshikdagi elektromagnit qulf yoki kalitka bilan ishlaganda u faqat bazadagi odamlar uchun ochiladi. Bu bog'cha hududiga begonalar kirishini cheklaydi.</p>
@@ -118,7 +118,7 @@ ARTICLES = [
 <p>Farzandi bog'chaga kirgan va chiqqan zahoti ota-onaga Telegram orqali rasm va vaqt bilan xabar boradi. Ish joyidagi ota-ona bolasi joyida ekanini darhol biladi.</p>
 
 <h2>Guruhlar bo'yicha hisobot</h2>
-<p>Mudira har bir guruh bo'yicha kunlik va oylik davomatni ko'radi: qaysi bola necha kun kelgani, kim kasal yoki uzrli sabab bilan kelmagani. Bu ovqatlanish va to'lovlarni rejalashtirishni ham osonlashtiradi.</p>
+<p>Mudira har bir guruh bo'yicha davomatni ko'radi: kim kelgani, kim kechikgani va kim kelmagani, tanlangan davr bo'yicha har bir bolaning kelgan-ketgan vaqtlari (Excel'ga yuklab olish mumkin). Kunlik kelganlar sonini bilish oshxona rejasini tuzishga ham yordam beradi.</p>
 
 <h2>Qanday boshlash kerak?</h2>
 <ol>
@@ -151,10 +151,10 @@ ARTICLES = [
 <p>Родитель один раз отправляет свой номер телефона Telegram-боту SchoolDay. После этого при каждом входе и выходе ребенка приходит сообщение с фото, временем и классом. Приложение устанавливать не нужно.</p>
 
 <h2>Нужен ли турникет?</h2>
-<p>Нет — для учета достаточно терминала Face ID. Турникет добавляют, если нужно не пускать посторонних: терминал открывает его только для учеников и сотрудников из базы. Уже установленный турникет обычно можно подключить.</p>
+<p>Нет — для учета достаточно терминала Face ID. Турникет добавляют, если нужно не пускать посторонних: терминал открывает его только для учеников из базы. Уже установленный турникет обычно можно подключить.</p>
 
 <h2>Отчеты по классам и сменам</h2>
-<p>Ученики распределены по классам и сменам, поэтому директор и классный руководитель видят, кто пришел, кто опоздал и кто отсутствует, а месячный отчет формируется одной кнопкой.</p>
+<p>Ученики распределены по классам и сменам, поэтому директор видит в панели, а классный руководитель — в Telegram-группе класса, кто пришел, кто опоздал и кто отсутствует. Отчет за любой период выгружается в Excel одной кнопкой.</p>
 <p>Подробнее — на странице <a href="/ru/">SchoolDay: система посещаемости для школ и детских садов</a>.</p>
 """),
 ]

@@ -161,7 +161,7 @@ PAGES = [
     cards_h2="Возможности SchoolDay",
     cards=[
       ("Распознавание лиц", "Терминалы Hikvision узнают ученика за доли секунды — без карт, которые теряют или передают друг другу."),
-      ("Турникет на входе", "Терминал открывает турникет только для учеников и сотрудников из базы — посторонние в школу не пройдут."),
+      ("Турникет на входе", "Терминал открывает турникет только для учеников, внесенных в базу — посторонние в школу не пройдут."),
       ("Telegram для родителей", "Когда ребенок входит или выходит из школы, родитель получает сообщение с фото и точным временем."),
       ("Классы и смены", "Ученики распределены по классам и сменам: видно, кто пришел, кто опоздал и кто отсутствует."),
       ("Отчеты", "Ежедневная и месячная посещаемость по классам и ученикам без бумажного журнала."),
@@ -178,7 +178,7 @@ PAGES = [
     ],
     faq_h2="Вопросы о системе посещаемости",
     faq=[
-      ("Как родители получают уведомления?", "Родитель один раз отправляет свой номер телефона Telegram-боту SchoolDay. После этого при каждом входе и выходе ребенка приходит сообщение с фото и временем."),
+      ("Как родители получают уведомления?", "Родитель, чей номер указан в карточке ученика, один раз отправляет его Telegram-боту SchoolDay. После этого при каждом входе и выходе ребенка приходит сообщение с фото и временем."),
       ("Нужен ли турникет?", "Нет, можно установить только терминал Face ID на входе. Турникет добавляется, если нужно ограничить проход посторонним."),
       ("Подходит ли система для детского сада?", "Да. SchoolDay работает в школах и детских садах: группы настраиваются так же, как классы."),
       ("Можно ли подключить существующий турникет?", "Да. Терминал Hikvision подключается к контроллеру турникета и открывает его после распознавания лица."),
@@ -197,12 +197,12 @@ PAGES = [
     img_alt="Maktab kirishidagi Hikvision yuz tanish terminali va turniket",
     cards_h2="Maktabga turniket va Face ID nima beradi",
     cards=[
-      ("Begonalar kirmaydi", "Turniket faqat bazadagi o'quvchi va xodimlar uchun ochiladi — maktab xavfsizligi oshadi."),
+      ("Begonalar kirmaydi", "Turniket faqat bazaga kiritilgan o'quvchilar uchun ochiladi — maktab xavfsizligi oshadi."),
       ("Yuzni tanish", "Karta yoki kalit kerak emas: o'quvchi kartasini yo'qotmaydi va boshqaga bera olmaydi."),
       ("Ota-onaga Telegram xabar", "Farzand maktabga kirganda va chiqqanda ota-ona darhol rasm va vaqt bilan xabar oladi."),
       ("Sinflar bo'yicha davomat", "Kim keldi, kim kechikdi, kim kelmadi — har bir sinf va smena bo'yicha real vaqtda."),
       ("Avtomatik hisobot", "Kunlik va oylik davomat qog'oz jurnalsiz, bir tugma bilan."),
-      ("Har qanday turniket", "Tripod, kalitka va flap turniketlar hamda eshikdagi elektromagnit qulflar bilan ishlaydi."),
+      ("Turniket yoki qulf", "Hikvision terminali rele orqali ko'pchilik tripod, kalitka, flap turniketlar va elektromagnit qulflarni boshqara oladi."),
     ],
     blocks=[
       dict(h2="Maktabga turniket qanday o'rnatiladi", body="""<ol>
@@ -215,7 +215,7 @@ PAGES = [
     ],
     faq_h2="Maktab turniketi va Face ID haqida savollar",
     faq=[
-      ("Ota-onalar xabarni qanday oladi?", "Ota-ona SchoolDay Telegram botiga telefon raqamini bir marta yuboradi. Shundan keyin farzandi har kirib-chiqqanda rasm va vaqt bilan xabar keladi."),
+      ("Ota-onalar xabarni qanday oladi?", "O'quvchi ma'lumotida ko'rsatilgan telefon raqami egasi (ota yoki ona) SchoolDay Telegram botiga shu raqamni bir marta yuboradi. Shundan keyin farzandi har kirib-chiqqanda rasm va vaqt bilan xabar keladi."),
       ("Turniketsiz ham ishlaydimi?", "Ha, kirishga faqat Face ID terminali o'rnatish mumkin. Begonalarni kiritmaslik kerak bo'lsa, turniket qo'shiladi."),
       ("Bog'cha uchun mos keladimi?", "Ha. SchoolDay maktab va bog'chalarda ishlaydi, guruhlar sinflar kabi sozlanadi."),
       ("Mavjud turniketimizga ulasa bo'ladimi?", "Ha. Hikvision terminali turniket kontrolleriga ulanadi va yuzni tanigandan keyin turniketni ochadi."),
