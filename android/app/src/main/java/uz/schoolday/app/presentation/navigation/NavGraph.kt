@@ -18,8 +18,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import uz.schoolday.app.presentation.account.ProfileEditScreen
 import uz.schoolday.app.presentation.account.TwoFactorScreen
@@ -72,7 +70,7 @@ fun MainNavGraph(userName: String) {
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     val isBottomBarVisible = currentRoute in bottomNavItems.map { it.route }
-    val hazeState = remember { HazeState() }
+    val backdrop = rememberBackdrop()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     // School names for the drawer header
@@ -107,7 +105,7 @@ fun MainNavGraph(userName: String) {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Dashboard.route,
-                    modifier = Modifier.fillMaxSize().hazeSource(state = hazeState)
+                    modifier = Modifier.fillMaxSize().backdropSource(backdrop)
                 ) {
                     composable(Screen.Dashboard.route) { DashboardScreen(navController) }
                     composable(Screen.Monitoring.route) { MonitoringScreen(navController) }
@@ -163,7 +161,7 @@ fun MainNavGraph(userName: String) {
                 if (isBottomBarVisible) {
                     SdBottomBar(
                         navController = navController,
-                        hazeState = hazeState,
+                        backdrop = backdrop,
                         modifier = Modifier.align(Alignment.BottomCenter)
                     )
                 }

@@ -25,8 +25,8 @@ android {
         minSdk = 26
         targetSdk = 36
         // Play Market: every upload needs a higher versionCode; versionName is what users see
-        versionCode = 3
-        versionName = "1.1.1"
+        versionCode = 4
+        versionName = "1.1.2"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -96,7 +96,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.biometric)
-    implementation(libs.haze)
     implementation(libs.mlkit.face.detection)
     implementation(libs.androidx.exifinterface)
 
