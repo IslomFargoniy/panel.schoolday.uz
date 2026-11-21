@@ -472,7 +472,9 @@
     "role": "Rol",
     "select_role": "Rolni tanlang",
     "search_placeholder": "Ism, email yoki telefon...",
-    "delete_confirm_title": "Foydalanuvchini o‘chirish"
+    "delete_confirm_title": "Foydalanuvchini o‘chirish",
+    "schools": "Maktablar",
+    "schools_hint": "Foydalanuvchi faqat belgilangan maktablar bilan ishlaydi"
   },
   "seo": {
     "welcome_title": "SchoolDay - Maktab va Bog'chalar uchun Elektron Davomat va Face ID Turniket Tizimi",

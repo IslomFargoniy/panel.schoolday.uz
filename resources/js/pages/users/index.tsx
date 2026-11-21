@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import {
     Dialog,
@@ -105,6 +106,7 @@ export default function UsersIndex({
         phone: '',
         password: '',
         role: 'Admin',
+        school_ids: [] as number[],
     });
 
     const openCreateModal = () => {
@@ -121,6 +123,7 @@ export default function UsersIndex({
             phone: user.phone || '',
             password: '',
             role: user.roles?.[0]?.name || 'Admin',
+            school_ids: (user.user_schools ?? []).map((us) => us.school_id),
         });
         setEditUser(user);
     };
@@ -544,6 +547,60 @@ export default function UsersIndex({
                                     </p>
                                 )}
                             </div>
+
+                            {data.role !== 'Superadmin' && (
+                                <div className="space-y-2">
+                                    <Label>
+                                        {t('users.schools', 'Maktablar')}
+                                    </Label>
+                                    <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
+                                        {schools.length === 0 && (
+                                            <p className="px-1 py-2 text-sm text-muted-foreground">
+                                                —
+                                            </p>
+                                        )}
+                                        {schools.map((school) => (
+                                            <label
+                                                key={school.id}
+                                                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted"
+                                            >
+                                                <Checkbox
+                                                    checked={data.school_ids.includes(
+                                                        school.id,
+                                                    )}
+                                                    onCheckedChange={(checked) =>
+                                                        setData(
+                                                            'school_ids',
+                                                            checked
+                                                                ? [
+                                                                      ...data.school_ids,
+                                                                      school.id,
+                                                                  ]
+                                                                : data.school_ids.filter(
+                                                                      (id) =>
+                                                                          id !==
+                                                                          school.id,
+                                                                  ),
+                                                        )
+                                                    }
+                                                />
+                                                {school.name}
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t(
+                                            'users.schools_hint',
+                                            'Foydalanuvchi faqat belgilangan maktablar bilan ishlaydi',
+                                        )}
+                                    </p>
+                                    {errors.school_ids && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.school_ids}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
 
                             <DialogFooter className="mt-6">
                                 <Button

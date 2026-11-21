@@ -294,3 +294,23 @@ test('admin works only with the school attached to them', function () {
 
     expect($schoolA->fresh()->school_setting?->timezone)->toBe('Asia/Tashkent');
 });
+
+test('superadmin attaches an admin to schools from the user form', function () {
+    $schoolA = School::create(['name' => 'School A']);
+    $schoolB = School::create(['name' => 'School B']);
+    $superadmin = User::factory()->create();
+    $superadmin->assignRole('Superadmin');
+    $this->actingAs($superadmin);
+
+    $this->post(route('users.store'), [
+        'name' => 'Yangi admin', 'email' => 'yangi@school.uz', 'password' => 'password123',
+        'role' => 'Admin', 'school_ids' => [$schoolA->id],
+    ])->assertRedirect();
+    $admin = User::where('email', 'yangi@school.uz')->first();
+    expect($admin->schools->pluck('id')->all())->toBe([$schoolA->id]);
+
+    $this->put(route('users.update', $admin), [
+        'name' => 'Yangi admin', 'email' => 'yangi@school.uz', 'role' => 'Admin', 'school_ids' => [$schoolB->id],
+    ])->assertRedirect();
+    expect($admin->fresh()->schools->pluck('id')->all())->toBe([$schoolB->id]);
+});

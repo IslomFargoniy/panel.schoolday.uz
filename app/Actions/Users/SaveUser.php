@@ -30,6 +30,9 @@ class SaveUser
             'phone' => ['nullable', 'string', 'max:20', new PhoneNumber, 'unique:users,phone' . ($id ? ",{$id}" : '')],
             'password' => ($id ? 'nullable' : 'required') . '|string|min:8',
             'role' => 'required|string|exists:roles,name',
+            // Schools the user works with; left out (the app) keeps the current ones
+            'school_ids' => 'sometimes|array',
+            'school_ids.*' => 'integer|exists:schools,id',
         ];
     }
 
@@ -42,6 +45,7 @@ class SaveUser
             'password' => Hash::make($data['password']),
         ]);
         $user->assignRole($data['role']);
+        $this->syncSchools($user, $data);
 
         return $user;
     }
@@ -60,7 +64,16 @@ class SaveUser
 
         $user->update($fields);
         $user->syncRoles([$data['role']]);
+        $this->syncSchools($user, $data);
 
         return $user;
+    }
+
+    /** @param  array{school_ids?: list<int>}  $data */
+    private function syncSchools(User $user, array $data): void
+    {
+        if (array_key_exists('school_ids', $data)) {
+            $user->schools()->sync($data['school_ids']);
+        }
     }
 }

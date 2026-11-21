@@ -472,7 +472,9 @@
     "role": "Role",
     "select_role": "Select Role",
     "search_placeholder": "Name, email or phone...",
-    "delete_confirm_title": "Delete user"
+    "delete_confirm_title": "Delete user",
+    "schools": "Schools",
+    "schools_hint": "The user works only with the checked schools"
   },
   "seo": {
     "welcome_title": "SchoolDay - Electronic Attendance and Face ID Turnstile System for Schools",

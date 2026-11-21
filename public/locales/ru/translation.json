@@ -472,7 +472,9 @@
     "role": "Роль",
     "select_role": "Выберите роль",
     "search_placeholder": "Имя, email или телефон...",
-    "delete_confirm_title": "Удаление пользователя"
+    "delete_confirm_title": "Удаление пользователя",
+    "schools": "Школы",
+    "schools_hint": "Пользователь работает только с отмеченными школами"
   },
   "seo": {
     "welcome_title": "SchoolDay - Электронная система посещаемости и Face ID турникеты для школ",
