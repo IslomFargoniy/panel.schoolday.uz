@@ -10,12 +10,9 @@ import {
     Users,
     UserCog,
     Cpu,
-    Github,
-    Send,
     Smartphone,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -146,19 +143,6 @@ export function AppSidebar() {
     const { isMobile, setOpenMobile } = useSidebar();
     const navGroups = getNavGroups(t, auth?.user);
 
-    const footerNavItems: NavItem[] = [
-        {
-            title: t('sidebar.repository', 'Repository'),
-            href: 'https://github.com/IslomFargoniy',
-            icon: Github,
-        },
-        {
-            title: t('sidebar.telegram', 'Telegram'),
-            href: 'https://t.me/IslomFargniy',
-            icon: Send,
-        },
-    ];
-
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -220,10 +204,6 @@ export function AppSidebar() {
                         </SidebarMenuItem>
                     </SidebarMenu>
                 )}
-                <NavFooter
-                    items={footerNavItems}
-                    className={androidApp ? '' : 'mt-auto'}
-                />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
