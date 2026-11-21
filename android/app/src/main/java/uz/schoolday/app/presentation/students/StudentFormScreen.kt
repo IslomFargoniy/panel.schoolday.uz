@@ -1,5 +1,7 @@
 package uz.schoolday.app.presentation.students
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -172,7 +174,7 @@ fun StudentFormScreen(navController: NavController, viewModel: StudentFormViewMo
     val f = ui.form
     var confirmDelete by remember { mutableStateOf(false) }
     var showTerminal by remember { mutableStateOf(false) }
-    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    var showCamera by remember { mutableStateOf(false) }
 
     LaunchedEffect(ui.done) {
         if (ui.done) {
@@ -181,17 +183,23 @@ fun StudentFormScreen(navController: NavController, viewModel: StudentFormViewMo
         }
     }
 
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        if (ok) cameraUri?.let(viewModel::onPicture)
+    if (showCamera) {
+        StudentPhotoCameraDialog(
+            onCaptured = { file -> showCamera = false; viewModel.onPicture(Uri.fromFile(file)) },
+            onDismiss = { showCamera = false }
+        )
+    }
+    val cameraPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) showCamera = true
+        else Toast.makeText(context, tr("Kameradan foydalanish uchun ruxsat bering"), Toast.LENGTH_LONG).show()
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let(viewModel::onPicture)
     }
+    // In-app camera with an oval face guide (as in PayDay); CAMERA is asked for at runtime
     fun openCamera() {
-        val dir = File(context.cacheDir, "camera").apply { mkdirs() }
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", File(dir, "shot_${System.currentTimeMillis()}.jpg"))
-        cameraUri = uri
-        camera.launch(uri)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) showCamera = true
+        else cameraPermission.launch(Manifest.permission.CAMERA)
     }
 
     // "5-A · 1-smena · Asosiy bino"

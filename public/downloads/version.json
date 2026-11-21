@@ -1,7 +1,7 @@
 {
-    "versionCode": 6,
-    "versionName": "1.2.0",
-    "version": "1.2.0",
+    "versionCode": 7,
+    "versionName": "1.2.1",
+    "version": "1.2.1",
     "apk": "schoolday.apk",
-    "notes": "Ilova ichidan yangilanish; saytdagi APK alohida ilova (uz.schoolday.app.direct)"
+    "notes": "O'quvchi rasmini olishda kamerada yuz uchun oval ramka"
 }

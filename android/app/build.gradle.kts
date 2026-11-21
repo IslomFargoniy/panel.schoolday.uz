@@ -25,8 +25,8 @@ android {
         minSdk = 26
         targetSdk = 36
         // Play Market: every upload needs a higher versionCode; versionName is what users see
-        versionCode = 6
-        versionName = "1.2.0"
+        versionCode = 7
+        versionName = "1.2.1"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -113,6 +113,11 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.biometric)
     implementation(libs.mlkit.face.detection)
+    // CameraX: in-app camera with the oval face guide
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
     implementation(libs.androidx.exifinterface)
 
     // Hilt DI
