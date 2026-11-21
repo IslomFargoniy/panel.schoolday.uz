@@ -29,10 +29,11 @@ export default function SchoolTable({
     const [deleteSchoolId, setDeleteSchoolId] = useState<number | null>(null);
 
     const { auth } = usePage().props as unknown as { auth: { user: any } };
+    // Only a Superadmin creates, edits or deletes schools; an Admin sees just their own
     const isAdmin = auth?.user?.roles?.some((role: any) =>
         typeof role === 'string'
-            ? role === 'Admin' || role === 'Superadmin'
-            : role.name === 'Admin' || role.name === 'Superadmin',
+            ? role === 'Superadmin'
+            : role.name === 'Superadmin',
     );
 
     const handleEditClick = (item: School) => {

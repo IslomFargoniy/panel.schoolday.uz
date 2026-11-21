@@ -5,9 +5,9 @@ use App\Models\BranchDevice;
 use App\Models\User;
 
 test('authenticated user can create a branch device with isup connection', function () {
-    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin']);
+    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin']);
     $user = User::factory()->create();
-    $user->assignRole('Admin');
+    $user->assignRole('Superadmin');
     $this->actingAs($user);
 
     $branch = Branch::create([
@@ -35,9 +35,9 @@ test('authenticated user can create a branch device with isup connection', funct
 });
 
 test('authenticated user can delete a branch device', function () {
-    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin']);
+    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin']);
     $user = User::factory()->create();
-    $user->assignRole('Admin');
+    $user->assignRole('Superadmin');
     $this->actingAs($user);
 
     $branch = Branch::create([

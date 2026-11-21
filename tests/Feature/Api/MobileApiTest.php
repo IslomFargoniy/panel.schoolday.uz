@@ -165,7 +165,7 @@ test('records of another school are forbidden', function () {
 
 test('global admin sees every school', function () {
     $admin = User::factory()->create();
-    $admin->assignRole('Admin');
+    $admin->assignRole('Superadmin');
     actAsSchoolAdmin($admin);
 
     $this->getJson('/api/v1/filters')->assertOk()->assertJsonCount(2, 'data');

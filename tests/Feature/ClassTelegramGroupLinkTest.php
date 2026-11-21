@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
-    Role::firstOrCreate(['name' => 'Admin']);
+    Role::firstOrCreate(['name' => 'Superadmin']);
 
     $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user->assignRole('Superadmin');
 
     $this->school = School::create([
         'name' => '10-Maktab',

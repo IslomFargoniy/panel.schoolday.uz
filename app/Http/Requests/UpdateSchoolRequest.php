@@ -8,7 +8,7 @@ class UpdateSchoolRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasRole('Admin') || $this->user()?->hasRole('Superadmin');
+        return \App\Support\Tenant::isGlobalAdmin($this->user());
     }
 
     public function rules(): array

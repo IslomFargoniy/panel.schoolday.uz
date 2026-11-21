@@ -8,7 +8,11 @@ class StoreSchoolSettingRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasRole('Admin') || $this->user()?->hasRole('Superadmin');
+        // The API passes the school in the URL, the web form in the body
+        $school = $this->route('school');
+        $schoolId = $school instanceof \App\Models\School ? $school->id : (int) $this->input('school_id');
+
+        return \App\Support\Tenant::canAccessSchool($schoolId ?: null, $this->user());
     }
 
     public function rules(): array

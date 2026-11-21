@@ -199,9 +199,9 @@ test('dashboard stats filter out inactive students', function () {
         'status' => 'inactive',
     ]);
 
-    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin']);
+    Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin']);
     $user = User::factory()->create();
-    $user->assignRole('Admin');
+    $user->assignRole('Superadmin');
     $this->actingAs($user);
 
     $response = $this->get(route('dashboard'));

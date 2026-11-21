@@ -180,16 +180,34 @@ test('school admin cannot reach admin and superadmin endpoints', function () {
     $this->getJson('/api/v1/system-settings')->assertForbidden();
 });
 
-// ---- Admin ----
+// ---- Admin: works like a school admin, only with the attached schools ----
 
-test('admin manages schools, their settings and users', function () {
+test('admin sees and manages only the schools attached to them', function () {
+    UserSchool::create(['user_id' => $this->admin->id, 'school_id' => $this->a['school']->id]);
     actAs($this->admin);
-    $this->getJson('/api/v1/auth/me')->assertJsonPath('data.permissions.manage_schools', true)->assertJsonPath('data.permissions.manage_users', false);
+
+    $this->getJson('/api/v1/auth/me')
+        ->assertJsonPath('data.permissions.manage_schools', false)
+        ->assertJsonCount(1, 'data.schools');
+    $this->getJson('/api/v1/schools')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $this->a['school']->id);
+    $this->getJson('/api/v1/schools/' . $this->b['school']->id)->assertForbidden();
+    $this->getJson('/api/v1/branches/' . $this->b['branch']->id)->assertForbidden();
+    $this->getJson('/api/v1/students/' . $this->b['student']->id)->assertForbidden();
+    $this->getJson('/api/v1/students/' . $this->a['student']->id)->assertOk();
+    $this->postJson('/api/v1/schools', ['name' => 'X', 'branch_limit' => 1])->assertForbidden();
+    $this->postJson('/api/v1/schools/' . $this->a['school']->id . '/users', ['user_id' => $this->admin->id])->assertForbidden();
+});
+
+// ---- Superadmin ----
+
+test('superadmin manages schools, their settings and users', function () {
+    actAs($this->superadmin);
+    $this->getJson('/api/v1/auth/me')->assertJsonPath('data.permissions.manage_schools', true);
 
     $id = $this->postJson('/api/v1/schools', ['name' => 'Yangi maktab', 'branch_limit' => 3, 'status' => 1, 'valid_date' => '2027-01-01'])
         ->assertCreated()->json('data.id');
     // The creator is attached
-    $this->getJson("/api/v1/schools/$id")->assertJsonPath('data.users.0.id', $this->admin->id);
+    $this->getJson("/api/v1/schools/$id")->assertJsonPath('data.users.0.id', $this->superadmin->id);
 
     $this->putJson("/api/v1/schools/$id", ['name' => 'Nomi o\'zgardi', 'branch_limit' => 5])->assertOk()->assertJsonPath('data.branch_limit', 5);
     // The school in the URL wins over the body
@@ -203,11 +221,7 @@ test('admin manages schools, their settings and users', function () {
 
     $this->deleteJson('/api/v1/schools/' . $this->a['school']->id)->assertUnprocessable()->assertJsonPath('error', 'crud.cannot_delete_school_with_data');
     $this->deleteJson("/api/v1/schools/$id")->assertOk();
-
-    $this->getJson('/api/v1/users')->assertForbidden();
 });
-
-// ---- Superadmin ----
 
 test('superadmin manages users and system settings', function () {
     actAs($this->superadmin);

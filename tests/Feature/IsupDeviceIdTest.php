@@ -15,11 +15,11 @@ use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     Queue::fake();
-    Role::firstOrCreate(['name' => 'Admin']);
+    Role::firstOrCreate(['name' => 'Superadmin']);
     $this->school = School::create(['name' => 'S', 'status' => 1, 'valid_date' => now()->addYear()->toDateString()]);
     $this->branch = Branch::create(['school_id' => $this->school->id, 'name' => 'Bosh filial']);
     $this->admin = User::factory()->create();
-    $this->admin->assignRole('Admin');
+    $this->admin->assignRole('Superadmin');
     $this->actingAs($this->admin);
 });
 

@@ -252,14 +252,45 @@ test('user cannot view or delete attendance or events belonging to another schoo
     $this->delete(route('report-events.destroy', $eventB->id))->assertForbidden();
 });
 
-test('global admin can access and manage resources across any school', function () {
+test('superadmin can access and manage resources across any school', function () {
     $school = School::create(['name' => 'School B']);
     $branch = Branch::create(['school_id' => $school->id, 'name' => 'Branch B']);
 
+    $superadmin = User::factory()->create();
+    $superadmin->assignRole('Superadmin');
+
+    $this->actingAs($superadmin);
+
+    $this->get(route('branches.show', $branch))->assertOk();
+    $this->get(route('school.index'))->assertInertia(fn ($page) => $page->has('school.data', 1));
+});
+
+test('admin works only with the school attached to them', function () {
+    $schoolA = School::create(['name' => 'School A']);
+    $schoolB = School::create(['name' => 'School B']);
+    $branchA = Branch::create(['school_id' => $schoolA->id, 'name' => 'Branch A']);
+    $branchB = Branch::create(['school_id' => $schoolB->id, 'name' => 'Branch B']);
+
     $admin = User::factory()->create();
     $admin->assignRole('Admin');
+    UserSchool::create(['user_id' => $admin->id, 'school_id' => $schoolA->id]);
 
     $this->actingAs($admin);
 
-    $this->get(route('branches.show', $branch))->assertOk();
+    $this->get(route('school.index'))->assertInertia(fn ($page) => $page
+        ->has('school.data', 1)
+        ->where('school.data.0.id', $schoolA->id)
+    );
+    $this->get(route('branches.index'))->assertInertia(fn ($page) => $page
+        ->has('branches.data', 1)
+        ->where('branches.data.0.id', $branchA->id)
+    );
+    $this->get(route('branches.show', $branchB))->assertForbidden();
+    $this->delete(route('school.destroy', $schoolB))->assertForbidden();
+    $this->put(route('school.update', $schoolA), ['name' => 'X', 'branch_limit' => 99])->assertForbidden();
+    $this->post(route('user_school.store'), ['user_id' => $admin->id, 'school_id' => $schoolB->id])->assertForbidden();
+    $this->post(route('school_setting.store'), ['school_id' => $schoolB->id])->assertForbidden();
+    $this->post(route('school_setting.store'), ['school_id' => $schoolA->id, 'timezone' => 'Asia/Tashkent'])->assertRedirect();
+
+    expect($schoolA->fresh()->school_setting?->timezone)->toBe('Asia/Tashkent');
 });

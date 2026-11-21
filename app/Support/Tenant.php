@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class Tenant
 {
     /**
-     * Check if the given or authenticated user is a global admin (Admin or Superadmin).
+     * Check if the given or authenticated user is a global admin: only a Superadmin sees every school.
+     * An Admin works like any other user, only with the schools attached to them.
      */
     public static function isGlobalAdmin(?User $user = null): bool
     {
@@ -20,7 +21,7 @@ class Tenant
             return false;
         }
 
-        return $user->hasRole('Admin') || $user->hasRole('Superadmin');
+        return $user->hasRole('Superadmin');
     }
 
     /**
