@@ -12,6 +12,7 @@ import {
     Cpu,
     Github,
     Send,
+    Smartphone,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavFooter } from '@/components/nav-footer';
@@ -28,7 +29,7 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import type { NavGroup, NavItem } from '@/types';
+import type { AndroidApp, NavGroup, NavItem } from '@/types';
 import AppLogo from './app-logo';
 
 const getNavGroups = (t: any, user: any): NavGroup[] => {
@@ -138,7 +139,10 @@ const getNavGroups = (t: any, user: any): NavGroup[] => {
 
 export function AppSidebar() {
     const { t } = useTranslation();
-    const { auth } = usePage().props as unknown as { auth: { user: any } };
+    const { auth, androidApp } = usePage().props as unknown as {
+        auth: { user: any };
+        androidApp?: AndroidApp;
+    };
     const { isMobile, setOpenMobile } = useSidebar();
     const navGroups = getNavGroups(t, auth?.user);
 
@@ -181,7 +185,45 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {/* Phone menu too: on mobile the sidebar opens as a drawer with this footer */}
+                {androidApp && (
+                    <SidebarMenu className="mt-auto">
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                tooltip={{
+                                    children: t(
+                                        'sidebar.androidApp',
+                                        'Android ilova (APK)',
+                                    ),
+                                }}
+                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                            >
+                                <a
+                                    href={androidApp.url}
+                                    download="schoolday.apk"
+                                >
+                                    <Smartphone className="h-5 w-5" />
+                                    <span>
+                                        {t(
+                                            'sidebar.androidApp',
+                                            'Android ilova (APK)',
+                                        )}
+                                    </span>
+                                    {androidApp.version && (
+                                        <span className="ml-auto text-xs text-muted-foreground">
+                                            v{androidApp.version}
+                                        </span>
+                                    )}
+                                </a>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                )}
+                <NavFooter
+                    items={footerNavItems}
+                    className={androidApp ? '' : 'mt-auto'}
+                />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

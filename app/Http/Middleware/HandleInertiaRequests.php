@@ -47,6 +47,8 @@ class HandleInertiaRequests extends Middleware
                 'domain' => config('hikvision.server_domain'),
                 'port' => (int) config('hikvision.cms_port'),
             ] : null,
+            // Sidebar "Android ilova (APK)" link: the published APK version (public/downloads/version.json)
+            'androidApp' => fn () => $this->androidApp(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'new_student' => $request->session()->get('new_student'),
@@ -54,5 +56,16 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
             ],
         ];
+    }
+
+    /**
+     * @return array{version: ?string, url: string}
+     */
+    private function androidApp(): array
+    {
+        $manifest = json_decode((string) @file_get_contents(public_path('downloads/version.json')), true);
+        $version = is_array($manifest) ? ($manifest['versionName'] ?? $manifest['version'] ?? null) : null;
+
+        return ['version' => is_string($version) ? $version : null, 'url' => '/downloads/schoolday.apk'];
     }
 }

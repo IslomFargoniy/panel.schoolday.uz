@@ -25,8 +25,8 @@ android {
         minSdk = 26
         targetSdk = 36
         // Play Market: every upload needs a higher versionCode; versionName is what users see
-        versionCode = 5
-        versionName = "1.1.3"
+        versionCode = 6
+        versionName = "1.2.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -34,6 +34,22 @@ android {
         // Phones only
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
+    }
+
+    // play: the AAB for Google Play (Play updates it, no self-update code or install permission).
+    // direct: the APK published at panel.schoolday.uz/downloads/schoolday.apk, updates itself in the app.
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            buildConfigField("boolean", "SELF_UPDATE", "false")
+        }
+        create("direct") {
+            dimension = "distribution"
+            // Its own app id: a phone with the Play build (signed by Google) can install this one next to it
+            applicationIdSuffix = ".direct"
+            buildConfigField("boolean", "SELF_UPDATE", "true")
         }
     }
 
@@ -77,7 +93,7 @@ android {
     }
 }
 
-// Output names carry the version: schoolday-v1.0.0-release.apk / .aab
+// Output names carry the version: schoolday-v1.2.0-direct-release.apk / schoolday-v1.2.0-play-release.aab
 base {
     archivesName.set("schoolday-v${android.defaultConfig.versionName}")
 }

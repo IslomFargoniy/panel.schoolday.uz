@@ -20,22 +20,26 @@ Yuz tekshiruvi ML Kit (Google Play services orqali, model APK ichida emas). Play
 
 ## Release
 
+Ikki flavor:
+
+- `direct` → `uz.schoolday.app.direct`, saytdagi APK: `https://panel.schoolday.uz/downloads/schoolday.apk`. Ilova har ochilganda `/downloads/version.json` ni o'qiydi, yangi `versionCode` bo'lsa APK'ni ilova ichida yuklab o'rnatadi (Profil → "Yangilanishni tekshirish"). Alohida id bo'lgani uchun Play'dagi ilova yonida o'rnatiladi.
+- `play` → `uz.schoolday.app`, Google Play uchun AAB: yangilovchi ham, `REQUEST_INSTALL_PACKAGES` ham yo'q.
+
 ```bash
-./release.sh            # testlar + imzolangan APK va AAB; APK → ../public/android/schoolday-v<versiya>.apk
-./release.sh --upload   # + APK'ni serverga yuklaydi: https://panel.schoolday.uz/android/schoolday-v<versiya>.apk
+scripts/release-android.sh "Nima o'zgardi"              # testlar, APK + AAB, imzo tekshiruvi, APK'ni serverga yuklaydi, version.json
+scripts/release-android.sh --no-upload "Nima o'zgardi"  # yuklamaydi, scp buyruqlarini chiqaradi
 ```
 
-Yangi versiyadan oldin `app/build.gradle.kts` dagi `versionCode` ni 1 ga oshiring va `versionName` ni yangilang.
-Fayl nomlari versiyadan olinadi: `schoolday-v1.0.0-release.apk` va `.aab`.
+Fayllar: `~/Desktop/android-releases/SchoolDay_v<versiya>.apk` va `.aab` (Play Console'ga AAB).
+Keyin `public/downloads/version.json` ni commit qilib deploy qiling. `android/release.sh` shu skriptni chaqiradi (`--upload` bilan yuklaydi).
 
-Imzo: `keystore.properties` va `schoolday-release.keystore` (ikkalasi ham gitga qo'shilmaydi).
-**Bu ikki faylning zaxira nusxasini xavfsiz joyda saqlang**: kalit yo'qolsa, o'rnatilgan ilovani yangilab bo'lmaydi.
+Yangi versiyadan oldin `app/build.gradle.kts` dagi `versionCode` ni 1 ga oshiring va `versionName` ni yangilang.
 
 ## Play Market
 
-- Yuklanadigan fayl: `app/build/outputs/bundle/release/schoolday-v<versiya>-release.aab`.
+- Yuklanadigan fayl: `app/build/outputs/bundle/playRelease/schoolday-v<versiya>-play-release.aab (yoki ~/Desktop/android-releases/SchoolDay_v<versiya>.aab)`.
 - Play App Signing yoqiladi; bizning keystore "upload key" bo'lib qoladi.
-- Crash hisobotlari uchun `app/build/outputs/mapping/release/mapping.txt` ni shu versiyaga yuklang.
+- Crash hisobotlari uchun `app/build/outputs/mapping/playRelease/mapping.txt` ni shu versiyaga yuklang.
 - Paket nomi `uz.schoolday.app`, minSdk 26, targetSdk 36.
 - Play Console'da kerak bo'ladi: maxfiylik siyosati https://panel.schoolday.uz/privacy, hisobni o‘chirish https://panel.schoolday.uz/delete-account, 512×512 ikonka, 1024×500 banner,
   telefon skrinshotlari, Data safety anketasi (login, o'quvchi ismi va davomati serverdan o'qiladi; telefondan hech narsa yig'ilmaydi).

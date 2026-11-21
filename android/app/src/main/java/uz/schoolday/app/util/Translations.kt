@@ -399,6 +399,19 @@ internal val RU: Map<String, String> = mapOf(
     "Terminalda: Network → Platform Access → ISUP 5.0. Address Type: IP Address yoki Domain Name." to "На терминале: Network → Platform Access → ISUP 5.0. Address Type: IP Address или Domain Name.",
     "Terminal serverga o'zi ulanadi (ISUP 5.0). Device ID va kalitni bo'sh qoldirsangiz, qurilmaga alohida beriladi; MAC manzil kerak emas." to "Терминал сам подключается к серверу (ISUP 5.0). Если оставить Device ID и ключ пустыми, устройству выдаются свои; MAC-адрес не нужен.",
     "Terminalda: Network → Platform Access → ISUP 5.0. Server: %s (IP) yoki %s (Domain Name), port %s. Saqlangach, qurilmani bosib Device ID va kalitni nusxalang." to "На терминале: Network → Platform Access → ISUP 5.0. Сервер: %s (IP) или %s (Domain Name), порт %s. После сохранения нажмите на устройство и скопируйте Device ID и ключ.",
+    // Ilova yangilanishi (APK)
+    "Yangilanishni tekshirish" to "Проверить обновления",
+    "Versiya %s" to "Версия %s",
+    "Ilova versiyasi" to "Версия приложения",
+    "Ilovaning eng so'nggi versiyasi o'rnatilgan" to "Установлена последняя версия приложения",
+    "Yangi versiya: %s" to "Новая версия: %s",
+    "SchoolDay ilovasining yangi versiyasi chiqdi. Yangilab oling." to "Вышла новая версия SchoolDay. Обновите приложение.",
+    "SchoolDay'ga ilovalarni o'rnatishga ruxsat bering, so'ng \"Yangilash\"ni yana bosing." to "Разрешите SchoolDay устанавливать приложения, затем снова нажмите «Обновить».",
+    "Yuklanmoqda... %s%%" to "Загрузка... %s%%",
+    "Yangilanishni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring." to "Не удалось загрузить обновление. Проверьте интернет и попробуйте снова.",
+    "Brauzerda yuklab olish" to "Скачать в браузере",
+    "Yangilash" to "Обновить",
+    "Keyinroq" to "Позже",
 )
 
 internal val EN: Map<String, String> = mapOf(
@@ -798,4 +811,17 @@ internal val EN: Map<String, String> = mapOf(
     "Terminalda: Network → Platform Access → ISUP 5.0. Address Type: IP Address yoki Domain Name." to "On the terminal: Network → Platform Access → ISUP 5.0. Address Type: IP Address or Domain Name.",
     "Terminal serverga o'zi ulanadi (ISUP 5.0). Device ID va kalitni bo'sh qoldirsangiz, qurilmaga alohida beriladi; MAC manzil kerak emas." to "The terminal connects to the server itself (ISUP 5.0). Leave the Device ID and key empty and the device gets its own; no MAC address needed.",
     "Terminalda: Network → Platform Access → ISUP 5.0. Server: %s (IP) yoki %s (Domain Name), port %s. Saqlangach, qurilmani bosib Device ID va kalitni nusxalang." to "On the terminal: Network → Platform Access → ISUP 5.0. Server: %s (IP) or %s (Domain Name), port %s. After saving, tap the device and copy its Device ID and key.",
+    // Ilova yangilanishi (APK)
+    "Yangilanishni tekshirish" to "Check for updates",
+    "Versiya %s" to "Version %s",
+    "Ilova versiyasi" to "App version",
+    "Ilovaning eng so'nggi versiyasi o'rnatilgan" to "You have the latest version of the app",
+    "Yangi versiya: %s" to "New version: %s",
+    "SchoolDay ilovasining yangi versiyasi chiqdi. Yangilab oling." to "A new version of SchoolDay is out. Please update.",
+    "SchoolDay'ga ilovalarni o'rnatishga ruxsat bering, so'ng \"Yangilash\"ni yana bosing." to "Allow SchoolDay to install apps, then tap \"Update\" again.",
+    "Yuklanmoqda... %s%%" to "Downloading... %s%%",
+    "Yangilanishni yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring." to "Couldn't download the update. Check your internet and try again.",
+    "Brauzerda yuklab olish" to "Download in browser",
+    "Yangilash" to "Update",
+    "Keyinroq" to "Later",
 )

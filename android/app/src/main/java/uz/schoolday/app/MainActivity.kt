@@ -21,6 +21,7 @@ import uz.schoolday.app.presentation.auth.BiometricLockScreen
 import uz.schoolday.app.presentation.auth.LoginScreen
 import uz.schoolday.app.presentation.navigation.MainNavGraph
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
+import uz.schoolday.app.update.UpdatePrompt
 import uz.schoolday.app.util.I18n
 import uz.schoolday.app.util.PinCode
 import javax.inject.Inject
@@ -91,6 +92,8 @@ class MainActivity : FragmentActivity() {
                                 if (auth.user.value == null) auth.me()
                             }
                             MainNavGraph(userName = userName.orEmpty())
+                            // APK build only (no-op in the Play build): offers a newer version once per launch
+                            UpdatePrompt()
                         }
                     }
                 }

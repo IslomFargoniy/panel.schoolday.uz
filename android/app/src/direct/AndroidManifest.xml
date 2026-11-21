@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Direct (APK) build only: lets the in-app updater hand the downloaded APK to the system installer.
+     The APK is shared through the main FileProvider (${applicationId}.fileprovider, cache-path "updates/"). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+</manifest>

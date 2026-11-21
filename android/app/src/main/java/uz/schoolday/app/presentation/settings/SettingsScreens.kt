@@ -36,6 +36,7 @@ import uz.schoolday.app.presentation.components.*
 import uz.schoolday.app.presentation.navigation.BottomBarContentPadding
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.theme.SchoolDayTheme
+import uz.schoolday.app.update.rememberUpdateChecker
 import uz.schoolday.app.util.BiometricHelper
 import uz.schoolday.app.util.DateUtils
 import uz.schoolday.app.util.findFragmentActivity
@@ -50,6 +51,8 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
     val context = LocalContext.current
     var showLogout by remember { mutableStateOf(false) }
     var pinSetup by remember { mutableStateOf(false) }
+    // APK build: "Yangilanishni tekshirish"; Play build: null, only the version is shown
+    val updateChecker = rememberUpdateChecker()
     var deleteAccount by remember { mutableStateOf(false) }
     val deleteVm: uz.schoolday.app.presentation.account.DeleteAccountViewModel = hiltViewModel()
     val deleting by deleteVm.busy.collectAsState()
@@ -201,6 +204,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
                 RowDivider()
                 SettingsRow(icon = Icons.Outlined.Fingerprint, title = tr("Barmoq izi yoki yuz bilan kirish")) {
                     Switch(
+                        colors = schoolDaySwitchColors(),
                         checked = ui.isBiometricEnabled,
                         onCheckedChange = { enable ->
                             if (!enable) {
@@ -229,6 +233,41 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
         }
 
         item {
+            SettingsGroup {
+                val checker = updateChecker
+                if (checker != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(enabled = !checker.isChecking) { checker.check() }
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RowIcon(Icons.Outlined.SystemUpdate, c.accentText, c.indigoBg)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(tr("Yangilanishni tekshirish"), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium))
+                            Text(
+                                tr("Versiya %s", BuildConfig.VERSION_NAME),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (checker.isChecking) {
+                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Icon(Icons.Rounded.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                } else {
+                    SettingsRow(icon = Icons.Outlined.Info, title = tr("Ilova versiyasi")) {
+                        Text(BuildConfig.VERSION_NAME, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+
+        item {
             Spacer(Modifier.height(4.dp))
             SettingsGroup {
                 Row(
@@ -251,15 +290,6 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
             }
         }
 
-        item {
-            Text(
-                "SchoolDay ${BuildConfig.VERSION_NAME}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        }
     }
 }
 

@@ -3,4 +3,6 @@
     <cache-path name="reports" path="reports/" />
     <!-- Camera pictures for student face photos -->
     <cache-path name="camera" path="camera/" />
+    <!-- Downloaded update APK handed to the system installer (direct build only) -->
+    <cache-path name="updates" path="updates/" />
 </paths>

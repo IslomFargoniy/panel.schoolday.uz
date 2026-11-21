@@ -38,3 +38,6 @@ sync-tool/schoolday_sync_tool.zip
 
 # Android APK (serverga rsync orqali yuklanadi)
 /public/android/*.apk
+
+# Android APK on the site (uploaded by scripts/release-android.sh, version.json is committed)
+/public/downloads/*.apk

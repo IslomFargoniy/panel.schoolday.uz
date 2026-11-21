@@ -577,3 +577,20 @@ fun PhotoViewerDialog(url: String, title: String, subtitle: String, onDismiss: (
         }
     }
 }
+
+/**
+ * Switch colors with a visible "off" state in both themes: Material's default light track is almost the same
+ * color as the card, so the off switch disappeared on white.
+ */
+@Composable
+fun schoolDaySwitchColors(): SwitchColors {
+    val colors = SchoolDayTheme.colors
+    return SwitchDefaults.colors(
+        checkedThumbColor = Color.White,
+        checkedTrackColor = MaterialTheme.colorScheme.primary,
+        checkedBorderColor = MaterialTheme.colorScheme.primary,
+        uncheckedThumbColor = if (colors.isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color.White,
+        uncheckedTrackColor = colors.borderStrong,
+        uncheckedBorderColor = colors.borderStrong,
+    )
+}

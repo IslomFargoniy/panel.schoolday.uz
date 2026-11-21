@@ -11,7 +11,9 @@ class TranslationsTest {
     private val screenTitles = listOf("Asosiy", "Monitoring", "O'quvchilar", "Profil")
 
     private fun keysInSources(): Set<String> =
-        File("src/main/java").walkTopDown()
+        // main plus the play / direct flavor code (the in-app updater lives in src/direct)
+        listOf("src/main/java", "src/direct/java", "src/play/java").map(::File).filter { it.exists() }
+            .flatMap { it.walkTopDown() }
             .filter { it.extension == "kt" && it.name != "Translations.kt" }
             .flatMap { file -> trCall.findAll(file.readText()).map { it.groupValues[1].replace("\\\"", "\"") } }
             .toSet() + screenTitles

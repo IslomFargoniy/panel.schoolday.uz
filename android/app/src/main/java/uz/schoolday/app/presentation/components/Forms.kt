@@ -158,7 +158,7 @@ fun SwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit, subt
                 Text(title, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium))
                 subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
-            Switch(checked = checked, onCheckedChange = onChange)
+            Switch(checked = checked, onCheckedChange = onChange, colors = schoolDaySwitchColors())
         }
     }
 }
