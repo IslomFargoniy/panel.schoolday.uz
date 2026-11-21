@@ -187,6 +187,9 @@ interface ApiService {
         @Query("connection_type") connectionType: String?
     ): Response<ApiResponse<List<DeviceDto>>>
 
+    @GET("v1/devices/connection")
+    suspend fun deviceConnection(): Response<ApiResponse<DeviceConnectionDto>>
+
     @POST("v1/devices")
     suspend fun createDevice(@Body body: DeviceBody): Response<ApiResponse<DeviceDto>>
 

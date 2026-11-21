@@ -21,6 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import uz.schoolday.app.data.remote.dto.DeviceConnectionDto
 import uz.schoolday.app.data.remote.dto.DeviceDto
 import uz.schoolday.app.data.remote.dto.FilterSchool
 import uz.schoolday.app.data.repository.Resource
@@ -35,6 +36,7 @@ import javax.inject.Inject
 
 data class DevicesUiState(
     val devices: List<DeviceDto> = emptyList(),
+    val connection: DeviceConnectionDto? = null,
     val online: Boolean? = null,
     val type: String? = null,
     val loaded: Boolean = false,
@@ -56,6 +58,10 @@ class DevicesViewModel @Inject constructor(
     init {
         viewModelScope.launch { scopeStore.load() }
         viewModelScope.launch { scopeStore.scope.collect { load() } }
+        // Server address shown when a device is opened
+        viewModelScope.launch {
+            manage.deviceConnection().data?.let { c -> _uiState.update { it.copy(connection = c) } }
+        }
     }
 
     fun onOnline(v: Boolean?) {
@@ -91,6 +97,7 @@ fun DevicesScreen(navController: NavController, viewModel: DevicesViewModel = hi
     val schools by viewModel.schools.collectAsState()
     val scope by viewModel.scope.collectAsState()
     val online = ui.devices.count { it.isOnline }
+    var openDevice by remember { mutableStateOf<DeviceDto?>(null) }
     uz.schoolday.app.presentation.navigation.OnChangedReturn(navController) { viewModel.load() }
 
     Scaffold(
@@ -135,10 +142,20 @@ fun DevicesScreen(navController: NavController, viewModel: DevicesViewModel = hi
                 ui.errorMessage?.let { item { ErrorBanner(it) } }
                 if (ui.loaded && ui.devices.isEmpty()) item { EmptyState(tr("Qurilmalar topilmadi"), Icons.Outlined.Router) }
                 items(ui.devices, key = { it.id }) { d ->
-                    DeviceRow(d) { navController.navigate(uz.schoolday.app.presentation.navigation.Screen.DeviceForm.createRoute(deviceId = d.id, branchId = d.branchId)) }
+                    DeviceRow(d) { openDevice = d }
                 }
             }
         }
+    }
+    openDevice?.let { d ->
+        DeviceInfoDialog(
+            d, ui.connection,
+            onEdit = {
+                openDevice = null
+                navController.navigate(uz.schoolday.app.presentation.navigation.Screen.DeviceForm.createRoute(deviceId = d.id, branchId = d.branchId))
+            },
+            onDismiss = { openDevice = null }
+        )
     }
 }
 

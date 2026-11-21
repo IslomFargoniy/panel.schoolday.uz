@@ -659,7 +659,11 @@
     "isup_adv_desc": "1. No static IP required: Terminal works via Wi-Fi, 4G or standard internet provider.\n2. Full 2-way synchronization: Attendance is logged in real-time; offline logs are stored and automatically uploaded upon reconnection.",
     "save_isup_desc": "Click the Save button. Within 5-15 seconds, Register Status will become: 🟢 Online.",
     "http_desc": "In this mode, whenever a face is scanned, the terminal directly sends an HTTP webhook POST request to the server.",
-    "save_http_desc": "Click the Save button. Attendance will now be automatically transmitted to the server when students scan their faces."
+    "save_http_desc": "Click the Save button. Attendance will now be automatically transmitted to the server when students scan their faces.",
+    "or_domain": "or Domain Name:",
+    "and": "and",
+    "per_device": "are given to each device separately. First add the device with \"Create\", then copy the values from its card.",
+    "address_type": "Address Type: with \"IP Address\" enter the IP, with \"Domain Name\" enter the domain. A device connected by domain reconnects by itself even if the server moves."
   },
   "monitoring": {
     "subtitle": "Real-time attendance monitoring",
@@ -777,5 +781,11 @@
   "school_inactive_or_expired": "The assigned schools are inactive or expired.",
   "school_inactive_title": "School Inactive or Expired",
   "school_inactive_desc": "Your assigned school subscription has expired or has been deactivated. Please contact the platform administrator to restore access.",
-  "until": "Valid until:"
+  "until": "Valid until:",
+  "isup_auto_hint": "Leave empty and every device gets its own Device ID and key automatically. No MAC address needed.",
+  "auto_generated": "Generated automatically",
+  "copy": "Copy",
+  "isup_key_label": "ISUP key",
+  "server_ip_label": "Server IP",
+  "domain_label": "Domain"
 }

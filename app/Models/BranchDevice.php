@@ -31,9 +31,38 @@ class BranchDevice extends Model
         'is_online' => 'boolean',
         'last_seen_at' => 'datetime:Y-m-d H:i:s',
         'last_event_synced_at' => 'datetime:Y-m-d H:i:s',
+        'users_cleaned_at' => 'datetime:Y-m-d H:i:s',
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
+
+    /** Letters and digits only: terminals refuse '-', '_', '.' and other signs in the ISUP Device ID. */
+    public const ISUP_ID_PATTERN = '/^[A-Za-z0-9]{1,32}$/';
+
+    /** 8-16 letters and digits with a capital, a small letter and a digit: terminals refuse weaker keys. */
+    public const ISUP_KEY_PATTERN = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z0-9]{8,16}$/';
+
+    /** A Device ID no other device (active or not) has, e.g. "school482913". */
+    public static function generateIsupId(): string
+    {
+        do {
+            $id = 'school' . random_int(100000, 999999);
+        } while (static::query()->where('device_id', $id)->exists());
+
+        return $id;
+    }
+
+    /** A key the terminal accepts, e.g. "Kqmxa4821". */
+    public static function generateIsupKey(): string
+    {
+        $letters = 'abcdefghjkmnpqrstuvwxyz';
+        $word = '';
+        for ($i = 0; $i < 5; $i++) {
+            $word .= $letters[random_int(0, strlen($letters) - 1)];
+        }
+
+        return ucfirst($word) . random_int(1000, 9999);
+    }
 
     public function branch(): BelongsTo
     {

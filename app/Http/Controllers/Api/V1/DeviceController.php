@@ -27,6 +27,18 @@ class DeviceController extends ApiController
         return $this->ok(DeviceResource::collection($devices));
     }
 
+    /** What to type into a Hikvision terminal: the server address and a fresh unique Device ID and key for the next device. */
+    public function connection(): JsonResponse
+    {
+        return $this->ok([
+            'server_ip' => config('hikvision.server_ip'),
+            'server_domain' => config('hikvision.server_domain'),
+            'isup_port' => (int) config('hikvision.cms_port'),
+            'isup_device_id' => BranchDevice::generateIsupId(),
+            'isup_key' => BranchDevice::generateIsupKey(),
+        ]);
+    }
+
     public function store(StoreBranchDeviceRequest $request): JsonResponse
     {
         $device = BranchDevice::create($request->validated());

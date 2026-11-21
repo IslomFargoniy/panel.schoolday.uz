@@ -41,6 +41,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user() ? array_merge($request->user()->toArray(), ['roles' => $request->user()->roles->pluck('name')]) : null,
             ],
+            // What an ISUP terminal is told to connect to (device cards and the connection guide)
+            'isupServer' => fn () => $request->user() ? [
+                'ip' => config('hikvision.server_ip'),
+                'domain' => config('hikvision.server_domain'),
+                'port' => (int) config('hikvision.cms_port'),
+            ] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'new_student' => $request->session()->get('new_student'),

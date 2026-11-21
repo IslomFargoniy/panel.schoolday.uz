@@ -353,7 +353,6 @@ internal val RU: Map<String, String> = mapOf(
     "Telegram guruh ID" to "ID группы Telegram",
     "Telegram kanal ID" to "ID канала Telegram",
     "Terminal menyusiga kirish" to "Доступ к меню терминала",
-    "Terminal serverga o'zi ulanadi (ISUP 5.0). Terminal sozlamasidagi Device ID kerak." to "Терминал сам подключается к серверу (ISUP 5.0). Нужен Device ID из настроек терминала.",
     "Terminal shu rasm bo'yicha taniydi" to "Терминал узнаёт по этому фото",
     "Terminal sozlamalari" to "Настройки терминала",
     "Terminaldagi ISUP kaliti" to "ISUP-ключ терминала",
@@ -391,6 +390,15 @@ internal val RU: Map<String, String> = mapOf(
     "Yuzni aniqlab bo'lmadi" to "Не удалось распознать лицо",
     "Zaxira kodlar" to "Резервные коды",
     "Zaxira kodlarni ko'rish" to "Показать резервные коды",
+    // ISUP device info
+    "Nusxalandi" to "Скопировано",
+    "Nusxalash" to "Копировать",
+    "Qurilma" to "Устройство",
+    "yoki Domain" to "или домен",
+    "Avtomatik" to "Автоматически",
+    "Terminalda: Network → Platform Access → ISUP 5.0. Address Type: IP Address yoki Domain Name." to "На терминале: Network → Platform Access → ISUP 5.0. Address Type: IP Address или Domain Name.",
+    "Terminal serverga o'zi ulanadi (ISUP 5.0). Device ID va kalitni bo'sh qoldirsangiz, qurilmaga alohida beriladi; MAC manzil kerak emas." to "Терминал сам подключается к серверу (ISUP 5.0). Если оставить Device ID и ключ пустыми, устройству выдаются свои; MAC-адрес не нужен.",
+    "Terminalda: Network → Platform Access → ISUP 5.0. Server: %s (IP) yoki %s (Domain Name), port %s. Saqlangach, qurilmani bosib Device ID va kalitni nusxalang." to "На терминале: Network → Platform Access → ISUP 5.0. Сервер: %s (IP) или %s (Domain Name), порт %s. После сохранения нажмите на устройство и скопируйте Device ID и ключ.",
 )
 
 internal val EN: Map<String, String> = mapOf(
@@ -744,7 +752,6 @@ internal val EN: Map<String, String> = mapOf(
     "Telegram guruh ID" to "Telegram group ID",
     "Telegram kanal ID" to "Telegram channel ID",
     "Terminal menyusiga kirish" to "Terminal menu access",
-    "Terminal serverga o'zi ulanadi (ISUP 5.0). Terminal sozlamasidagi Device ID kerak." to "The terminal connects to the server itself (ISUP 5.0). Use the Device ID from its settings.",
     "Terminal shu rasm bo'yicha taniydi" to "The terminal recognises by this photo",
     "Terminal sozlamalari" to "Terminal settings",
     "Terminaldagi ISUP kaliti" to "The terminal's ISUP key",
@@ -782,4 +789,13 @@ internal val EN: Map<String, String> = mapOf(
     "Yuzni aniqlab bo'lmadi" to "Couldn't detect a face",
     "Zaxira kodlar" to "Recovery codes",
     "Zaxira kodlarni ko'rish" to "Show recovery codes",
+    // ISUP device info
+    "Nusxalandi" to "Copied",
+    "Nusxalash" to "Copy",
+    "Qurilma" to "Device",
+    "yoki Domain" to "or Domain",
+    "Avtomatik" to "Automatic",
+    "Terminalda: Network → Platform Access → ISUP 5.0. Address Type: IP Address yoki Domain Name." to "On the terminal: Network → Platform Access → ISUP 5.0. Address Type: IP Address or Domain Name.",
+    "Terminal serverga o'zi ulanadi (ISUP 5.0). Device ID va kalitni bo'sh qoldirsangiz, qurilmaga alohida beriladi; MAC manzil kerak emas." to "The terminal connects to the server itself (ISUP 5.0). Leave the Device ID and key empty and the device gets its own; no MAC address needed.",
+    "Terminalda: Network → Platform Access → ISUP 5.0. Server: %s (IP) yoki %s (Domain Name), port %s. Saqlangach, qurilmani bosib Device ID va kalitni nusxalang." to "On the terminal: Network → Platform Access → ISUP 5.0. Server: %s (IP) or %s (Domain Name), port %s. After saving, tap the device and copy its Device ID and key.",
 )

@@ -23,6 +23,11 @@ return [
 
     'das_address' => env('HIKVISION_DAS_ADDRESS', '193.180.213.188'),
 
+    // Terminalga yoziladigan server manzili (Platform Access → ISUP): IP ham, domen ham ishlaydi.
+    'server_ip' => env('HIKVISION_SERVER_IP', env('HIKVISION_DAS_ADDRESS', '193.180.213.188')),
+
+    'server_domain' => env('HIKVISION_SERVER_DOMAIN', 'panel.schoolday.uz'),
+
     'cms_port' => (int) env('HIKVISION_CMS_PORT', 7670),
 
     'alarm_port' => (int) env('HIKVISION_ALARM_PORT', 7270),

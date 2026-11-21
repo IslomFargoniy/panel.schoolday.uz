@@ -124,12 +124,13 @@ test('classes, shifts and devices round trip', function () {
     $this->deleteJson("/api/v1/classes/$classId")->assertOk();
     $this->deleteJson("/api/v1/shifts/$shiftId")->assertOk();
 
-    $deviceId = $this->postJson('/api/v1/devices', ['branch_id' => $this->a['branch']->id, 'connection_type' => 'isup', 'device_id' => 'DS-1', 'encryption_key' => 'secret-key'])
-        ->assertCreated()->assertJsonPath('data.has_encryption_key', true)->assertJsonMissingPath('data.encryption_key')->json('data.id');
+    // ISUP: the key comes back, it is typed into the terminal together with the Device ID
+    $deviceId = $this->postJson('/api/v1/devices', ['branch_id' => $this->a['branch']->id, 'connection_type' => 'isup', 'device_id' => 'DS1', 'encryption_key' => 'Secret123'])
+        ->assertCreated()->assertJsonPath('data.has_encryption_key', true)->assertJsonPath('data.encryption_key', 'Secret123')->json('data.id');
     // A blank key with keep_encryption_key keeps the stored one
-    $this->putJson("/api/v1/devices/$deviceId", ['branch_id' => $this->a['branch']->id, 'connection_type' => 'isup', 'device_id' => 'DS-1', 'name' => 'Kirish', 'keep_encryption_key' => true])
+    $this->putJson("/api/v1/devices/$deviceId", ['branch_id' => $this->a['branch']->id, 'connection_type' => 'isup', 'device_id' => 'DS1', 'name' => 'Kirish', 'keep_encryption_key' => true])
         ->assertOk()->assertJsonPath('data.has_encryption_key', true);
-    expect(BranchDevice::find($deviceId)->encryption_key)->toBe('secret-key');
+    expect(BranchDevice::find($deviceId)->encryption_key)->toBe('Secret123');
     $this->deleteJson("/api/v1/devices/$deviceId")->assertOk();
 });
 

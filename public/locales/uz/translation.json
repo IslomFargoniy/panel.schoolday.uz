@@ -659,7 +659,11 @@
     "isup_adv_desc": "1. Statik IP kerak emas: Terminal Wi-Fi, 4G yoki oddiy provayderda ishlayveradi.\n2. 2 tomonlama to‘liq sinxronizatsiya: Davomat sekundiga keladi, internet uzilib qolsa terminal xotirada saqlab, keyin avtomatik yuklaydi.",
     "save_isup_desc": "Save tugmasini bosing. 5-15 soniya ichida Register Status: 🟢 Online bo‘ladi.",
     "http_desc": "Ushbu usulda terminal har safar o‘quvchi yuzini skaner qilganda serverga to‘g‘ridan-to‘g‘ri HTTP webhook POST yuboradi.",
-    "save_http_desc": "Save tugmasini bosing. Shundan so‘ng o‘quvchilar yuzini ko‘rsatganda davomat avtomatik serverga uzatiladi."
+    "save_http_desc": "Save tugmasini bosing. Shundan so‘ng o‘quvchilar yuzini ko‘rsatganda davomat avtomatik serverga uzatiladi.",
+    "or_domain": "yoki Domain Name:",
+    "and": "va",
+    "per_device": "har bir qurilmaga alohida beriladi. Avval \"Yaratish\" orqali qurilmani qo'shing, so'ng qiymatlarni qurilma kartasidan nusxalang.",
+    "address_type": "Address Type: \"IP Address\" tanlasangiz IP manzilni, \"Domain Name\" tanlasangiz domenni yozing. Domen bilan ulangan qurilma server ko'chsa ham o'zi qayta ulanadi."
   },
   "monitoring": {
     "subtitle": "Real-vaqt davomat monitoring",
@@ -777,5 +781,11 @@
   "school_inactive_or_expired": "Siz biriktirilgan maktablarning faoliyati to‘xtatilgan yoki muddati tugagan.",
   "school_inactive_title": "Maktab faoliyati to‘xtatilgan",
   "school_inactive_desc": "Siz biriktirilgan maktab(lar)ning tizimdan foydalanish muddati tugagan yoki faoliyati to‘xtatilgan. Tizimga qayta kirish huquqini tiklash uchun platforma ma’muri bilan bog‘laning.",
-  "until": "Muddati:"
+  "until": "Muddati:",
+  "isup_auto_hint": "Bo'sh qoldirsangiz, har bir qurilmaga alohida Device ID va kalit avtomatik beriladi. MAC manzil kerak emas.",
+  "auto_generated": "Avtomatik beriladi",
+  "copy": "Nusxalash",
+  "isup_key_label": "ISUP kalit",
+  "server_ip_label": "Server IP",
+  "domain_label": "Domen"
 }

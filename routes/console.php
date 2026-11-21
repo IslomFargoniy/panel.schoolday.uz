@@ -12,3 +12,5 @@ Schedule::command('hikvision:sync-events')->everyMinute()->withoutOverlapping(10
 Schedule::command('hikvision:healthcheck')->everyMinute()->runInBackground();
 // Kichik bo'shliqlar uchun himoya: har kecha oxirgi 3 kunni qayta sinxronlash (dublikatlar o'tkazib yuboriladi)
 Schedule::command('hikvision:sync-events --days=3')->dailyAt('03:30')->withoutOverlapping(30)->runInBackground();
+// Yangi ulangan ISUP qurilma: MAC manzili qurilmadan olinadi, eski foydalanuvchilar bir marta tozalanib filial o'quvchilari yoziladi
+Schedule::command('hikvision:ensure-device-config')->everyFiveMinutes()->withoutOverlapping(10)->runInBackground();

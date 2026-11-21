@@ -25,8 +25,8 @@ android {
         minSdk = 26
         targetSdk = 36
         // Play Market: every upload needs a higher versionCode; versionName is what users see
-        versionCode = 4
-        versionName = "1.1.2"
+        versionCode = 5
+        versionName = "1.1.3"
 
         vectorDrawables {
             useSupportLibrary = true

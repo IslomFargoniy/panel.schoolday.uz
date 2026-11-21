@@ -65,6 +65,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
             Route::apiResource('shifts', V1\ShiftController::class)->except('show');
             Route::apiResource('branches', V1\BranchController::class);
+            Route::get('devices/connection', [V1\DeviceController::class, 'connection'])->name('devices.connection');
             Route::apiResource('devices', V1\DeviceController::class)->except('show');
 
             Route::get('schools', [V1\SchoolController::class, 'index'])->name('schools.index');

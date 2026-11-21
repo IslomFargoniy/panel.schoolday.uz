@@ -1,9 +1,16 @@
+/** Where an ISUP terminal connects to: either the IP or the domain works. */
+export interface IsupServer {
+    ip: string;
+    domain: string;
+    port: number;
+}
+
 export interface BranchDevice {
     id: number;
     branch_id: number;
     branch?: Branch;
     name?: string | null;
-    mac_address: string;
+    mac_address?: string | null;
     device_id?: string | null;
     connection_type: 'isup' | 'http_listening';
     status: boolean;

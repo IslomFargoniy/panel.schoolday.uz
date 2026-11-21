@@ -21,6 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useIsupServer } from '@/hooks/use-isup-server';
 import type { Branch } from '@/types';
 
 interface DeviceConnectionGuideModalProps {
@@ -42,10 +43,10 @@ export default function DeviceConnectionGuideModal({
         setTimeout(() => setCopiedKey(null), 2000);
     };
 
-    const isupDeviceId = `branch${branch.id}`;
-    const isupKey = `SchoolDay${branch.id}2026`;
-    const serverIp = '193.180.213.188';
-    const serverDomain = 'panel.schoolday.uz';
+    const isupServer = useIsupServer();
+    const serverIp = isupServer.ip;
+    const serverDomain = isupServer.domain;
+    const serverPort = String(isupServer.port);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -177,7 +178,7 @@ export default function DeviceConnectionGuideModal({
                                         Server Address Type:
                                     </div>
                                     <div className="font-mono font-semibold">
-                                        IP Address
+                                        IP Address / Domain Name
                                     </div>
                                 </div>
 
@@ -216,7 +217,7 @@ export default function DeviceConnectionGuideModal({
                                             Server Port:
                                         </div>
                                         <div className="font-mono font-semibold">
-                                            7670
+                                            {serverPort}
                                         </div>
                                     </div>
                                     <Button
@@ -224,7 +225,7 @@ export default function DeviceConnectionGuideModal({
                                         variant="ghost"
                                         onClick={() =>
                                             copyToClipboard(
-                                                '7670',
+                                                serverPort,
                                                 'Server Port',
                                                 'serverPort',
                                             )
@@ -239,13 +240,16 @@ export default function DeviceConnectionGuideModal({
                                     </Button>
                                 </div>
 
-                                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/60 p-2.5">
+                                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/60 p-2.5 md:col-span-2">
                                     <div>
                                         <div className="text-[11px] text-muted-foreground">
-                                            Device ID:
+                                            {t(
+                                                'device_guide_modal.or_domain',
+                                                'yoki Domain Name:',
+                                            )}
                                         </div>
                                         <div className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">
-                                            {isupDeviceId}
+                                            {serverDomain}
                                         </div>
                                     </div>
                                     <Button
@@ -253,14 +257,14 @@ export default function DeviceConnectionGuideModal({
                                         variant="ghost"
                                         onClick={() =>
                                             copyToClipboard(
-                                                isupDeviceId,
-                                                'Device ID',
-                                                'isupDeviceId',
+                                                serverDomain,
+                                                'Domain',
+                                                'serverDomain',
                                             )
                                         }
                                         className="h-7 px-2"
                                     >
-                                        {copiedKey === 'isupDeviceId' ? (
+                                        {copiedKey === 'serverDomain' ? (
                                             <Check className="h-3.5 w-3.5 text-emerald-500" />
                                         ) : (
                                             <Copy className="h-3.5 w-3.5" />
@@ -268,33 +272,20 @@ export default function DeviceConnectionGuideModal({
                                     </Button>
                                 </div>
 
-                                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/60 p-2.5">
-                                    <div>
-                                        <div className="text-[11px] text-muted-foreground">
-                                            Encryption Key / Register Password:
-                                        </div>
-                                        <div className="font-mono font-semibold">
-                                            {isupKey}
-                                        </div>
-                                    </div>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() =>
-                                            copyToClipboard(
-                                                isupKey,
-                                                'Encryption Key',
-                                                'isupKey',
-                                            )
-                                        }
-                                        className="h-7 px-2"
-                                    >
-                                        {copiedKey === 'isupKey' ? (
-                                            <Check className="h-3.5 w-3.5 text-emerald-500" />
-                                        ) : (
-                                            <Copy className="h-3.5 w-3.5" />
-                                        )}
-                                    </Button>
+                                <div className="rounded-lg border border-purple-500/20 bg-purple-500/10 p-2.5 text-purple-700 md:col-span-2 dark:text-purple-300">
+                                    <strong>Device ID</strong>{' '}
+                                    {t('device_guide_modal.and', 'va')}{' '}
+                                    <strong>Encryption Key</strong>:{' '}
+                                    {t(
+                                        'device_guide_modal.per_device',
+                                        "har bir qurilmaga alohida beriladi. Avval \"Yaratish\" orqali qurilmani qo'shing, so'ng qiymatlarni qurilma kartasidan nusxalang.",
+                                    )}
+                                </div>
+                                <div className="text-[11px] text-muted-foreground md:col-span-2">
+                                    {t(
+                                        'device_guide_modal.address_type',
+                                        "Address Type: \"IP Address\" tanlasangiz IP manzilni, \"Domain Name\" tanlasangiz domenni yozing. Domen bilan ulangan qurilma server ko'chsa ham o'zi qayta ulanadi.",
+                                    )}
                                 </div>
                             </div>
 

@@ -532,38 +532,43 @@ export default function DevicesPage({
 
                                                 <td className="px-4 py-3 font-mono text-xs">
                                                     <span className="rounded bg-muted px-1.5 py-0.5 text-foreground">
-                                                        {item.device_id ||
-                                                            `branch${item.branch_id}`}
+                                                        {item.device_id || '—'}
                                                     </span>
                                                 </td>
 
                                                 <td className="px-4 py-3 font-mono text-xs text-foreground">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span>
-                                                            {item.mac_address}
+                                                    {item.mac_address ? (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span>
+                                                                {item.mac_address}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    copyToClipboard(
+                                                                        item.mac_address ?? '',
+                                                                        item.id,
+                                                                    )
+                                                                }
+                                                                className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                                                                title={t(
+                                                                    'copy_mac',
+                                                                    'MAC manzilni nusxalash',
+                                                                )}
+                                                            >
+                                                                {copiedId ===
+                                                                item.id ? (
+                                                                    <Check className="h-3 w-3 text-emerald-500" />
+                                                                ) : (
+                                                                    <Copy className="h-3 w-3" />
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">
+                                                            —
                                                         </span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                copyToClipboard(
-                                                                    item.mac_address,
-                                                                    item.id,
-                                                                )
-                                                            }
-                                                            className="rounded p-0.5 text-muted-foreground hover:text-foreground"
-                                                            title={t(
-                                                                'copy_mac',
-                                                                'MAC manzilni nusxalash',
-                                                            )}
-                                                        >
-                                                            {copiedId ===
-                                                            item.id ? (
-                                                                <Check className="h-3 w-3 text-emerald-500" />
-                                                            ) : (
-                                                                <Copy className="h-3 w-3" />
-                                                            )}
-                                                        </button>
-                                                    </div>
+                                                    )}
                                                 </td>
 
                                                 <td className="px-4 py-3 text-center">

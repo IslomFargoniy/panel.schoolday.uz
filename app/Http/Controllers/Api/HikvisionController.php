@@ -78,29 +78,31 @@ class HikvisionController extends Controller
             // --- 2. Device whitelist check & status update -------------------
             $incomingMac = strtoupper(trim($eventData->macAddress ?? ''));
             $shortSerial = $eventData->shortSerialNumber ?? null;
+            // ISUP terminals send "deviceID" (their ISUP Device ID) with every event
             $deviceId = $eventData->device_id
                 ?? $eventData->deviceId
                 ?? $eventData->deviceID
+                ?? $eventData->AccessControllerEvent->deviceID
                 ?? $request->query('device_id')
                 ?? $request->query('deviceId')
                 ?? $request->query('deviceID');
             $deviceId = $deviceId !== null ? (string) $deviceId : null;
 
+            // Resolve the active device by Device ID first (unique), by MAC only when no ID matches:
+            // the same terminal may still be listed under its old branch with the same MAC.
             $branchDevice = null;
-            if ($incomingMac || $shortSerial || $deviceId) {
+            $ids = array_values(array_filter([$deviceId, $shortSerial], fn ($v) => $v && $v !== 'default'));
+            if ($ids) {
                 $branchDevice = BranchDevice::where('status', true)
                     ->with('branch.school')
-                    ->where(function ($q) use ($incomingMac, $shortSerial, $deviceId) {
-                        if ($incomingMac) {
-                            $q->orWhereRaw('UPPER(mac_address) = ?', [$incomingMac]);
-                        }
-                        if ($shortSerial && $shortSerial !== 'default') {
-                            $q->orWhere('device_id', '=', $shortSerial);
-                        }
-                        if ($deviceId) {
-                            $q->orWhere('device_id', '=', $deviceId);
-                        }
-                    })
+                    ->whereIn('device_id', $ids)
+                    ->first();
+            }
+            if (! $branchDevice && $incomingMac) {
+                $branchDevice = BranchDevice::where('status', true)
+                    ->with('branch.school')
+                    ->whereRaw("UPPER(REPLACE(mac_address, '-', ':')) = ?", [str_replace('-', ':', $incomingMac)])
+                    ->orderByDesc('last_seen_at')
                     ->first();
             }
 
@@ -151,23 +153,24 @@ class HikvisionController extends Controller
                 }
             }
 
+            // The student must belong to the branch of the device the event came from
             $checkStudent = Student::with('schoolClass.shift')
                 ->where('employeeNoString', $employeeNo)
                 ->where('status', 'active')
+                ->whereHas('schoolClass.shift', fn ($q) => $q->where('branch_id', $branchDevice->branch_id))
                 ->first();
 
             if (! $checkStudent) {
+                $elsewhere = Student::where('employeeNoString', $employeeNo)->where('status', 'active')->exists();
+                if ($elsewhere) {
+                    Log::warning("Hikvision: student [{$employeeNo}] does not belong to device branch [{$branchDevice->branch_id}]");
+
+                    return response()->json(['success' => false, 'reason' => 'student_branch_mismatch'], 200);
+                }
+
                 Log::info('Hikvision: no active student found for employeeNo ' . $employeeNo);
 
                 return response()->json(['success' => false, 'reason' => 'student_not_found']);
-            }
-
-            // Student must belong to this device's branch
-            $studentBranchId = $checkStudent->schoolClass?->shift?->branch_id;
-            if ($studentBranchId === null || (int) $studentBranchId !== (int) $branchDevice->branch_id) {
-                Log::warning("Hikvision: student [{$checkStudent->id}] branch [{$studentBranchId}] does not match device branch [{$branchDevice->branch_id}]");
-
-                return response()->json(['success' => false, 'reason' => 'student_branch_mismatch'], 200);
             }
 
             // --- 4b. Persistent duplicate check (employeeNo + dateTime) ------

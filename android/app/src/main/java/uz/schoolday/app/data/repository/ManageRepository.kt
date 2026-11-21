@@ -131,6 +131,7 @@ class ManageRepository @Inject constructor(
         apiCall(gson) { api.devicesFiltered(scope.schoolId, scope.branchId, online?.let { if (it) 1 else 0 }, type) }
     suspend fun saveDevice(id: Int?, body: DeviceBody) = apiCall(gson) { if (id == null) api.createDevice(body) else api.updateDevice(id, body) }
     suspend fun deleteDevice(id: Int) = apiAction(gson) { api.deleteDevice(id) }
+    suspend fun deviceConnection() = apiCall(gson) { api.deviceConnection() }
 
     // ---- Reports ----
 

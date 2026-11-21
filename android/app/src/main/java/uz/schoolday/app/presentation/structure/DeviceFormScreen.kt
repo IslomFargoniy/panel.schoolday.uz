@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uz.schoolday.app.data.remote.dto.DeviceBody
+import uz.schoolday.app.data.remote.dto.DeviceConnectionDto
 import uz.schoolday.app.data.remote.dto.FilterSchool
 import uz.schoolday.app.data.repository.ManageRepository
 import uz.schoolday.app.data.repository.Resource
@@ -34,6 +35,7 @@ data class DeviceFormUi(
     val mac: String = "",
     val key: String = "",
     val hasKey: Boolean = false,
+    val connection: DeviceConnectionDto? = null,
     val loading: Boolean = false,
     val saving: Boolean = false,
     val error: String? = null,
@@ -54,6 +56,10 @@ class DeviceFormViewModel @Inject constructor(
 
     init {
         viewModelScope.launch { scopeStore.load() }
+        // Server address for the instructions
+        viewModelScope.launch {
+            manage.deviceConnection().data?.let { c -> _ui.update { it.copy(connection = c) } }
+        }
         deviceId?.let { id ->
             viewModelScope.launch {
                 _ui.update { it.copy(loading = true) }
@@ -63,7 +69,7 @@ class DeviceFormViewModel @Inject constructor(
                         _ui.update {
                             it.copy(
                                 loading = false, branchId = d.branchId, type = d.connectionType ?: "isup", name = d.name.orEmpty(),
-                                deviceId = d.deviceId.orEmpty(), mac = d.macAddress.orEmpty(), hasKey = d.hasEncryptionKey
+                                deviceId = d.deviceId.orEmpty(), mac = d.macAddress.orEmpty(), key = d.encryptionKey.orEmpty(), hasKey = d.hasEncryptionKey
                             )
                         }
                     } ?: _ui.update { it.copy(loading = false, error = tr("Qurilma topilmadi")) }
@@ -78,7 +84,8 @@ class DeviceFormViewModel @Inject constructor(
     fun save() {
         val s = _ui.value
         val branchId = s.branchId ?: return _ui.update { it.copy(error = tr("Filialni tanlang")) }
-        if (s.type == "isup" && s.deviceId.isBlank()) return _ui.update { it.copy(error = tr("Device ID ni kiriting")) }
+        // A new ISUP device may leave the Device ID empty: the server gives it its own ID and key
+        if (s.isEdit && s.type == "isup" && s.deviceId.isBlank()) return _ui.update { it.copy(error = tr("Device ID ni kiriting")) }
         if (s.type == "http_listening" && s.mac.isBlank()) return _ui.update { it.copy(error = tr("MAC manzilni kiriting")) }
         viewModelScope.launch {
             _ui.update { it.copy(saving = true) }
@@ -148,16 +155,27 @@ fun DeviceFormScreen(navController: NavController, viewModel: DeviceFormViewMode
             onSelect = { i -> viewModel.edit { it.copy(type = if (i == 0) "isup" else "http_listening") } }
         )
         Text(
-            if (ui.type == "isup") tr("Terminal serverga o'zi ulanadi (ISUP 5.0). Terminal sozlamasidagi Device ID kerak.")
+            if (ui.type == "isup") tr("Terminal serverga o'zi ulanadi (ISUP 5.0). Device ID va kalitni bo'sh qoldirsangiz, qurilmaga alohida beriladi; MAC manzil kerak emas.")
             else tr("Server terminalni MAC manzil bo'yicha taniydi."),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        if (ui.type == "isup") ui.connection?.let { c ->
+            Text(
+                tr("Terminalda: Network → Platform Access → ISUP 5.0. Server: %s (IP) yoki %s (Domain Name), port %s. Saqlangach, qurilmani bosib Device ID va kalitni nusxalang.", c.serverIp, c.serverDomain ?: "—", c.isupPort),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         SdTextField(ui.name, { v -> viewModel.edit { it.copy(name = v) } }, tr("Nomi"), placeholder = tr("Kirish eshigi"))
         if (ui.type == "isup") {
-            SdTextField(ui.deviceId, { v -> viewModel.edit { it.copy(deviceId = v) } }, tr("Device ID"))
             SdTextField(
-                ui.key, { v -> viewModel.edit { it.copy(key = v) } }, tr("Shifrlash kaliti"), password = true,
+                ui.deviceId, { v -> viewModel.edit { it.copy(deviceId = v.trim()) } }, tr("Device ID"),
+                placeholder = if (ui.isEdit) null else tr("Avtomatik")
+            )
+            SdTextField(
+                ui.key, { v -> viewModel.edit { it.copy(key = v.trim()) } }, tr("Shifrlash kaliti"),
+                placeholder = if (ui.isEdit) null else tr("Avtomatik"),
                 supporting = if (ui.hasKey) tr("Kalit saqlangan. O'zgartirish uchun yangisini kiriting.") else tr("Terminaldagi ISUP kaliti")
             )
         } else {

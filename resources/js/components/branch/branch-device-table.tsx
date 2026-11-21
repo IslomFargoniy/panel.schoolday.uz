@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
+import { useIsupServer } from '@/hooks/use-isup-server';
 import { formatDateTime } from '@/lib/utils';
 import type { Branch, BranchDevice } from '@/types';
 import CreateBranchDeviceModal from './create-branch-device-modal';
@@ -28,7 +29,8 @@ export default function BranchDeviceTable({
     layout = 'grid',
 }: BranchDeviceTableProps) {
     const { t } = useTranslation();
-    const [copiedId, setCopiedId] = useState<number | null>(null);
+    const isupServer = useIsupServer();
+    const [copiedId, setCopiedId] = useState<string | null>(null);
     const [deleteDeviceId, setDeleteDeviceId] = useState<number | null>(null);
     const [deviceToEdit, setDeviceToEdit] = useState<BranchDevice | null>(null);
     const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
@@ -62,9 +64,9 @@ export default function BranchDeviceTable({
         });
     };
 
-    const copyToClipboard = (text: string, deviceId: number) => {
+    const copyToClipboard = (text: string, copyKey: string) => {
         navigator.clipboard.writeText(text);
-        setCopiedId(deviceId);
+        setCopiedId(copyKey);
         toast.success(t('copied', 'Nusxalandi!'));
         setTimeout(() => setCopiedId(null), 2000);
     };
@@ -208,59 +210,123 @@ export default function BranchDeviceTable({
 
                                     {/* Specs / Properties Box */}
                                     <div className="space-y-1.5 rounded-lg border border-border bg-muted/60 p-2.5 font-mono text-xs">
-                                        {/* Device ID */}
-                                        {item.device_id && (
-                                            <div className="flex items-center justify-between text-[11px]">
-                                                <span className="font-sans text-muted-foreground">
-                                                    {t('device_id_label', 'Device ID')}:
-                                                </span>
-                                                <span className="rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 font-semibold text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-400">
-                                                    {item.device_id}
-                                                </span>
-                                            </div>
-                                        )}
+                                        {/* What to type into the terminal, each with copy */}
+                                        {(isIsup
+                                            ? [
+                                                  {
+                                                      label: t(
+                                                          'device_id_label',
+                                                          'Device ID',
+                                                      ),
+                                                      value: item.device_id,
+                                                      tone: 'text-indigo-600 dark:text-indigo-400',
+                                                  },
+                                                  {
+                                                      label: t(
+                                                          'isup_key_label',
+                                                          'ISUP kalit',
+                                                      ),
+                                                      value: item.encryption_key,
+                                                      tone: 'text-amber-600 dark:text-amber-400',
+                                                  },
+                                                  {
+                                                      label: t(
+                                                          'server_ip_label',
+                                                          'Server IP',
+                                                      ),
+                                                      value: isupServer.ip,
+                                                      tone: 'text-foreground',
+                                                  },
+                                                  {
+                                                      label: t(
+                                                          'domain_label',
+                                                          'Domen',
+                                                      ),
+                                                      value: isupServer.domain,
+                                                      tone: 'text-foreground',
+                                                  },
+                                                  {
+                                                      label: t(
+                                                          'mac_label',
+                                                          'MAC',
+                                                      ),
+                                                      value: item.mac_address,
+                                                      tone: 'text-foreground',
+                                                  },
+                                              ]
+                                            : [
+                                                  {
+                                                      label: t(
+                                                          'mac_label',
+                                                          'MAC',
+                                                      ),
+                                                      value: item.mac_address,
+                                                      tone: 'text-foreground',
+                                                  },
+                                              ]
+                                        )
+                                            .filter((row) => Boolean(row.value))
+                                            .map((row) => {
+                                                const copyKey = `${item.id}-${row.label}`;
 
-                                        {/* MAC Address with copy */}
-                                        <div className="flex items-center justify-between text-[11px]">
-                                            <span className="font-sans text-muted-foreground">
-                                                {t('mac_label', 'MAC')}:
-                                            </span>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="text-foreground">
-                                                    {item.mac_address}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        copyToClipboard(
-                                                            item.mac_address,
-                                                            item.id,
-                                                        )
-                                                    }
-                                                    className="rounded p-0.5 text-muted-foreground hover:text-foreground"
-                                                    title={t(
-                                                        'copy_mac',
-                                                        'MAC manzilni nusxalash',
-                                                    )}
-                                                >
-                                                    {copiedId === item.id ? (
-                                                        <Check className="h-3 w-3 text-emerald-500" />
-                                                    ) : (
-                                                        <Copy className="h-3 w-3" />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
+                                                return (
+                                                    <div
+                                                        key={row.label}
+                                                        className="flex items-center justify-between gap-2 text-[11px]"
+                                                    >
+                                                        <span className="shrink-0 font-sans text-muted-foreground">
+                                                            {row.label}:
+                                                        </span>
+                                                        <div className="flex min-w-0 items-center gap-1.5">
+                                                            <span
+                                                                className={`truncate font-semibold ${row.tone}`}
+                                                            >
+                                                                {row.value}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    copyToClipboard(
+                                                                        String(
+                                                                            row.value,
+                                                                        ),
+                                                                        copyKey,
+                                                                    )
+                                                                }
+                                                                className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+                                                                title={t(
+                                                                    'copy',
+                                                                    'Nusxalash',
+                                                                )}
+                                                            >
+                                                                {copiedId ===
+                                                                copyKey ? (
+                                                                    <Check className="h-3 w-3 text-emerald-500" />
+                                                                ) : (
+                                                                    <Copy className="h-3 w-3" />
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
 
                                         {/* Port & Protocol */}
                                         <div className="flex items-center justify-between border-t border-border pt-1 text-[11px]">
                                             <span className="font-sans text-muted-foreground">
-                                                {t('port_protocol_label', 'Port / Protokol')}:
+                                                {t(
+                                                    'port_protocol_label',
+                                                    'Port / Protokol',
+                                                )}
+                                                :
                                             </span>
                                             <span className="font-sans text-[11px] text-foreground">
                                                 {isIsup
-                                                    ? t('port_isup', 'Port 7670 (ISUP)')
-                                                    : t('port_http', 'Port 80/443 (HTTP)')}
+                                                    ? `Port ${isupServer.port} (ISUP)`
+                                                    : t(
+                                                          'port_http',
+                                                          'Port 80/443 (HTTP)',
+                                                      )}
                                             </span>
                                         </div>
                                     </div>
@@ -304,7 +370,8 @@ export default function BranchDeviceTable({
                                                     'Oxirgi aloqa vaqti',
                                                 )}
                                             >
-                                                {t('last_seen', 'Oxirgi aloqa')}:{' '}
+                                                {t('last_seen', 'Oxirgi aloqa')}
+                                                :{' '}
                                                 {formatLastSeen(
                                                     item.last_seen_at,
                                                 )}

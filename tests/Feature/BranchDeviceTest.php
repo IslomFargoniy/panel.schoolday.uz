@@ -20,7 +20,7 @@ test('authenticated user can create a branch device with isup connection', funct
         'name' => 'Kirish Turniketi (ISUP)',
         'mac_address' => 'AA:BB:CC:DD:EE:01',
         'connection_type' => 'isup',
-        'device_id' => 'TERM_SCH_01',
+        'device_id' => 'TERMSCH01',
         'encryption_key' => 'Hik12345678',
     ]);
 
@@ -30,7 +30,7 @@ test('authenticated user can create a branch device with isup connection', funct
         'name' => 'Kirish Turniketi (ISUP)',
         'mac_address' => 'AA:BB:CC:DD:EE:01',
         'connection_type' => 'isup',
-        'device_id' => 'TERM_SCH_01',
+        'device_id' => 'TERMSCH01',
     ]);
 });
 

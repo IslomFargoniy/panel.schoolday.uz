@@ -74,9 +74,10 @@ export default function CreateBranchDeviceModal({
             branch_id: initialBranchId,
             name: '',
             mac_address: '',
-            device_id: `branch${initialBranchId}`,
+            // Left empty, the server gives every new ISUP device its own Device ID and key
+            device_id: '',
             connection_type: 'isup',
-            encryption_key: `SchoolDay${initialBranchId}2026`,
+            encryption_key: '',
         });
 
     useEffect(() => {
@@ -85,15 +86,12 @@ export default function CreateBranchDeviceModal({
                 branch_id: deviceToEdit.branch_id,
                 name: deviceToEdit.name || '',
                 mac_address: deviceToEdit.mac_address || '',
-                device_id:
-                    deviceToEdit.device_id || `branch${deviceToEdit.branch_id}`,
+                device_id: deviceToEdit.device_id || '',
                 connection_type:
                     (deviceToEdit.connection_type as
                         | 'isup'
                         | 'http_listening') || 'isup',
-                encryption_key:
-                    (deviceToEdit as any).encryption_key ||
-                    `SchoolDay${deviceToEdit.branch_id}2026`,
+                encryption_key: deviceToEdit.encryption_key || '',
             });
         } else {
             const bId =
@@ -102,9 +100,9 @@ export default function CreateBranchDeviceModal({
                 branch_id: bId,
                 name: '',
                 mac_address: '',
-                device_id: `branch${bId}`,
+                device_id: '',
                 connection_type: 'isup',
-                encryption_key: `SchoolDay${bId}2026`,
+                encryption_key: '',
             });
         }
     }, [deviceToEdit, open, branch?.id, branches, setData]);
@@ -231,12 +229,7 @@ export default function CreateBranchDeviceModal({
                                 value={String(data.branch_id)}
                                 onValueChange={(val) => {
                                     const bId = Number(val);
-                                    setData((prev) => ({
-                                        ...prev,
-                                        branch_id: bId,
-                                        device_id: `branch${bId}`,
-                                        encryption_key: `SchoolDay${bId}2026`,
-                                    }));
+                                    setData('branch_id', bId);
                                 }}
                             >
                                 <SelectTrigger className="h-9 rounded-lg border-input text-xs sm:text-sm">
@@ -281,32 +274,40 @@ export default function CreateBranchDeviceModal({
                         <InputError message={errors.name} />
                     </div>
 
-                    <div className="space-y-1.5">
-                        <Label
-                            htmlFor="mac_address"
-                            className="text-xs font-medium"
-                        >
-                            {t('mac_address', 'MAC manzil')}{' '}
-                            {data.connection_type === 'http_listening' ? (
-                                <span className="text-rose-500">*</span>
-                            ) : (
-                                <span className="text-[11px] font-normal text-muted-foreground">
-                                    ({t('optional', 'ixtiyoriy')})
-                                </span>
-                            )}
-                        </Label>
-                        <Input
-                            id="mac_address"
-                            placeholder="88:de:39:32:d8:0f"
-                            value={data.mac_address}
-                            onChange={(e) =>
-                                setData('mac_address', formatMacInput(e.target.value))
-                            }
-                            className="h-9 rounded-lg border-input font-mono text-xs sm:text-sm"
-                            required={data.connection_type === 'http_listening'}
-                        />
-                        <InputError message={errors.mac_address} />
-                    </div>
+                    {(data.connection_type === 'http_listening' ||
+                        deviceToEdit) && (
+                        <div className="space-y-1.5">
+                            <Label
+                                htmlFor="mac_address"
+                                className="text-xs font-medium"
+                            >
+                                {t('mac_address', 'MAC manzil')}{' '}
+                                {data.connection_type === 'http_listening' ? (
+                                    <span className="text-rose-500">*</span>
+                                ) : (
+                                    <span className="text-[11px] font-normal text-muted-foreground">
+                                        ({t('optional', 'ixtiyoriy')})
+                                    </span>
+                                )}
+                            </Label>
+                            <Input
+                                id="mac_address"
+                                placeholder="88:de:39:32:d8:0f"
+                                value={data.mac_address}
+                                onChange={(e) =>
+                                    setData(
+                                        'mac_address',
+                                        formatMacInput(e.target.value),
+                                    )
+                                }
+                                className="h-9 rounded-lg border-input font-mono text-xs sm:text-sm"
+                                required={
+                                    data.connection_type === 'http_listening'
+                                }
+                            />
+                            <InputError message={errors.mac_address} />
+                        </div>
+                    )}
 
                     <div className="space-y-1.5">
                         <Label
@@ -354,6 +355,14 @@ export default function CreateBranchDeviceModal({
 
                     {data.connection_type === 'isup' && (
                         <div className="space-y-3 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3.5 dark:border-indigo-950 dark:bg-indigo-950/30">
+                            {!deviceToEdit && (
+                                <p className="text-[11px] leading-relaxed text-muted-foreground">
+                                    {t(
+                                        'isup_auto_hint',
+                                        "Bo'sh qoldirsangiz, har bir qurilmaga alohida Device ID va kalit avtomatik beriladi. MAC manzil kerak emas.",
+                                    )}
+                                </p>
+                            )}
                             <div className="space-y-1">
                                 <Label
                                     htmlFor="device_id"
@@ -363,6 +372,10 @@ export default function CreateBranchDeviceModal({
                                 </Label>
                                 <Input
                                     id="device_id"
+                                    placeholder={t(
+                                        'auto_generated',
+                                        'Avtomatik beriladi',
+                                    )}
                                     value={data.device_id}
                                     onChange={(e) =>
                                         setData('device_id', e.target.value)
@@ -384,6 +397,10 @@ export default function CreateBranchDeviceModal({
                                 </Label>
                                 <Input
                                     id="encryption_key"
+                                    placeholder={t(
+                                        'auto_generated',
+                                        'Avtomatik beriladi',
+                                    )}
                                     value={data.encryption_key}
                                     onChange={(e) =>
                                         setData(

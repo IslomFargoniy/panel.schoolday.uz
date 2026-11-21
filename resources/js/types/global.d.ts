@@ -1,4 +1,5 @@
 import type { Auth } from '@/types/auth';
+import type { IsupServer } from '@/types/branch';
 
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
@@ -6,6 +7,7 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            isupServer: IsupServer | null;
             [key: string]: unknown;
         };
     }

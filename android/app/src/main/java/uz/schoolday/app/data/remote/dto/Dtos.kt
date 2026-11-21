@@ -245,8 +245,20 @@ data class DeviceDto(
     val status: Boolean = true,
     val isOnline: Boolean = false,
     val hasEncryptionKey: Boolean = false,
+    /** ISUP only: what to type into the terminal together with the Device ID. */
+    val encryptionKey: String? = null,
     val lastSeenAt: String? = null,
     val branchId: Int? = null,
     val branchName: String? = null,
     val schoolName: String? = null
+)
+
+/** GET v1/devices/connection: what to type into a Hikvision terminal (Platform Access → ISUP 5.0). */
+data class DeviceConnectionDto(
+    val serverIp: String = "",
+    val serverDomain: String? = null,
+    val isupPort: Int = 7670,
+    /** A fresh unique pair for the next device; left empty in the form, the server gives one anyway. */
+    val isupDeviceId: String? = null,
+    val isupKey: String? = null
 )

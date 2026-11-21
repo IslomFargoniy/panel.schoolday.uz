@@ -2,6 +2,7 @@ package uz.schoolday.app.presentation.structure
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,12 +32,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import uz.schoolday.app.data.remote.dto.BranchBody
 import uz.schoolday.app.data.remote.dto.BranchDto
+import uz.schoolday.app.data.remote.dto.DeviceConnectionDto
+import uz.schoolday.app.data.remote.dto.DeviceDto
 import uz.schoolday.app.data.remote.dto.FilterSchool
 import uz.schoolday.app.data.repository.ManageRepository
 import uz.schoolday.app.data.repository.Resource
 import uz.schoolday.app.data.repository.Scope
 import uz.schoolday.app.data.repository.ScopeStore
 import uz.schoolday.app.presentation.components.*
+import uz.schoolday.app.presentation.devices.DeviceInfoDialog
 import uz.schoolday.app.presentation.navigation.OnChangedReturn
 import uz.schoolday.app.presentation.navigation.Screen
 import uz.schoolday.app.presentation.navigation.finishForm
@@ -146,7 +150,7 @@ private fun BranchRow(b: BranchDto, onClick: () -> Unit) {
 
 // ---------------- Detail ----------------
 
-data class BranchDetailUi(val branch: BranchDto? = null, val loading: Boolean = false, val error: String? = null)
+data class BranchDetailUi(val branch: BranchDto? = null, val connection: DeviceConnectionDto? = null, val loading: Boolean = false, val error: String? = null)
 
 @HiltViewModel
 class BranchDetailViewModel @Inject constructor(
@@ -159,6 +163,10 @@ class BranchDetailViewModel @Inject constructor(
 
     init {
         load()
+        // Server address shown when a device is opened
+        viewModelScope.launch {
+            manage.deviceConnection().data?.let { c -> _ui.update { it.copy(connection = c) } }
+        }
     }
 
     fun load() {
@@ -178,6 +186,7 @@ fun BranchDetailScreen(navController: NavController, viewModel: BranchDetailView
     val ui by viewModel.ui.collectAsState()
     val c = SchoolDayTheme.colors
     val b = ui.branch
+    var openDevice by remember { mutableStateOf<DeviceDto?>(null) }
     OnChangedReturn(navController) { viewModel.load() }
 
     Scaffold(
@@ -248,7 +257,7 @@ fun BranchDetailScreen(navController: NavController, viewModel: BranchDetailView
                         b.devices.forEachIndexed { i, d ->
                             if (i > 0) RowDivider()
                             Row(
-                                Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                                Modifier.fillMaxWidth().clickable { openDevice = d }.padding(horizontal = 14.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(Modifier.size(8.dp).clip(CircleShape).background(if (d.isOnline) c.success else c.danger))
@@ -266,6 +275,16 @@ fun BranchDetailScreen(navController: NavController, viewModel: BranchDetailView
                 }
             }
         }
+    }
+    openDevice?.let { d ->
+        DeviceInfoDialog(
+            d, ui.connection,
+            onEdit = {
+                openDevice = null
+                navController.navigate(Screen.DeviceForm.createRoute(deviceId = d.id, branchId = d.branchId ?: b?.id))
+            },
+            onDismiss = { openDevice = null }
+        )
     }
 }
 
